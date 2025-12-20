@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { WorkspaceService } from "@/shared/config/workspace";
 import { DexieTransactionsRepo } from "@/features/transactions/api/repo.dexie";
 import type { Transaction } from "@/features/transactions/model/types";
-import { AddTransactionSheet } from "@/features/transactions/ui/add-transaction-sheet";
+import { TransactionSheet } from "@/features/transactions/ui/transaction-sheet";
 
 type State =
   | { status: "loading" }
@@ -14,7 +14,11 @@ type State =
 export default function TransactionsPage() {
   const repo = useMemo(() => new DexieTransactionsRepo(), []);
   const [state, setState] = useState<State>({ status: "loading" });
-  const [open, setOpen] = useState(false);
+
+  const [createOpen, setCreateOpen] = useState(false);
+
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingTx, setEditingTx] = useState<Transaction | null>(null);
 
   async function load() {
     setState({ status: "loading" });
@@ -31,6 +35,11 @@ export default function TransactionsPage() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function openEdit(tx: Transaction) {
+    setEditingTx(tx);
+    setEditOpen(true);
+  }
 
   return (
     <div className="p-6 space-y-4 relative">
@@ -57,7 +66,11 @@ export default function TransactionsPage() {
         <div className="rounded-2xl border p-6">
           <div className="text-lg font-semibold">Пока нет записей</div>
           <div className="opacity-70 mt-1">Добавь первую трату — это займёт пару секунд.</div>
-          <button className="mt-4 rounded-2xl bg-black text-white px-4 py-3 font-semibold" onClick={() => setOpen(true)}>
+          <button
+            className="mt-4 rounded-2xl bg-black text-white px-4 py-3 font-semibold"
+            onClick={() => setCreateOpen(true)}
+            type="button"
+          >
             Добавить
           </button>
         </div>
@@ -66,30 +79,56 @@ export default function TransactionsPage() {
       {state.status === "ready" && state.items.length > 0 ? (
         <div className="space-y-2">
           {state.items.map((t) => (
-            <div key={t.id} className="rounded-2xl border p-4 flex items-center justify-between">
+            <button
+              key={t.id}
+              className="w-full text-left rounded-2xl border p-4 flex items-center justify-between hover:bg-black/5"
+              onClick={() => openEdit(t)}
+              type="button"
+            >
               <div>
                 <div className="font-medium">{t.note ?? "Без заметки"}</div>
-                <div className="text-sm opacity-70">{t.date} · {t.type}</div>
+                <div className="text-sm opacity-70">
+                  {t.date} · {t.type}
+                </div>
               </div>
               <div className="font-semibold">
-                {t.type === "expense" ? "-" : "+"}{t.amount} {t.currency}
+                {t.type === "expense" ? "-" : "+"}
+                {t.amount} {t.currency}
               </div>
-            </div>
+            </button>
           ))}
         </div>
       ) : null}
 
-      {/* FAB */}
+      {/* FAB create */}
       <button
         className="fixed right-5 bottom-5 rounded-full w-14 h-14 bg-black text-white text-2xl shadow-lg"
-        onClick={() => setOpen(true)}
+        onClick={() => setCreateOpen(true)}
         aria-label="Добавить запись"
         type="button"
       >
         +
       </button>
 
-      <AddTransactionSheet open={open} onClose={() => setOpen(false)} onCreated={load} />
+      {/* Create */}
+      <TransactionSheet
+        open={createOpen}
+        mode="create"
+        onClose={() => setCreateOpen(false)}
+        onChanged={load}
+      />
+
+      {/* Edit */}
+      <TransactionSheet
+        open={editOpen}
+        mode="edit"
+        transaction={editingTx}
+        onClose={() => {
+          setEditOpen(false);
+          setEditingTx(null);
+        }}
+        onChanged={load}
+      />
     </div>
   );
 }

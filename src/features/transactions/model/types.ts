@@ -21,3 +21,12 @@ export type CreateTransactionInput = {
   categoryId?: string | null;
   note?: string | null;
 };
+
+export type UpdateTransactionPatch = Partial<
+  Pick<Transaction, "type" | "amount" | "date" | "categoryId" | "note">
+>;
+
+export type UpdateTransactionInput = {
+  id: string;
+  patch: UpdateTransactionPatch;
+};

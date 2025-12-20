@@ -2,6 +2,7 @@ import type { TransactionsRepo, TransactionListQuery } from "./repo";
 import type { Transaction } from "../model/types";
 import { AppError } from "@/shared/errors/app-error";
 import { db, ensureDbInitialized } from "@/shared/lib/storage/db";
+import { nowIso } from "@/shared/lib/storage/db";
 
 export class DexieTransactionsRepo implements TransactionsRepo {
   async create(workspaceId: string, tx: Transaction): Promise<Transaction> {
@@ -48,4 +49,42 @@ export class DexieTransactionsRepo implements TransactionsRepo {
       });
     }
   }
+
+  async getById(workspaceId: string, id: string) {
+    await ensureDbInitialized();
+    const tx = await db.transactions.get(id);
+    if (!tx || tx.workspaceId !== workspaceId || tx.deletedAt) return null;
+    return tx;
+  }
+
+  async update(workspaceId: string, id: string, patch: Partial<Transaction>) {
+    await ensureDbInitialized();
+
+    const existing = await this.getById(workspaceId, id);
+    if (!existing) throw new AppError("NOT_FOUND", "Transaction not found", { id });
+
+    const updated: Transaction = {
+      ...existing,
+      ...patch,
+      updatedAt: nowIso(),
+    };
+
+  await db.transactions.put(updated);
+  return updated;
 }
+
+  async softDelete(workspaceId: string, id: string) {
+    await ensureDbInitialized();
+
+    const existing = await this.getById(workspaceId, id);
+    if (!existing) return;
+
+    await db.transactions.put({
+      ...existing,
+      deletedAt: nowIso(),
+      updatedAt: nowIso(),
+    });
+}
+
+}
+

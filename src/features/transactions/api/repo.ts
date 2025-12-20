@@ -1,4 +1,4 @@
-import type { Transaction, TransactionType, CreateTransactionInput } from "@/features/transactions/model/types";
+import type { Transaction, TransactionType, CreateTransactionInput } from "../model/types";
 
 export type TransactionListQuery = {
   from?: string;
@@ -11,4 +11,14 @@ export type TransactionListQuery = {
 export interface TransactionsRepo {
   create(workspaceId: string, tx: Transaction): Promise<Transaction>;
   list(workspaceId: string, query?: TransactionListQuery): Promise<Transaction[]>;
+}
+
+export interface TransactionsRepo {
+  create(workspaceId: string, tx: Transaction): Promise<Transaction>;
+  list(workspaceId: string, query?: TransactionListQuery): Promise<Transaction[]>;
+
+  update(workspaceId: string, id: string, patch: Partial<Transaction>): Promise<Transaction>;
+  softDelete(workspaceId: string, id: string): Promise<void>;
+
+  getById(workspaceId: string, id: string): Promise<Transaction | null>;
 }
