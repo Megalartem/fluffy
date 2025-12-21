@@ -5,11 +5,16 @@ export type Category = {
   workspaceId: string;
   name: string;
   type: CategoryType;
-  icon?: string | null;
-  color?: string | null;
+  icon?: string | null;   // optional
+  color?: string | null;  // optional
   isDefault: boolean;
   order: number;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
+};
+
+export type CreateCategoryInput = {
+  name: string;
+  type?: CategoryType; // default "expense"
 };

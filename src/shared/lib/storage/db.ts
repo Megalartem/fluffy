@@ -1,7 +1,7 @@
 import Dexie, { Table } from "dexie";
 import type { AppSettings } from "@/features/settings/model/types";
 import type { Transaction } from "@/features/transactions/model/types";
-import type { Category } from "@/core/domain/category";
+import type { Category } from "@/features/categories/model/types";
 
 export type DbMeta = {
   key: string;
@@ -18,14 +18,19 @@ export class BudgetDB extends Dexie {
   constructor() {
     super("BudgetDB");
 
-    // v1
     this.version(1).stores({
       meta: "&key",
       settings: "&id, workspaceId",
     });
 
-    // v2 (Slice 2): transactions + categories
     this.version(2).stores({
+      meta: "&key",
+      settings: "&id, workspaceId",
+      transactions: "&id, workspaceId, date, type, categoryId, deletedAt",
+    });
+
+    // v3: categories
+    this.version(3).stores({
       meta: "&key",
       settings: "&id, workspaceId",
       transactions: "&id, workspaceId, date, type, categoryId, deletedAt",
@@ -41,7 +46,6 @@ export function nowIso(): string {
 }
 
 export function todayIsoDate(): string {
-  // YYYY-MM-DD in local time
   const d = new Date();
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -53,11 +57,10 @@ export async function ensureDbInitialized(): Promise<void> {
   const key = "schemaVersion";
   const existing = await db.meta.get(key);
   if (!existing) {
-    await db.meta.put({ key, value: "2", updatedAt: nowIso() });
+    await db.meta.put({ key, value: "3", updatedAt: nowIso() });
     return;
   }
-  // если обновились со старой версии — перезапишем версию в meta
-  if (existing.value !== "2") {
-    await db.meta.put({ key, value: "2", updatedAt: nowIso() });
+  if (existing.value !== "3") {
+    await db.meta.put({ key, value: "3", updatedAt: nowIso() });
   }
 }

@@ -5,6 +5,10 @@ import { WorkspaceService } from "@/shared/config/workspace";
 import { DexieTransactionsRepo } from "@/features/transactions/api/repo.dexie";
 import type { Transaction } from "@/features/transactions/model/types";
 import { TransactionSheet } from "@/features/transactions/ui/transaction-sheet";
+import { ensureDefaultCategoriesSeeded } from "@/features/categories/model/seed";
+import { DexieCategoriesRepo } from "@/features/categories/api/repo.dexie";
+import type { Category } from "@/features/categories/model/types";
+
 
 type State =
   | { status: "loading" }
@@ -19,17 +23,32 @@ export default function TransactionsPage() {
 
   const [editOpen, setEditOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [categoriesMap, setCategoriesMap] = useState<Map<string, Category>>(new Map());
+
 
   async function load() {
     setState({ status: "loading" });
     try {
       const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-      const items = await repo.list(workspaceId, { limit: 50 });
+
+      const [items, categories] = await Promise.all([
+        repo.list(workspaceId, { limit: 50 }),
+        new DexieCategoriesRepo().list(workspaceId),
+      ]);
+
+      const map = new Map<string, Category>();
+      categories.forEach((c) => map.set(c.id, c));
+      setCategoriesMap(map);
+
       setState({ status: "ready", items });
     } catch (e) {
-      setState({ status: "error", message: e instanceof Error ? e.message : "Unknown error" });
+      setState({
+        status: "error",
+        message: e instanceof Error ? e.message : "Unknown error",
+      });
     }
   }
+
 
   useEffect(() => {
     load();
@@ -78,27 +97,36 @@ export default function TransactionsPage() {
 
       {state.status === "ready" && state.items.length > 0 ? (
         <div className="space-y-2">
-          {state.items.map((t) => (
-            <button
-              key={t.id}
-              className="w-full text-left rounded-2xl border p-4 flex items-center justify-between hover:bg-black/5"
-              onClick={() => openEdit(t)}
-              type="button"
-            >
-              <div>
-                <div className="font-medium">{t.note ?? "Без заметки"}</div>
-                <div className="text-sm opacity-70">
-                  {t.date} · {t.type}
+          {state.items.map((t) => {
+            const category = t.categoryId ? categoriesMap.get(t.categoryId) : null;
+
+            return (
+              <button
+                key={t.id}
+                className="w-full text-left rounded-2xl border p-4 flex items-center justify-between hover:bg-black/5"
+                onClick={() => openEdit(t)}
+                type="button"
+              >
+                <div>
+                  <div className="font-medium">
+                    {category?.name ?? "Без категории"}
+                  </div>
+
+                  <div className="text-sm opacity-70">
+                    {t.note ? t.note : t.date}
+                  </div>
                 </div>
-              </div>
-              <div className="font-semibold">
-                {t.type === "expense" ? "-" : "+"}
-                {t.amount} {t.currency}
-              </div>
-            </button>
-          ))}
+
+                <div className="font-semibold tabular-nums">
+                  {t.type === "expense" ? "-" : "+"}
+                  {t.amount} {t.currency}
+                </div>
+              </button>
+            );
+          })}
         </div>
       ) : null}
+
 
       {/* FAB create */}
       <button

@@ -7,6 +7,9 @@ import { WorkspaceService } from "@/shared/config/workspace";
 import { DexieSettingsRepo } from "@/features/settings/api/repo.dexie";
 import { DexieTransactionsRepo } from "@/features/transactions/api/repo.dexie";
 import { TransactionService } from "@/features/transactions/model/service";
+import { DexieCategoriesRepo } from "@/features/categories/api/repo.dexie";
+import type { Category } from "@/features/categories/model/types";
+
 
 type Mode = "create" | "edit";
 
@@ -34,6 +37,9 @@ export function TransactionSheet({
   const [note, setNote] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryId, setCategoryId] = useState<string>(""); // "" = none
+
 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
@@ -41,26 +47,42 @@ export function TransactionSheet({
   useEffect(() => {
     if (!open) return;
 
-    setError(null);
-    setSaving(false);
+    (async () => {
+      try {
+        const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
+        const list = await new DexieCategoriesRepo().list(workspaceId);
+        setCategories(list);
 
-    if (mode === "edit") {
-      const tx = transaction;
-      if (!tx) {
-        setError("Не удалось открыть запись (не найдена).");
-        return;
+        if (mode === "edit" && transaction) {
+          setCategoryId(transaction.categoryId ?? "");
+        } else {
+          setCategoryId("");
+        }
+      } catch {
+        setCategories([]);
       }
-      setType(tx.type);
-      setAmount(String(tx.amount));
-      setNote(tx.note ?? "");
-    } else {
-      setType("expense");
-      setAmount("");
-      setNote("");
-    }
-
-    setTimeout(() => amountRef.current?.focus(), 0);
+    })();
   }, [open, mode, transaction]);
+  useEffect(() => {
+    if (!open) return;
+
+    (async () => {
+      try {
+        const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
+        const list = await new DexieCategoriesRepo().list(workspaceId);
+        setCategories(list);
+
+        if (mode === "edit" && transaction) {
+          setCategoryId(transaction.categoryId ?? "");
+        } else {
+          setCategoryId("");
+        }
+      } catch {
+        setCategories([]);
+      }
+    })();
+  }, [open, mode, transaction]);
+
 
   function parseAmount(input: string): number | null {
     const parsed = Number(input.replace(",", "."));
@@ -86,6 +108,7 @@ export function TransactionSheet({
           type,
           amount: parsedAmount,
           note: note.trim() ? note.trim() : null,
+          categoryId: categoryId ? categoryId : null,
         });
       } else {
         if (!transaction?.id) {
@@ -98,6 +121,7 @@ export function TransactionSheet({
             type,
             amount: parsedAmount,
             note: note.trim() ? note.trim() : null,
+            categoryId: categoryId ? categoryId : null,
           },
         });
       }
@@ -148,6 +172,23 @@ export function TransactionSheet({
             />
             {error ? <div className="mt-2 text-sm text-red-600">{error}</div> : null}
           </div>
+
+          <div>
+            <label className="text-sm opacity-70">Категория (опционально)</label>
+            <select
+              className="mt-1 w-full rounded-xl border px-3 py-3"
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+            >
+              <option value="">Без категории</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
 
           <div>
             <label className="text-sm opacity-70">Тип</label>
