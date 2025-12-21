@@ -14,7 +14,9 @@ import { GoalsService } from "@/features/goals/model/service";
 import type { Goal } from "@/features/goals/model/types";
 import { GoalMiniCard } from "@/features/goals/ui/goal-mini-card";
 import { GoalQuickAddSheet } from "@/features/goals/ui/goal-quick-add-sheet";
-
+import { NotificationsService } from "@/features/notifications/model/service";
+import type { Notice } from "@/features/notifications/model/types";
+import { NotificationsBell } from "@/features/notifications/ui/notifications-bell";
 
 
 
@@ -33,23 +35,38 @@ export default function DashboardPage() {
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
+  const [notices, setNotices] = useState<Notice[]>([]);
+
 
 
   async function load() {
     setLoading(true);
-    const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-    Promise.all([
-      new DashboardService().getMonthlySummary(workspaceId, period),
-      new BudgetService().getBudgetStatus(workspaceId, period),
-      new GoalsService().list(workspaceId),
-    ]).then(([data, budgetStatus, goals]) => {
+    try {
+      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
+
+      const [data, goals] = await Promise.all([
+        new DashboardService().getMonthlySummary(workspaceId, period),
+        new GoalsService().list(workspaceId),
+      ]);
+
+      const budgetStatus = await new BudgetService().getBudgetStatus(workspaceId, data.month);
+
+      const noticeList = await new NotificationsService().getDashboardNotices({
+        workspaceId,
+        month: data.month,
+        budget: budgetStatus,
+        goals,
+      });
+
       setSummary(data);
       setBudget(budgetStatus);
       setGoals(goals);
-    }).finally(() => {
+      setNotices(noticeList);
+    } finally {
       setLoading(false);
-    });
+    }
   }
+
 
   async function saveQuickAdd(amount: number) {
     if (!selectedGoal) return;
@@ -68,6 +85,7 @@ export default function DashboardPage() {
       setSavingGoalId(null);
     }
   }
+
 
 
   function openQuickAdd(goal: Goal) {
@@ -104,9 +122,22 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">
-        Обзор · {summary.label || "Месяц"}
-      </h1>
+<div className="flex items-center justify-between gap-3">
+  <h1 className="text-2xl font-semibold">Обзор · {summary.label}</h1>
+
+  <div className="flex items-center gap-2">
+    {/* period toggle (если есть) */}
+    <NotificationsBell
+      notices={notices}
+      onDismiss={async (n) => {
+        await new NotificationsService().dismissNotice(n.dismissKey, n.dismissValue);
+        setNotices((prev) => prev.filter((x) => x.id !== n.id));
+      }}
+    />
+  </div>
+</div>
+
+
 
       <div className="flex gap-2">
         <button
