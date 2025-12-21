@@ -9,6 +9,12 @@ import { BudgetService } from "@/features/budgets/model/service";
 import { BudgetCard } from "@/features/budgets/ui/budget-card";
 import { BudgetLimitSheet } from "@/features/budgets/ui/budget-limit-sheet";
 import type { BudgetStatus } from "@/features/budgets/model/types";
+import Link from "next/link";
+import { GoalsService } from "@/features/goals/model/service";
+import type { Goal } from "@/features/goals/model/types";
+import { GoalMiniCard } from "@/features/goals/ui/goal-mini-card";
+import { GoalQuickAddSheet } from "@/features/goals/ui/goal-quick-add-sheet";
+
 
 
 
@@ -23,7 +29,10 @@ export default function DashboardPage() {
   const [period, setPeriod] = useState<"current" | "previous">("current");
   const [budget, setBudget] = useState<BudgetStatus | null>(null);
   const [budgetOpen, setBudgetOpen] = useState(false);
-
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [savingGoalId, setSavingGoalId] = useState<string | null>(null);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
 
 
   async function load() {
@@ -32,13 +41,48 @@ export default function DashboardPage() {
     Promise.all([
       new DashboardService().getMonthlySummary(workspaceId, period),
       new BudgetService().getBudgetStatus(workspaceId, period),
-    ]).then(([data, budgetStatus]) => {
+      new GoalsService().list(workspaceId),
+    ]).then(([data, budgetStatus, goals]) => {
       setSummary(data);
       setBudget(budgetStatus);
+      setGoals(goals);
     }).finally(() => {
       setLoading(false);
     });
   }
+
+  async function saveQuickAdd(amount: number) {
+    if (!selectedGoal) return;
+
+    setSavingGoalId(selectedGoal.id);
+    try {
+      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
+      await new GoalsService().addToGoal(workspaceId, selectedGoal.id, amount);
+
+      const goalsList = await new GoalsService().list(workspaceId);
+      setGoals(goalsList);
+
+      setQuickAddOpen(false);
+      setSelectedGoal(null);
+    } finally {
+      setSavingGoalId(null);
+    }
+  }
+
+
+  function openQuickAdd(goal: Goal) {
+    if (savingGoalId) return;
+    setSelectedGoal(goal);
+    setQuickAddOpen(true);
+  }
+
+  function closeQuickAdd() {
+    if (savingGoalId) return;
+    setQuickAddOpen(false);
+    setSelectedGoal(null);
+  }
+
+
 
   useEffect(() => {
     load();
@@ -51,6 +95,12 @@ export default function DashboardPage() {
   if (!summary) {
     return <div className="p-6">Нет данных</div>;
   }
+
+  const topGoals = [...goals]
+    .filter((g) => !g.deletedAt)
+    .sort(goalSort)
+    .slice(0, 3);
+
 
   return (
     <div className="p-6 space-y-6">
@@ -115,6 +165,40 @@ export default function DashboardPage() {
         }}
       />
 
+      <div className="rounded-2xl border p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="font-semibold">Цели</div>
+          <Link className="text-sm underline opacity-80" href="/goals">
+            Все цели
+          </Link>
+        </div>
+
+        {topGoals.length === 0 ? (
+          <div className="opacity-70 text-sm">
+            Пока нет целей. Добавь цель — и прогресс будет виден прямо здесь.
+            <div className="mt-2">
+              <Link className="underline" href="/goals">
+                Создать цель
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {topGoals.map((g) => (
+              <GoalMiniCard
+                key={g.id}
+                goal={g}
+                onQuickAddClick={openQuickAdd}
+                isSaving={savingGoalId === g.id}
+              />
+            ))}
+
+
+          </div>
+        )}
+      </div>
+
+
       {/* Trend */}
       <div className="rounded-2xl border p-4 space-y-3">
         <div className="flex items-center justify-between">
@@ -165,6 +249,42 @@ export default function DashboardPage() {
         </div>
       )}
 
+
+      <GoalQuickAddSheet
+        open={quickAddOpen}
+        goal={selectedGoal}
+        isSaving={Boolean(savingGoalId)}
+        onClose={closeQuickAdd}
+        onSave={saveQuickAdd}
+      />
+
     </div>
   );
+}
+
+function goalProgress(g: { currentAmount: number; targetAmount: number }) {
+  if (!Number.isFinite(g.targetAmount) || g.targetAmount <= 0) return 0;
+  return Math.min(1, g.currentAmount / g.targetAmount);
+}
+
+function goalSort(a: any, b: any) {
+  const aHasDeadline = Boolean(a.deadline);
+  const bHasDeadline = Boolean(b.deadline);
+
+  // 1) Дедлайн есть → выыше
+  if (aHasDeadline !== bHasDeadline) return aHasDeadline ? -1 : 1;
+
+  // 2) Оба с дедлайном → ближайший выше
+  if (aHasDeadline && bHasDeadline) {
+    const cmp = String(a.deadline).localeCompare(String(b.deadline));
+    if (cmp !== 0) return cmp;
+  }
+
+  // 3) Без дедлайна (или одинаковые дедлайны) → меньший прогресс выше
+  const ap = goalProgress(a);
+  const bp = goalProgress(b);
+  if (ap !== bp) return ap - bp;
+
+  // 4) Стабильность
+  return String(a.title).localeCompare(String(b.title));
 }
