@@ -1,9 +1,5 @@
-import type { ReactNode } from "react";
+import { AppShell } from "./app-shell";
 
-export default function AppLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="min-h-dvh">
-      {children}
-    </div>
-  );
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return <AppShell>{children}</AppShell>;
 }

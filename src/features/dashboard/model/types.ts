@@ -9,10 +9,14 @@ export type CategorySummary = {
 
 export type MonthlySummary = {
   month: string; // YYYY-MM
+  label: string; // Месяц ГГГГ
   incomeTotal: number;
   expenseTotal: number;
   balance: number;
   topCategories: CategorySummary[];
+  daily: DailyPoint[];
+  avgExpensePerDay: number;
+  peakExpenseDay: DailyPoint | null;
 };
 
 export type DailyPoint = {
@@ -20,10 +24,3 @@ export type DailyPoint = {
   date: string;       // YYYY-MM-DD
   expenseTotal: number;
 };
-
-export type TrendSummary = {
-  daily: DailyPoint[];
-  avgExpensePerDay: number;
-  peakExpenseDay: DailyPoint | null;
-};
-

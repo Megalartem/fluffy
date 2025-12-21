@@ -67,7 +67,6 @@ export default function DashboardPage() {
     }
   }
 
-
   async function saveQuickAdd(amount: number) {
     if (!selectedGoal) return;
 
@@ -86,8 +85,6 @@ export default function DashboardPage() {
     }
   }
 
-
-
   function openQuickAdd(goal: Goal) {
     if (savingGoalId) return;
     setSelectedGoal(goal);
@@ -99,7 +96,6 @@ export default function DashboardPage() {
     setQuickAddOpen(false);
     setSelectedGoal(null);
   }
-
 
 
   useEffect(() => {
@@ -122,20 +118,20 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 space-y-6">
-<div className="flex items-center justify-between gap-3">
-  <h1 className="text-2xl font-semibold">Обзор · {summary.label}</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Обзор · {summary.label}</h1>
 
-  <div className="flex items-center gap-2">
-    {/* period toggle (если есть) */}
-    <NotificationsBell
-      notices={notices}
-      onDismiss={async (n) => {
-        await new NotificationsService().dismissNotice(n.dismissKey, n.dismissValue);
-        setNotices((prev) => prev.filter((x) => x.id !== n.id));
-      }}
-    />
-  </div>
-</div>
+        <div className="flex items-center gap-2">
+          {/* period toggle (если есть) */}
+          <NotificationsBell
+            notices={notices}
+            onDismiss={async (n) => {
+              await new NotificationsService().dismissNotice(n.dismissKey, n.dismissValue);
+              setNotices((prev) => prev.filter((x) => x.id !== n.id));
+            }}
+          />
+        </div>
+      </div>
 
 
 
