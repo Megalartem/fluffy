@@ -2,6 +2,10 @@ import Dexie, { Table } from "dexie";
 import type { AppSettings } from "@/features/settings/model/types";
 import type { Transaction } from "@/features/transactions/model/types";
 import type { Category } from "@/features/categories/model/types";
+import type { MonthlyBudget } from "@/features/budgets/model/types";
+import type { Goal } from "@/features/goals/model/types";
+
+
 
 export type DbMeta = {
   key: string;
@@ -14,6 +18,10 @@ export class BudgetDB extends Dexie {
   settings!: Table<AppSettings, string>;
   transactions!: Table<Transaction, string>;
   categories!: Table<Category, string>;
+  budgets!: Table<MonthlyBudget, string>;
+  goals!: Table<Goal, string>;
+
+
 
   constructor() {
     super("BudgetDB");
@@ -36,6 +44,24 @@ export class BudgetDB extends Dexie {
       transactions: "&id, workspaceId, date, type, categoryId, deletedAt",
       categories: "&id, workspaceId, type, order, deletedAt",
     });
+
+    this.version(4).stores({
+      meta: "&key",
+      settings: "&id, workspaceId",
+      transactions: "&id, workspaceId, date, type, categoryId, deletedAt",
+      categories: "&id, workspaceId, type, order, deletedAt",
+      budgets: "&id, workspaceId, month, deletedAt",
+    });
+
+    this.version(5).stores({
+      meta: "&key",
+      settings: "&id, workspaceId",
+      transactions: "&id, workspaceId, date, type, categoryId, deletedAt",
+      categories: "&id, workspaceId, type, order, deletedAt",
+      budgets: "&id, workspaceId, month, deletedAt",
+      goals: "&id, workspaceId, targetAmount, currentAmount, deadline, deletedAt",
+    });
+
   }
 }
 
