@@ -17,12 +17,7 @@ import { GoalQuickAddSheet } from "@/features/goals/ui/goal-quick-add-sheet";
 import { NotificationsService } from "@/features/notifications/model/service";
 import type { Notice } from "@/features/notifications/model/types";
 import { NotificationsBell } from "@/features/notifications/ui/notifications-bell";
-
-
-
-function fmt(n: number) {
-  return n.toLocaleString("ru-RU");
-}
+import { fmt } from "@/shared/lib/formatter";
 
 
 export default function DashboardPage() {
