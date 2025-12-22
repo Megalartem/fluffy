@@ -1,33 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { WorkspaceService } from "@/shared/config/workspace";
-import { DexieCategoriesRepo } from "@/features/categories/api/repo.dexie";
+import { useEffect, useState } from "react";
 import type { Category } from "@/features/categories/model/types";
-import { ensureDefaultCategoriesSeeded } from "@/features/categories/model/seed";
 import { Modal } from "@/shared/ui/modal";
-import { nowIso } from "@/shared/lib/storage/db";
-
-function makeId(prefix: string) {
-  return `${prefix}_${crypto.randomUUID()}`;
-}
+import { useCategories } from "@/features/categories/hooks/use-categories";
 
 export default function CategoriesPage() {
-  const repo = useMemo(() => new DexieCategoriesRepo(), []);
-  const [items, setItems] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { items, loading, load, create, rename, remove } = useCategories();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [name, setName] = useState("");
-
-  async function load() {
-    setLoading(true);
-    const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-    await ensureDefaultCategoriesSeeded(workspaceId);
-    const list = await repo.list(workspaceId);
-    setItems(list);
-    setLoading(false);
-  }
 
   useEffect(() => {
     load();
@@ -35,46 +17,22 @@ export default function CategoriesPage() {
   }, []);
 
   async function addCategory() {
-    const n = name.trim();
-    if (!n) return;
-
-    const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-    const maxOrder = items.reduce((m, c) => Math.max(m, c.order), 0);
-
-    const now = nowIso();
-    await repo.create(workspaceId, {
-      id: makeId("cat"),
-      workspaceId,
-      name: n,
-      type: "expense",
-      icon: null,
-      color: null,
-      isDefault: false,
-      order: maxOrder + 10,
-      createdAt: now,
-      updatedAt: now,
-      deletedAt: null,
-    });
-
+    if (!name.trim()) return;
+    await create(name);
     setCreateOpen(false);
     setName("");
-    await load();
   }
 
   async function renameCategory(cat: Category) {
     const newName = prompt("Новое название категории:", cat.name);
     if (!newName) return;
-    const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-    await repo.update(workspaceId, cat.id, { name: newName.trim() });
-    await load();
+    await rename(cat.id, newName);
   }
 
   async function deleteCategory(cat: Category) {
     const ok = confirm(`Удалить категорию "${cat.name}"?`);
     if (!ok) return;
-    const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-    await repo.softDelete(workspaceId, cat.id);
-    await load();
+    await remove(cat.id);
   }
 
   return (
