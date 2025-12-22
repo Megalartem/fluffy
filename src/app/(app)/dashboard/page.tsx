@@ -170,7 +170,7 @@ export default function DashboardPage() {
         <div className="text-sm opacity-70">Баланс</div>
         <div className="text-2xl font-semibold mt-1">
           {summary.balance >= 0 ? "+" : ""}
-          {summary.balance}
+          {fmt(summary.balance)}
         </div>
       </div>
 
