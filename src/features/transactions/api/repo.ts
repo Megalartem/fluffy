@@ -16,6 +16,7 @@ export interface TransactionsRepo {
 export interface TransactionsRepo {
   create(workspaceId: string, tx: Transaction): Promise<Transaction>;
   list(workspaceId: string, query?: TransactionListQuery): Promise<Transaction[]>;
+  listRecent(workspaceId: string, params?: { type?: "expense" | "income"; limit?: number }): Promise<Transaction[]>;
 
   update(workspaceId: string, id: string, patch: Partial<Transaction>): Promise<Transaction>;
   softDelete(workspaceId: string, id: string): Promise<void>;

@@ -50,6 +50,32 @@ export class DexieTransactionsRepo implements TransactionsRepo {
     }
   }
 
+  async listRecent(
+    workspaceId: string,
+    params?: { type?: "expense" | "income"; limit?: number }
+  ) {
+    const type = params?.type;
+    const limit = params?.limit ?? 5;
+    const sortField: "createdAt" | "occurredAt" | "updatedAt" = "createdAt";
+
+    // 1) Берём по workspaceId
+    let coll = await db.transactions
+      .where("workspaceId")
+      .equals(workspaceId)
+      .filter((t) => !t.deletedAt)
+      .toArray();
+
+    // 2) Фильтруем удалённые и по типу
+    coll = coll.filter((t: any) => !t.deletedAt && (!type || t.type === type));
+
+    // 3) Сортируем по времени убыванию
+    coll.sort((a: any, b: any) => String(b[sortField] ?? "").localeCompare(String(a[sortField] ?? "")));
+
+    // 4) Ограничиваем
+    return coll.slice(0, limit);
+  }
+
+
   async getById(workspaceId: string, id: string) {
     await ensureDbInitialized();
     const tx = await db.transactions.get(id);
@@ -69,9 +95,9 @@ export class DexieTransactionsRepo implements TransactionsRepo {
       updatedAt: nowIso(),
     };
 
-  await db.transactions.put(updated);
-  return updated;
-}
+    await db.transactions.put(updated);
+    return updated;
+  }
 
   async softDelete(workspaceId: string, id: string) {
     await ensureDbInitialized();
@@ -84,7 +110,7 @@ export class DexieTransactionsRepo implements TransactionsRepo {
       deletedAt: nowIso(),
       updatedAt: nowIso(),
     });
-}
+  }
 
 }
 

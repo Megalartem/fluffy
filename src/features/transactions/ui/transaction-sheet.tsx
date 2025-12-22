@@ -49,28 +49,25 @@ export function TransactionSheet({
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryId, setCategoryId] = useState<string>(""); // "" = none
   const [defaults, setDefaults] = useState<LastTransactionDefaults | null>(null);
-
-
-
+  const [presets, setPresets] = useState<Transaction[]>([]);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
-
     let cancelled = false;
 
     (async () => {
       try {
         const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
 
-        const [cats, rawDefaults] = await Promise.all([
+        const [cats, rawDefaults, recent] = await Promise.all([
           new DexieCategoriesRepo().list(workspaceId),
           new MetaService().get(LAST_TX_DEFAULTS_KEY),
+          new DexieTransactionsRepo().listRecent(workspaceId, { type: "expense", limit: 5 }),
         ]);
-
         if (cancelled) return;
-
         setCategories(cats);
+        setPresets(recent);
 
         let parsedDefaults: LastTransactionDefaults | null = null;
         if (rawDefaults) {
@@ -220,6 +217,35 @@ export function TransactionSheet({
             />
             {error ? <div className="mt-2 text-sm text-red-600">{error}</div> : null}
           </div>
+          {/* Presets */}
+          {mode === "create" && presets.length > 0 ? (
+            <div className="space-y-2">
+              <div className="text-sm opacity-70">Быстрые шаблоны</div>
+              <div className="flex gap-2 overflow-auto pb-1">
+                {presets.map((p) => {
+                  const catName =
+                    p.categoryId ? categories.find((c) => c.id === p.categoryId)?.name : null;
+
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      className="shrink-0 rounded-full border px-3 py-2 text-sm"
+                      onClick={() => {
+                        setType("expense");
+                        setAmount(String(p.amount));
+                        setCategoryId(p.categoryId ?? "");
+                        setTimeout(() => amountRef.current?.focus(), 0);
+                      }}
+                      title="Применить шаблон"
+                    >
+                      {catName ? `${catName} · ${p.amount}` : `Расход · ${p.amount}`}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
 
           <div>
             <label className="text-sm opacity-70">Категория (опционально)</label>
