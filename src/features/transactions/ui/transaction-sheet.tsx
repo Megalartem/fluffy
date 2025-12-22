@@ -9,6 +9,15 @@ import { DexieTransactionsRepo } from "@/features/transactions/api/repo.dexie";
 import { TransactionService } from "@/features/transactions/model/service";
 import { DexieCategoriesRepo } from "@/features/categories/api/repo.dexie";
 import type { Category } from "@/features/categories/model/types";
+import { MetaService } from "@/shared/lib/storage/meta";
+
+const LAST_TX_DEFAULTS_KEY = "last_transaction_defaults";
+
+type LastTransactionDefaults = {
+  type: "expense" | "income";
+  categoryId: string | null;
+  currency: string;
+};
 
 
 type Mode = "create" | "edit";
@@ -39,30 +48,13 @@ export function TransactionSheet({
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryId, setCategoryId] = useState<string>(""); // "" = none
+  const [defaults, setDefaults] = useState<LastTransactionDefaults | null>(null);
+
 
 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   // Prefill when opening in edit mode
-  useEffect(() => {
-    if (!open) return;
-
-    (async () => {
-      try {
-        const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-        const list = await new DexieCategoriesRepo().list(workspaceId);
-        setCategories(list);
-
-        if (mode === "edit" && transaction) {
-          setCategoryId(transaction.categoryId ?? "");
-        } else {
-          setCategoryId("");
-        }
-      } catch {
-        setCategories([]);
-      }
-    })();
-  }, [open, mode, transaction]);
   useEffect(() => {
     if (!open) return;
 
