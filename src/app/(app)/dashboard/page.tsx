@@ -1,78 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { WorkspaceService } from "@/shared/config/workspace";
-import { DashboardService } from "@/features/dashboard/model/service";
-import type { MonthlySummary } from "@/features/dashboard/model/types";
+import { useState } from "react";
+import Link from "next/link";
+import { fmt } from "@/shared/lib/formatter";
 import { Sparkline } from "@/features/dashboard/ui/sparkline";
-import { BudgetService } from "@/features/budgets/model/service";
 import { BudgetCard } from "@/features/budgets/ui/budget-card";
 import { BudgetLimitSheet } from "@/features/budgets/ui/budget-limit-sheet";
-import type { BudgetStatus } from "@/features/budgets/model/types";
-import Link from "next/link";
-import { GoalsService } from "@/features/goals/model/service";
-import type { Goal } from "@/features/goals/model/types";
 import { GoalMiniCard } from "@/features/goals/ui/goal-mini-card";
 import { GoalQuickAddSheet } from "@/features/goals/ui/goal-quick-add-sheet";
-import { NotificationsService } from "@/features/notifications/model/service";
-import type { Notice } from "@/features/notifications/model/types";
 import { NotificationsBell } from "@/features/notifications/ui/notifications-bell";
-import { fmt } from "@/shared/lib/formatter";
+import type { Goal } from "@/features/goals/model/types";
+import { useDashboardData } from "@/features/dashboard/model/use-dashboard-data";
+import { PeriodToggle } from "@/features/dashboard/ui/period-toggle";
 
 
 export default function DashboardPage() {
-  const [summary, setSummary] = useState<MonthlySummary | null>(null);
-  const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<"current" | "previous">("current");
-  const [budget, setBudget] = useState<BudgetStatus | null>(null);
+  const { loading, summary, budget, goals, notices, setBudgetLimit, dismissNotice, addToGoal } =
+    useDashboardData(period);
+
   const [budgetOpen, setBudgetOpen] = useState(false);
-  const [goals, setGoals] = useState<Goal[]>([]);
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
-  const [notices, setNotices] = useState<Notice[]>([]);
-
-
-
-  async function load() {
-    setLoading(true);
-    try {
-      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-
-      const [data, goals] = await Promise.all([
-        new DashboardService().getMonthlySummary(workspaceId, period),
-        new GoalsService().list(workspaceId),
-      ]);
-
-      const budgetStatus = await new BudgetService().getBudgetStatus(workspaceId, data.month);
-
-      const noticeList = await new NotificationsService().getDashboardNotices({
-        workspaceId,
-        month: data.month,
-        budget: budgetStatus,
-        goals,
-      });
-
-      setSummary(data);
-      setBudget(budgetStatus);
-      setGoals(goals);
-      setNotices(noticeList);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function saveQuickAdd(amount: number) {
     if (!selectedGoal) return;
-
     setSavingGoalId(selectedGoal.id);
     try {
-      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-      await new GoalsService().addToGoal(workspaceId, selectedGoal.id, amount);
-
-      const goalsList = await new GoalsService().list(workspaceId);
-      setGoals(goalsList);
-
+      await addToGoal(selectedGoal.id, amount);
       setQuickAddOpen(false);
       setSelectedGoal(null);
     } finally {
@@ -91,11 +47,7 @@ export default function DashboardPage() {
     setQuickAddOpen(false);
     setSelectedGoal(null);
   }
-
-
-  useEffect(() => {
-    load();
-  }, [period]);
+  
 
   if (loading) {
     return <div className="p-6">Loading…</div>;
@@ -117,35 +69,11 @@ export default function DashboardPage() {
         <h1 className="text-2xl font-semibold">Обзор · {summary.label}</h1>
 
         <div className="flex items-center gap-2">
-          {/* period toggle (если есть) */}
-          <NotificationsBell
-            notices={notices}
-            onDismiss={async (n) => {
-              await new NotificationsService().dismissNotice(n.dismissKey, n.dismissValue);
-              setNotices((prev) => prev.filter((x) => x.id !== n.id));
-            }}
-          />
+          <NotificationsBell notices={notices} onDismiss={dismissNotice} />
         </div>
       </div>
 
-
-
-      <div className="flex gap-2">
-        <button
-          className={`rounded-xl px-3 py-2 border ${period === "current" ? "bg-black text-white" : ""
-            }`}
-          onClick={() => setPeriod("current")}
-        >
-          Этот месяц
-        </button>
-        <button
-          className={`rounded-xl px-3 py-2 border ${period === "previous" ? "bg-black text-white" : ""
-            }`}
-          onClick={() => setPeriod("previous")}
-        >
-          Прошлый
-        </button>
-      </div>
+      <PeriodToggle value={period} onChange={setPeriod} />
 
       {/* Totals */}
       <div className="grid grid-cols-2 gap-4">
@@ -173,20 +101,17 @@ export default function DashboardPage() {
       {budget ? (
         <BudgetCard status={budget} onSetLimit={() => setBudgetOpen(true)} />
       ) : null}
-
       <BudgetLimitSheet
         open={budgetOpen}
         currency={budget?.currency ?? "₽"}
         initialValue={budget?.limit ?? null}
         onClose={() => setBudgetOpen(false)}
         onSave={async (limit) => {
-          const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-          await new BudgetService().setMonthlyLimit(workspaceId, summary.month, limit);
-          const refreshed = await new BudgetService().getBudgetStatus(workspaceId, summary.month);
-          setBudget(refreshed);
+          await setBudgetLimit(limit);
         }}
       />
 
+      {/* Top goals */}
       <div className="rounded-2xl border p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="font-semibold">Цели</div>
@@ -194,7 +119,6 @@ export default function DashboardPage() {
             Все цели
           </Link>
         </div>
-
         {topGoals.length === 0 ? (
           <div className="opacity-70 text-sm">
             Пока нет целей. Добавь цель — и прогресс будет виден прямо здесь.
@@ -270,7 +194,6 @@ export default function DashboardPage() {
           ))}
         </div>
       )}
-
 
       <GoalQuickAddSheet
         open={quickAddOpen}
