@@ -16,7 +16,7 @@ const LAST_TX_DEFAULTS_KEY = "last_transaction_defaults";
 type LastTransactionDefaults = {
   type: "expense" | "income";
   categoryId: string | null;
-  currency: string;
+  currency?: string;
 };
 
 
@@ -54,25 +54,74 @@ export function TransactionSheet({
 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
-  // Prefill when opening in edit mode
   useEffect(() => {
     if (!open) return;
+
+    let cancelled = false;
 
     (async () => {
       try {
         const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-        const list = await new DexieCategoriesRepo().list(workspaceId);
-        setCategories(list);
 
+        const [cats, rawDefaults] = await Promise.all([
+          new DexieCategoriesRepo().list(workspaceId),
+          new MetaService().get(LAST_TX_DEFAULTS_KEY),
+        ]);
+
+        if (cancelled) return;
+
+        setCategories(cats);
+
+        let parsedDefaults: LastTransactionDefaults | null = null;
+        if (rawDefaults) {
+          try {
+            parsedDefaults = JSON.parse(rawDefaults);
+          } catch {
+            parsedDefaults = null;
+          }
+        }
+        setDefaults(parsedDefaults);
+
+        // Init form
         if (mode === "edit" && transaction) {
+          setType(transaction.type);
+          setAmount(String(transaction.amount));
+          setNote(transaction.note ?? "");
           setCategoryId(transaction.categoryId ?? "");
         } else {
+          setType(parsedDefaults?.type ?? "expense");
+          setAmount("");
+          setNote("");
+          setCategoryId(parsedDefaults?.categoryId ?? "");
+        }
+
+        // focus amount
+        setTimeout(() => amountRef.current?.focus(), 0);
+      } catch {
+        if (cancelled) return;
+        setCategories([]);
+        setDefaults(null);
+
+        // fallback init (create)
+        if (mode === "edit" && transaction) {
+          setType(transaction.type);
+          setAmount(String(transaction.amount));
+          setNote(transaction.note ?? "");
+          setCategoryId(transaction.categoryId ?? "");
+        } else {
+          setType("expense");
+          setAmount("");
+          setNote("");
           setCategoryId("");
         }
-      } catch {
-        setCategories([]);
+
+        setTimeout(() => amountRef.current?.focus(), 0);
       }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [open, mode, transaction]);
 
 
@@ -102,6 +151,13 @@ export function TransactionSheet({
           note: note.trim() ? note.trim() : null,
           categoryId: categoryId ? categoryId : null,
         });
+        await new MetaService().set(
+          LAST_TX_DEFAULTS_KEY,
+          JSON.stringify({
+            type,
+            categoryId: categoryId ? categoryId : null,
+          } satisfies LastTransactionDefaults)
+        );
       } else {
         if (!transaction?.id) {
           setError("Не удалось сохранить: отсутствует id записи.");
