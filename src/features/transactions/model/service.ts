@@ -1,4 +1,4 @@
-import type { CreateTransactionInput, Transaction } from "../model/types";
+import type { CreateTransactionInput, Transaction, TransactionType } from "../model/types";
 import type { TransactionsRepo } from "../api/repo";
 import type { SettingsRepo } from "../../settings/api/repo";
 import { AppError } from "@/shared/errors/app-error";
@@ -40,7 +40,7 @@ export class TransactionService {
     return this.transactionsRepo.create(workspaceId, tx);
   }
 
-  async updateTransaction(workspaceId: string, input: UpdateTransactionInput) {
+  async updateTransaction(workspaceId: string, id: string, p0: { type: TransactionType; amount: number; note: string | null; categoryId: string | null; }, input: UpdateTransactionInput) {
   if (input.patch.amount !== undefined) {
     if (!Number.isFinite(input.patch.amount) || input.patch.amount <= 0) {
       throw new AppError("VALIDATION_ERROR", "Amount must be greater than 0", { field: "amount" });

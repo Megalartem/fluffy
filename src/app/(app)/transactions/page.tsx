@@ -5,6 +5,7 @@ import { fmt } from "@/shared/lib/formatter";
 import { TransactionSheet } from "@/features/transactions/ui/transaction-sheet";
 import { FiltersIconButton, TransactionsFiltersModal } from "@/features/transactions/ui/filters-modal";
 import { useTransactions } from "@/features/transactions/hooks/use-transactions";
+import { Pagination, usePagination } from "@/shared/ui/pagination";
 
 
 export default function TransactionsPage() {
@@ -23,6 +24,9 @@ export default function TransactionsPage() {
     filteredItems,
   } = useTransactions();
 
+  const pagination = usePagination(filteredItems.length, 25);
+  const paginatedItems = pagination.paginate(filteredItems);
+
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<import("@/features/transactions/model/types").Transaction | null>(null);
@@ -32,6 +36,12 @@ export default function TransactionsPage() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    pagination.reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters, sort]);
 
   function openEdit(tx: import("@/features/transactions/model/types").Transaction) {
     setEditingTx(tx);
@@ -128,34 +138,47 @@ export default function TransactionsPage() {
       ) : null}
 
       {state.status === "ready" && filteredItems.length > 0 ? (
-        <div className="space-y-2">
-          {filteredItems.map((t) => {
-            const category = t.categoryId ? categoriesMap.get(t.categoryId) : null;
+        <div className="space-y-4">
+          <div className="space-y-2">
+            {paginatedItems.map((t) => {
+              const category = t.categoryId ? categoriesMap.get(t.categoryId) : null;
 
-            return (
-              <button
-                key={t.id}
-                className="w-full text-left rounded-2xl border p-4 flex items-center justify-between hover:bg-black/5"
-                onClick={() => openEdit(t)}
-                type="button"
-              >
-                <div>
-                  <div className="font-medium">
-                    {category?.name ?? "Без категории"}
+              return (
+                <button
+                  key={t.id}
+                  className="w-full text-left rounded-2xl border p-4 flex items-center justify-between hover:bg-black/5"
+                  onClick={() => openEdit(t)}
+                  type="button"
+                >
+                  <div>
+                    <div className="font-medium">
+                      {category?.name ?? "Без категории"}
+                    </div>
+
+                    <div className="text-sm opacity-70">
+                      {t.note ? t.note : t.date}
+                    </div>
                   </div>
 
-                  <div className="text-sm opacity-70">
-                    {t.note ? t.note : t.date}
+                  <div className="font-semibold tabular-nums">
+                    {t.type === "expense" ? "-" : "+"}
+                    {fmt(t.amount)} {t.currency}
                   </div>
-                </div>
+                </button>
+              );
+            })}
+          </div>
 
-                <div className="font-semibold tabular-nums">
-                  {t.type === "expense" ? "-" : "+"}
-                  {fmt(t.amount)} {t.currency}
-                </div>
-              </button>
-            );
-          })}
+          {filteredItems.length > 10 && (
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalItems={filteredItems.length}
+              itemsPerPage={pagination.itemsPerPage}
+              onPageChange={pagination.goToPage}
+              onItemsPerPageChange={pagination.setItemsPerPage}
+            />
+          )}
         </div>
       ) : null}
 

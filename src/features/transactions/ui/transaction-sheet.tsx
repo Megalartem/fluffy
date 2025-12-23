@@ -1,24 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Modal } from "@/shared/ui/modal";
-import type { Transaction, TransactionType } from "@/features/transactions/model/types";
-import { useWorkspace } from "@/shared/config/workspace-context";
-import { DexieSettingsRepo } from "@/features/settings/api/repo.dexie";
-import { DexieTransactionsRepo } from "@/features/transactions/api/repo.dexie";
-import { TransactionService } from "@/features/transactions/model/service";
-import { DexieCategoriesRepo } from "@/features/categories/api/repo.dexie";
-import type { Category } from "@/features/categories/model/types";
-import { MetaService } from "@/shared/lib/storage/meta";
-
-const LAST_TX_DEFAULTS_KEY = "last_transaction_defaults";
-
-type LastTransactionDefaults = {
-  type: "expense" | "income";
-  categoryId: string | null;
-  currency?: string;
-};
-
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Select } from "@/shared/ui/select";
+import type { Transaction } from "@/features/transactions/model/types";
+import { useTransactionForm } from "@/features/transactions/hooks/use-transaction-form";
+import { TransactionTypeToggle } from "./transaction-type-toggle";
+import { TransactionForm } from "./transaction-form";
+import { CategorySelector } from "./category-selector";
+import { AmountPresets } from "./amount-presets";
+import { TransactionFormActions } from "./transaction-form-actions";
+import { DeleteConfirmModal } from "./delete-confirm-modal";
 
 type Mode = "create" | "edit";
 
@@ -31,167 +25,67 @@ export function TransactionSheet({
 }: {
   open: boolean;
   mode: Mode;
-  transaction?: Transaction | null; // required for edit
+  transaction?: Transaction | null;
   onClose: () => void;
-  onChanged: () => void; // reload list
+  onChanged: () => void;
 }) {
-  const { workspaceId } = useWorkspace();
   const amountRef = useRef<HTMLInputElement | null>(null);
-
-  const service = useMemo(() => {
-    return new TransactionService(new DexieTransactionsRepo(), new DexieSettingsRepo());
-  }, []);
-
-  const [type, setType] = useState<TransactionType>("expense");
-  const [amount, setAmount] = useState<string>("");
-  const [note, setNote] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryId, setCategoryId] = useState<string>(""); // "" = none
-  const [defaults, setDefaults] = useState<LastTransactionDefaults | null>(null);
-  const [presets, setPresets] = useState<Transaction[]>([]);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
+  const {
+    type,
+    setType,
+    amount,
+    setAmount,
+    note,
+    setNote,
+    categoryId,
+    setCategoryId,
+    error,
+    saving,
+    categories,
+    presets,
+    save,
+    deleteTransaction,
+    applyPreset,
+  } = useTransactionForm({ open, mode, transaction });
+
+  /**
+   * Focus amount input when sheet opens
+   */
   useEffect(() => {
-    if (!open) return;
-    let cancelled = false;
-
-    (async () => {
-      try {
-        const [cats, rawDefaults, recent] = await Promise.all([
-          new DexieCategoriesRepo().list(workspaceId),
-          new MetaService().get(LAST_TX_DEFAULTS_KEY),
-          new DexieTransactionsRepo().listRecent(workspaceId, { type: "expense", limit: 5 }),
-        ]);
-        if (cancelled) return;
-        setCategories(cats);
-        setPresets(recent);
-
-        let parsedDefaults: LastTransactionDefaults | null = null;
-        if (rawDefaults) {
-          try {
-            parsedDefaults = JSON.parse(rawDefaults);
-          } catch {
-            parsedDefaults = null;
-          }
-        }
-        setDefaults(parsedDefaults);
-
-        // Init form
-        if (mode === "edit" && transaction) {
-          setType(transaction.type);
-          setAmount(String(transaction.amount));
-          setNote(transaction.note ?? "");
-          setCategoryId(transaction.categoryId ?? "");
-        } else {
-          setType(parsedDefaults?.type ?? "expense");
-          setAmount("");
-          setNote("");
-          setCategoryId(parsedDefaults?.categoryId ?? "");
-        }
-
-        // focus amount
-        setTimeout(() => amountRef.current?.focus(), 0);
-      } catch {
-        if (cancelled) return;
-        setCategories([]);
-        setDefaults(null);
-
-        // fallback init (create)
-        if (mode === "edit" && transaction) {
-          setType(transaction.type);
-          setAmount(String(transaction.amount));
-          setNote(transaction.note ?? "");
-          setCategoryId(transaction.categoryId ?? "");
-        } else {
-          setType("expense");
-          setAmount("");
-          setNote("");
-          setCategoryId("");
-        }
-
-        setTimeout(() => amountRef.current?.focus(), 0);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [open, mode, transaction]);
-
-
-  function parseAmount(input: string): number | null {
-    const parsed = Number(input.replace(",", "."));
-    if (!Number.isFinite(parsed) || parsed <= 0) return null;
-    return parsed;
-  }
-
-  async function handleSave() {
-    setError(null);
-
-    const parsedAmount = parseAmount(amount);
-    if (!parsedAmount) {
-      setError("Введите сумму больше нуля.");
-      return;
+    if (open) {
+      setTimeout(() => amountRef.current?.focus(), 0);
     }
+  }, [open]);
 
-    setSaving(true);
-    try {
-      if (mode === "create") {
-        await service.addTransaction(workspaceId, {
-          type,
-          amount: parsedAmount,
-          note: note.trim() ? note.trim() : null,
-          categoryId: categoryId ? categoryId : null,
-        });
-        await new MetaService().set(
-          LAST_TX_DEFAULTS_KEY,
-          JSON.stringify({
-            type,
-            categoryId: categoryId ? categoryId : null,
-          } satisfies LastTransactionDefaults)
-        );
-      } else {
-        if (!transaction?.id) {
-          setError("Не удалось сохранить: отсутствует id записи.");
-          return;
-        }
-        await service.updateTransaction(workspaceId, {
-          id: transaction.id,
-          patch: {
-            type,
-            amount: parsedAmount,
-            note: note.trim() ? note.trim() : null,
-            categoryId: categoryId ? categoryId : null,
-          },
-        });
-      }
-
+  /**
+   * Handle save
+   */
+  async function handleSave() {
+    const success = await save();
+    if (success) {
       onClose();
       onChanged();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Ошибка сохранения");
-    } finally {
-      setSaving(false);
     }
   }
 
+  /**
+   * Handle delete click
+   */
+  function handleDeleteClick() {
+    setConfirmDeleteOpen(true);
+  }
+
+  /**
+   * Handle delete confirmation
+   */
   async function handleDeleteConfirmed() {
-    if (!transaction?.id) return;
-
-    setSaving(true);
-    setError(null);
-    try {
-      await service.deleteTransaction(workspaceId, transaction.id);
-
+    const success = await deleteTransaction();
+    if (success) {
       setConfirmDeleteOpen(false);
       onClose();
       onChanged();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Ошибка удаления");
-    } finally {
-      setSaving(false);
     }
   }
 
@@ -201,148 +95,56 @@ export function TransactionSheet({
     <>
       <Modal open={open} title={title} onClose={onClose}>
         <div className="space-y-4">
-          <div>
-            <label className="text-sm opacity-70">Сумма</label>
-            <input
-              ref={amountRef}
-              inputMode="decimal"
-              className="mt-1 w-full rounded-xl border px-3 py-3 text-lg"
-              placeholder="0"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
-            {error ? <div className="mt-2 text-sm text-red-600">{error}</div> : null}
-          </div>
-          {/* Presets */}
-          {mode === "create" && presets.length > 0 ? (
-            <div className="space-y-2">
-              <div className="text-sm opacity-70">Быстрые шаблоны</div>
-              <div className="flex gap-2 overflow-auto pb-1">
-                {presets.map((p) => {
-                  const catName =
-                    p.categoryId ? categories.find((c) => c.id === p.categoryId)?.name : null;
+          <TransactionTypeToggle value={type} onChange={setType} disabled={saving} />
 
-                  return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      className="shrink-0 rounded-full border px-3 py-2 text-sm"
-                      onClick={() => {
-                        setType("expense");
-                        setAmount(String(p.amount));
-                        setCategoryId(p.categoryId ?? "");
-                        setTimeout(() => amountRef.current?.focus(), 0);
-                      }}
-                      title="Применить шаблон"
-                    >
-                      {catName ? `${catName} · ${p.amount}` : `Расход · ${p.amount}`}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null}
-
-          <div>
-            <label className="text-sm opacity-70">Категория (опционально)</label>
-            <select
-              className="mt-1 w-full rounded-xl border px-3 py-3"
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-            >
-              <option value="">Без категории</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-
-          <div>
-            <label className="text-sm opacity-70">Тип</label>
-            <div className="mt-1 grid grid-cols-2 gap-2">
-              <button
-                className={`rounded-xl border py-2 ${type === "expense" ? "font-semibold" : "opacity-70"}`}
-                onClick={() => setType("expense")}
-                type="button"
-              >
-                Расход
-              </button>
-              <button
-                className={`rounded-xl border py-2 ${type === "income" ? "font-semibold" : "opacity-70"}`}
-                onClick={() => setType("income")}
-                type="button"
-              >
-                Доход
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label className="text-sm opacity-70">Заметка (опционально)</label>
-            <input
-              className="mt-1 w-full rounded-xl border px-3 py-3"
-              placeholder="например: кофе"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-          </div>
-
-          <button
-            className="w-full rounded-2xl bg-black text-white py-3 font-semibold disabled:opacity-50"
-            onClick={handleSave}
+          <TransactionForm
+            ref={amountRef}
+            amount={amount}
+            onAmountChange={setAmount}
+            note={note}
+            onNoteChange={setNote}
             disabled={saving}
-            type="button"
-          >
-            {saving ? "Сохраняю…" : "Сохранить"}
-          </button>
+          />
 
-          {mode === "edit" ? (
-            <button
-              className="w-full rounded-2xl border py-3 font-semibold disabled:opacity-50"
-              onClick={() => setConfirmDeleteOpen(true)}
+          <CategorySelector
+            categories={categories}
+            value={categoryId}
+            onChange={setCategoryId}
+            disabled={saving}
+          />
+
+          {mode === "create" && (
+            <AmountPresets
+              presets={presets}
+              onSelect={applyPreset}
               disabled={saving}
-              type="button"
-            >
-              Удалить
-            </button>
-          ) : null}
+            />
+          )}
+
+          {error && (
+            <div className="rounded-xl bg-red-50 p-3 text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          <TransactionFormActions
+            mode={mode}
+            saving={saving}
+            onSave={handleSave}
+            onDelete={mode === "edit" ? handleDeleteClick : undefined}
+            onClose={onClose}
+          />
         </div>
       </Modal>
 
-      {/* Confirm delete */}
-      <Modal
-        open={confirmDeleteOpen}
-        title="Удалить запись?"
-        onClose={() => !saving && setConfirmDeleteOpen(false)}
-      >
-        <div className="space-y-4">
-          <div className="opacity-80">
-            Запись будет скрыта из списка. Это действие можно будет сделать обратимым позже через sync/архив, но в MVP
-            удаление необратимо.
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              className="rounded-2xl border py-3 font-semibold disabled:opacity-50"
-              onClick={() => setConfirmDeleteOpen(false)}
-              disabled={saving}
-              type="button"
-            >
-              Отмена
-            </button>
-            <button
-              className="rounded-2xl bg-black text-white py-3 font-semibold disabled:opacity-50"
-              onClick={handleDeleteConfirmed}
-              disabled={saving}
-              type="button"
-            >
-              {saving ? "Удаляю…" : "Удалить"}
-            </button>
-          </div>
-        </div>
-      </Modal>
+      {mode === "edit" && (
+        <DeleteConfirmModal
+          open={confirmDeleteOpen}
+          saving={saving}
+          onConfirm={handleDeleteConfirmed}
+          onCancel={() => setConfirmDeleteOpen(false)}
+        />
+      )}
     </>
   );
 }
