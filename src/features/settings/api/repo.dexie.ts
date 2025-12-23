@@ -1,9 +1,9 @@
-import type { SettingsRepo } from "./repo";
+import type { ISettingsRepository } from "@/core/repositories";
 import type { AppSettings } from "../model/types";
 import { AppError } from "@/shared/errors/app-error";
 import { db, ensureDbInitialized, nowIso } from "@/shared/lib/storage/db";
 
-export class DexieSettingsRepo implements SettingsRepo {
+export class DexieSettingsRepo implements ISettingsRepository {
   async get(workspaceId: string): Promise<AppSettings> {
     try {
       await ensureDbInitialized();

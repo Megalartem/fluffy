@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { WorkspaceService } from "@/shared/config/workspace";
+import { useWorkspace } from "@/shared/config/workspace-context";
 import { DashboardService } from "@/features/dashboard/model/service";
 import type { MonthlySummary } from "@/features/dashboard/model/types";
 import { BudgetService } from "@/features/budgets/model/service";
@@ -14,6 +14,7 @@ import type { Notice } from "@/features/notifications/model/types";
 export type DashboardPeriod = "current" | "previous";
 
 export function useDashboardData(period: DashboardPeriod) {
+  const { workspaceId } = useWorkspace();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
   const [budget, setBudget] = useState<BudgetStatus | null>(null);
@@ -23,8 +24,6 @@ export function useDashboardData(period: DashboardPeriod) {
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-
       const [data, goalsList] = await Promise.all([
         new DashboardService().getMonthlySummary(workspaceId, period),
         new GoalsService().list(workspaceId),
@@ -49,7 +48,7 @@ export function useDashboardData(period: DashboardPeriod) {
     } finally {
       setLoading(false);
     }
-  }, [period]);
+  }, [period, workspaceId]);
 
   useEffect(() => {
     reload();
@@ -58,7 +57,6 @@ export function useDashboardData(period: DashboardPeriod) {
   const setBudgetLimit = useCallback(
     async (limit: number) => {
       if (!summary) return;
-      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
       await new BudgetService().setMonthlyLimit(workspaceId, summary.month, limit);
       const refreshed = await new BudgetService().getBudgetStatus(
         workspaceId,
@@ -75,7 +73,7 @@ export function useDashboardData(period: DashboardPeriod) {
       });
       setNotices(noticeList);
     },
-    [summary, goals]
+    [summary, goals, workspaceId]
   );
 
   const dismissNotice = useCallback(async (n: Notice) => {
@@ -84,11 +82,10 @@ export function useDashboardData(period: DashboardPeriod) {
   }, []);
 
   const addToGoal = useCallback(async (goalId: string, amount: number) => {
-    const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
     await new GoalsService().addToGoal(workspaceId, goalId, amount);
     const updatedGoals = await new GoalsService().list(workspaceId);
     setGoals(updatedGoals);
-  }, []);
+  }, [workspaceId]);
 
   return {
     loading,

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal } from "@/shared/ui/modal";
 import type { Transaction, TransactionType } from "@/features/transactions/model/types";
-import { WorkspaceService } from "@/shared/config/workspace";
+import { useWorkspace } from "@/shared/config/workspace-context";
 import { DexieSettingsRepo } from "@/features/settings/api/repo.dexie";
 import { DexieTransactionsRepo } from "@/features/transactions/api/repo.dexie";
 import { TransactionService } from "@/features/transactions/model/service";
@@ -35,6 +35,7 @@ export function TransactionSheet({
   onClose: () => void;
   onChanged: () => void; // reload list
 }) {
+  const { workspaceId } = useWorkspace();
   const amountRef = useRef<HTMLInputElement | null>(null);
 
   const service = useMemo(() => {
@@ -58,8 +59,6 @@ export function TransactionSheet({
 
     (async () => {
       try {
-        const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-
         const [cats, rawDefaults, recent] = await Promise.all([
           new DexieCategoriesRepo().list(workspaceId),
           new MetaService().get(LAST_TX_DEFAULTS_KEY),
@@ -139,8 +138,6 @@ export function TransactionSheet({
 
     setSaving(true);
     try {
-      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
-
       if (mode === "create") {
         await service.addTransaction(workspaceId, {
           type,
@@ -186,7 +183,6 @@ export function TransactionSheet({
     setSaving(true);
     setError(null);
     try {
-      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
       await service.deleteTransaction(workspaceId, transaction.id);
 
       setConfirmDeleteOpen(false);

@@ -1,10 +1,11 @@
-import type { TransactionsRepo, TransactionListQuery } from "./repo";
+import type { TransactionListQuery } from "./repo";
 import type { Transaction } from "../model/types";
+import type { ITransactionsRepository } from "@/core/repositories";
 import { AppError } from "@/shared/errors/app-error";
 import { db, ensureDbInitialized } from "@/shared/lib/storage/db";
 import { nowIso } from "@/shared/lib/storage/db";
 
-export class DexieTransactionsRepo implements TransactionsRepo {
+export class DexieTransactionsRepo implements ITransactionsRepository {
   async create(workspaceId: string, tx: Transaction): Promise<Transaction> {
     try {
       await ensureDbInitialized();
@@ -32,8 +33,8 @@ export class DexieTransactionsRepo implements TransactionsRepo {
       if (query.type) coll = coll.filter((t) => t.type === query.type);
       if (query.categoryId !== undefined) coll = coll.filter((t) => (t.categoryId ?? null) === query.categoryId);
 
-      if (query.from && query.from !== undefined) coll = coll.filter((t) => t.date >= query.from);
-      if (query.to && query.to !== undefined) coll = coll.filter((t) => t.date <= query.to);
+      if (query.from && query.from !== undefined) coll = coll.filter((t) => t.date >= query.from!);
+      if (query.to && query.to !== undefined) coll = coll.filter((t) => t.date <= query.to!);
 
       // Dexie: сортировка по date desc + createdAt desc вручную
       const arr = await coll.toArray();

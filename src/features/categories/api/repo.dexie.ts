@@ -1,9 +1,9 @@
 import { db, ensureDbInitialized, nowIso } from "@/shared/lib/storage/db";
 import { AppError } from "@/shared/errors/app-error";
-import type { CategoriesRepo } from "./repo";
+import type { ICategoriesRepository } from "@/core/repositories";
 import type { Category } from "../model/types";
 
-export class DexieCategoriesRepo implements CategoriesRepo {
+export class DexieCategoriesRepo implements ICategoriesRepository {
   async list(workspaceId: string): Promise<Category[]> {
     try {
       await ensureDbInitialized();

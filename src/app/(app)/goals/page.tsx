@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { WorkspaceService } from "@/shared/config/workspace";
+import { useWorkspace } from "@/shared/config/workspace-context";
 import { Modal } from "@/shared/ui/modal";
 import { GoalsService } from "@/features/goals/model/service";
 import type { Goal } from "@/features/goals/model/types";
@@ -13,6 +13,7 @@ function fmt(n: number) {
 }
 
 export default function GoalsPage() {
+    const { workspaceId } = useWorkspace();
     const service = useMemo(() => new GoalsService(), []);
     const [items, setItems] = useState<Goal[]>([]);
     const [loading, setLoading] = useState(true);
@@ -29,7 +30,6 @@ export default function GoalsPage() {
 
     async function load() {
         setLoading(true);
-        const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
         const list = await service.list(workspaceId);
         setItems(list);
         setLoading(false);
@@ -52,7 +52,6 @@ export default function GoalsPage() {
 
         setSavingGoalId(selectedGoal.id);
         try {
-            const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
             await service.addToGoal(workspaceId, selectedGoal.id, amount);
             await load();
 
@@ -76,7 +75,6 @@ export default function GoalsPage() {
         if (!t) return setError("Название обязательно");
         if (!Number.isFinite(n) || n <= 0) return setError("Цель должна быть больше нуля");
 
-        const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
         await service.create(workspaceId, { title: t, targetAmount: n });
 
         setCreateOpen(false);
@@ -91,7 +89,6 @@ export default function GoalsPage() {
         const n = Number(raw.replace(",", "."));
         if (!Number.isFinite(n) || n <= 0) return;
 
-        const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
         await service.addToGoal(workspaceId, goal.id, n);
         await load();
     }
@@ -99,7 +96,6 @@ export default function GoalsPage() {
     async function remove(goal: Goal) {
         const ok = confirm(`Архивировать цель "${goal.title}"?`);
         if (!ok) return;
-        const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
         await service.delete(workspaceId, goal.id);
         await load();
     }

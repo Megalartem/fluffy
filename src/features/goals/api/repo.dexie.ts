@@ -1,9 +1,9 @@
 import { db, ensureDbInitialized, nowIso } from "@/shared/lib/storage/db";
 import { AppError } from "@/shared/errors/app-error";
-import type { GoalsRepo } from "./repo";
+import type { IGoalsRepository } from "@/core/repositories";
 import type { Goal } from "../model/types";
 
-export class DexieGoalsRepo implements GoalsRepo {
+export class DexieGoalsRepo implements IGoalsRepository {
   async list(workspaceId: string): Promise<Goal[]> {
     await ensureDbInitialized();
     const arr = await db.goals

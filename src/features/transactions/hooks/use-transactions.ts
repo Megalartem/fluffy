@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { WorkspaceService } from "@/shared/config/workspace";
+import { useWorkspace } from "@/shared/config/workspace-context";
 import { DexieTransactionsRepo } from "@/features/transactions/api/repo.dexie";
 import type { Transaction } from "@/features/transactions/model/types";
 import { DexieCategoriesRepo } from "@/features/categories/api/repo.dexie";
@@ -14,6 +14,7 @@ export type TxState =
   | { status: "error"; message: string };
 
 export function useTransactions() {
+  const { workspaceId } = useWorkspace();
   const repo = useMemo(() => new DexieTransactionsRepo(), []);
   const [state, setState] = useState<TxState>({ status: "loading" });
 
@@ -57,7 +58,6 @@ export function useTransactions() {
   const load = useCallback(async () => {
     setState({ status: "loading" });
     try {
-      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
       const [items, categories] = await Promise.all([
         repo.list(workspaceId, { limit: 50 }),
         new DexieCategoriesRepo().list(workspaceId),
@@ -74,7 +74,7 @@ export function useTransactions() {
         message: e instanceof Error ? e.message : "Unknown error",
       });
     }
-  }, [repo]);
+  }, [repo, workspaceId]);
 
   const filteredItems = useMemo(() => {
     if (state.status !== "ready") return [] as Transaction[];

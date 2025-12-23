@@ -1,9 +1,17 @@
 import { db, ensureDbInitialized, nowIso } from "@/shared/lib/storage/db";
 import { AppError } from "@/shared/errors/app-error";
-import type { BudgetsRepo } from "./repo";
+import type { IBudgetsRepository } from "@/core/repositories";
 import type { MonthlyBudget } from "../model/types";
 
-export class DexieBudgetsRepo implements BudgetsRepo {
+export class DexieBudgetsRepo implements IBudgetsRepository {
+
+  set(workspaceId: string, budget: MonthlyBudget): Promise<MonthlyBudget> {
+    throw new Error("Method not implemented.");
+  }
+  list(workspaceId: string): Promise<MonthlyBudget[]> {
+    throw new Error("Method not implemented.");
+  }
+  
   async getByMonth(workspaceId: string, month: string): Promise<MonthlyBudget | null> {
     try {
       await ensureDbInitialized();

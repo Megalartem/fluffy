@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { WorkspaceService } from "@/shared/config/workspace";
+import { useWorkspace } from "@/shared/config/workspace-context";
 import { BackupService } from "@/features/backup/model/service";
 
 function downloadJson(filename: string, data: unknown) {
@@ -15,6 +15,7 @@ function downloadJson(filename: string, data: unknown) {
 }
 
 export default function SettingsPage() {
+    const { workspaceId } = useWorkspace();
     const fileRef = useRef<HTMLInputElement | null>(null);
     const [busy, setBusy] = useState(false);
     const [mode, setMode] = useState<"replace" | "merge">("replace");
@@ -23,7 +24,6 @@ export default function SettingsPage() {
     async function exportData() {
         setBusy(true);
         try {
-            const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
             const backup = await new BackupService().exportWorkspace(workspaceId);
             downloadJson(`budget-backup-${backup.workspaceId}-${backup.exportedAt.slice(0, 10)}.json`, backup);
         } finally {
@@ -45,7 +45,6 @@ export default function SettingsPage() {
             if (!ok) return;
 
 
-            const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
             await new BackupService().importWorkspace(workspaceId, json, mode);
 
 

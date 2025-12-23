@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { WorkspaceService } from "@/shared/config/workspace";
+import { useWorkspace } from "@/shared/config/workspace-context";
 import { DexieCategoriesRepo } from "@/features/categories/api/repo.dexie";
 import type { Category } from "@/features/categories/model/types";
 import { ensureDefaultCategoriesSeeded } from "@/features/categories/model/seed";
@@ -12,25 +12,24 @@ function makeId(prefix: string) {
 }
 
 export function useCategories() {
+  const { workspaceId } = useWorkspace();
   const repo = useMemo(() => new DexieCategoriesRepo(), []);
   const [items, setItems] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
     await ensureDefaultCategoriesSeeded(workspaceId);
     const list = await repo.list(workspaceId);
     setItems(list);
     setLoading(false);
-  }, [repo]);
+  }, [repo, workspaceId]);
 
   const create = useCallback(
     async (name: string) => {
       const n = name.trim();
       if (!n) return;
 
-      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
       const maxOrder = items.reduce((m, c) => Math.max(m, c.order), 0);
 
       const now = nowIso();
@@ -50,25 +49,23 @@ export function useCategories() {
 
       await load();
     },
-    [repo, items, load]
+    [repo, items, load, workspaceId]
   );
 
   const rename = useCallback(
     async (categoryId: string, newName: string) => {
-      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
       await repo.update(workspaceId, categoryId, { name: newName.trim() });
       await load();
     },
-    [repo, load]
+    [repo, load, workspaceId]
   );
 
   const remove = useCallback(
     async (categoryId: string) => {
-      const workspaceId = await new WorkspaceService().getCurrentWorkspaceId();
       await repo.softDelete(workspaceId, categoryId);
       await load();
     },
-    [repo, load]
+    [repo, load, workspaceId]
   );
 
   return {
