@@ -9,6 +9,8 @@ import { BudgetLimitSheet } from "@/features/budgets/ui/budget-limit-sheet";
 import { GoalMiniCard } from "@/features/goals/ui/goal-mini-card";
 import { GoalQuickAddSheet } from "@/features/goals/ui/goal-quick-add-sheet";
 import { NotificationsBell } from "@/features/notifications/ui/notifications-bell";
+import { SyncStatusBadge } from "@/features/sync/ui";
+import { useSyncStatus } from "@/features/sync/hooks/use-sync-status";
 import type { Goal } from "@/features/goals/model/types";
 import { useDashboardData } from "@/features/dashboard/model/use-dashboard-data";
 import { PeriodToggle } from "@/features/dashboard/ui/period-toggle";
@@ -18,11 +20,21 @@ export default function DashboardPage() {
   const [period, setPeriod] = useState<"current" | "previous">("current");
   const { loading, summary, budget, goals, notices, setBudgetLimit, dismissNotice, addToGoal } =
     useDashboardData(period);
+  const { syncState } = useSyncStatus();
 
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
+
+  const getSyncStatus = () => {
+    if (syncState.conflicts > 0) return "conflict" as const;
+    if (!syncState.isOnline) return "idle" as const;
+    if (syncState.isSyncing) return "syncing" as const;
+    if (syncState.failedChanges > 0) return "error" as const;
+    if (syncState.lastSyncTime) return "synced" as const;
+    return "idle" as const;
+  };
 
   async function saveQuickAdd(amount: number) {
     if (!selectedGoal) return;
@@ -69,6 +81,10 @@ export default function DashboardPage() {
         <h1 className="text-2xl font-semibold">Обзор · {summary.label}</h1>
 
         <div className="flex items-center gap-2">
+          <SyncStatusBadge 
+            status={getSyncStatus()} 
+            showLabel={false}
+          />
           <NotificationsBell notices={notices} onDismiss={dismissNotice} />
         </div>
       </div>

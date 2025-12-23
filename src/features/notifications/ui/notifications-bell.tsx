@@ -39,8 +39,7 @@ export function NotificationsBell({
 
     return (
         <div className="relative" ref={rootRef}>
-            <button
-                className="relative rounded-xl border px-3 py-2"
+            <button className="relative inline-flex items-center gap-2 rounded-xl border px-3 py-2"
                 type="button"
                 onClick={() => setOpen((v) => !v)}
                 aria-label="Уведомления"
@@ -50,7 +49,7 @@ export function NotificationsBell({
                 <span className="text-lg leading-none">🔔</span>
 
                 {count > 0 ? (
-                    <span className="absolute -top-2 -right-2 min-w-6 h-6 px-2 rounded-full bg-black text-white text-xs flex items-center justify-center">
+                    <span className="min-w-6 h-6 px-2 rounded-full bg-black text-white text-xs flex items-center justify-center">
                         {count}
                     </span>
                 ) : null}
