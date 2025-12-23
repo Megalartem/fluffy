@@ -30,6 +30,11 @@ async function metaSet(key: string, value: string): Promise<void> {
   await db.meta.put({ key, value, updatedAt: nowIso() });
 }
 
+async function metaDelete(key: string): Promise<void> {
+  await ensureDbInitialized();
+  await db.meta.delete(key);
+}
+
 export class NotificationsService {
   /**
    * Возвращает список уведомлений, которые стоит показать на Dashboard.
@@ -52,7 +57,7 @@ export class NotificationsService {
           : budget.threshold === "warn80"
             ? "warn80"
             : "none";
-
+      
       if (current !== "none") {
         const key = budgetMetaKey(workspaceId, month);
         const prevRaw = (await metaGet(key)) as BudgetNotified | null;
@@ -104,5 +109,28 @@ export class NotificationsService {
 
   async dismissNotice(dismissKey: string, dismissValue: string): Promise<void> {
     await metaSet(dismissKey, dismissValue);
+  }
+
+  /**
+   * Удаляет meta-флаг для бюджетных уведомлений за конкретный месяц.
+   * Полезно для дев/отладки или если нужно «переиграть» пороги.
+   */
+  async resetBudgetNotice(workspaceId: string, month: string): Promise<void> {
+    await metaDelete(budgetMetaKey(workspaceId, month));
+  }
+
+  /**
+   * Удаляет meta-флаг для уведомления о достижении конкретной цели.
+   */
+  async resetGoalNotice(workspaceId: string, goalId: string): Promise<void> {
+    await metaDelete(goalMetaKey(workspaceId, goalId));
+  }
+
+  /**
+   * Универсальный метод: удалить произвольный meta-ключ уведомления.
+   * Используй аккуратно (например, для dev UI/консоли).
+   */
+  async deleteNoticeMetaKey(key: string): Promise<void> {
+    await metaDelete(key);
   }
 }

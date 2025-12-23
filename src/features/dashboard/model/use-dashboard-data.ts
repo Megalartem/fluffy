@@ -19,7 +19,7 @@ export function useDashboardData(period: DashboardPeriod) {
   const [budget, setBudget] = useState<BudgetStatus | null>(null);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
-
+  
   const reload = useCallback(async () => {
     setLoading(true);
     try {
