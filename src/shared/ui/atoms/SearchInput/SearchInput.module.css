@@ -1,0 +1,77 @@
+.root {
+  position: relative;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--spacing-4);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+  transition: color var(--motion-fast) var(--motion-ease-standard);
+  pointer-events: none;
+
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
+}
+
+.searchIcon:focus-visible {
+    color: var(--color-text-primary);
+}
+
+.root:focus-within .searchIcon {
+    color: var(--color-text-primary);
+}
+
+.input {
+    padding-left: calc(var(--spacing-4) * 2 + 4px);
+}
+
+.clearButton {
+  position: absolute;
+  right: var(--spacing-4);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
+}
+
+.clearButton:focus-visible {
+    color: var(--color-text-primary);
+}
+
+/* Hide native search input clear button */
+.input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.input::-webkit-search-decoration {
+  display: none;
+}
+
+.root:focus-within .clearButton {
+    color: var(--color-text-primary);
+}
+
+.clearButton:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+.clearButton:focus-visible {
+  outline: none;
+  border-radius: var(--border-radius-rounded);
+  /* box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-focus) 20%, transparent); */
+}

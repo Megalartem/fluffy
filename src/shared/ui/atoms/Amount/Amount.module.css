@@ -1,0 +1,18 @@
+.amount {
+  font-family: var(--font-family-sans);
+  font-size: var(--text-base);
+  font-weight: var(--text-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.amount[data-state="positive"] {
+  color: var(--color-status-success);
+}
+
+.amount[data-state="negative"] {
+  color: var(--color-status-error);
+}
+
+.amount[data-state="neutral"] {
+  color: var(--color-text-primary);
+}

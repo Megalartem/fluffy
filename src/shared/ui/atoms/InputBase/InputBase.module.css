@@ -1,0 +1,56 @@
+
+.input {
+  width: 100%;
+
+  /* spacing */
+  padding: var(--spacing-2) var(--spacing-4);
+
+  /* typography */
+  font-family: var(--font-family-sans);
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+
+  /* surface */
+  background: var(--background-card);
+
+  /* shape */
+  border-radius: var(--radius-md);
+
+  /* border */
+  border: 1px solid var(--color-secondary);
+
+  /* motion */
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
+}
+
+.input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* Focus — только :focus-visible */
+.input:focus-visible {
+  outline: none;
+  color: var(--color-text-primary);
+  border-color: var(--color-focus);
+}
+
+/* Error */
+.input[data-state="error"] {
+  border-color: var(--color-status-error);
+}
+
+.input[data-state="error"]:focus-visible {
+  border-color: var(--color-status-error);
+}
+
+/* Disabled */
+.input:disabled,
+.input[data-state="disabled"] {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+  border: 1px solid var(--color-disabled);
+}
