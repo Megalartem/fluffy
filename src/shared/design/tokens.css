@@ -32,7 +32,7 @@
 
   /* Text colors */
   --color-text-primary: #34266C;
-  --color-text-secondary: #BFB9D8;
+  --color-text-secondary: #6F649B;
   --color-text-on-primary: #FFFFFF;
 
   /* Status colors */
@@ -70,4 +70,34 @@
 
   /* ========== Misc ========== */
   --opacity-transaction-type: 0.8;
+
+  /* ================================
+  Category color palette (bg only)
+  Opacity: 30%
+  ================================ */
+
+  --category-violet-bg: rgba(97, 62, 234, 0.3);
+  --category-indigo-bg: rgba(76, 81, 191, 0.3);
+  --category-blue-bg: rgba(25, 86, 140, 0.3);
+  --category-cyan-bg: rgba(43, 176, 237, 0.3);
+  --category-teal-bg: rgba(43, 174, 158, 0.3);
+
+  --category-amber-bg: rgba(246, 201, 14, 0.3);
+  --category-orange-bg: rgba(255, 158, 59, 0.3);
+  --category-coral-bg: rgba(255, 122, 90, 0.3);
+  --category-red-bg: rgba(229, 83, 61, 0.3);
+
+  --category-green-bg: rgba(63, 168, 107, 0.3);
+  --category-lime-bg: rgba(155, 197, 61, 0.3);
+  --category-mint-bg: rgba(110, 219, 213, 0.3);
+
+  --category-pink-bg: rgba(240, 98, 146, 0.3);
+  --category-magenta-bg: rgba(194, 59, 122, 0.3);
+  --category-plum-bg: rgba(123, 63, 228, 0.3);
+
+  --category-slate-bg: rgba(100, 116, 139, 0.3);
+  --category-steel-bg: rgba(122, 140, 164, 0.3);
+  --category-graphite-bg: rgba(75, 85, 99, 0.3);
+  --category-sand-bg: rgba(199, 184, 161, 0.3);
+  --category-brown-bg: rgba(139, 94, 60, 0.3);
 }
