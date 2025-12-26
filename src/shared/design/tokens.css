@@ -1,0 +1,73 @@
+/* src/styles/tokens.css */
+/* Tailwind v4 design tokens defined via @theme */
+
+
+@theme {
+  /* ========== Typography ========== */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+
+  /* Font sizes (map to Tailwind: text-*) */
+  --text-sm: 12px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-2xl: 32px;
+
+  /* Font weights */
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ========== Color (UI) ========== */
+  --color-primary: #A577FF;
+  --color-secondary: #BFB9D8;
+  --color-accent: #150A35;
+  --color-focus: var(--color-primary);
+  --color-disabled: #C4C4C4;
+  --color-border: rgba(21, 10, 53, 0.06);
+
+  /* Surfaces & backgrounds */
+  --color-bg: #F7F6FC;
+  --color-surface: #F6F7FB;
+  --color-bg-subtitle-border: #F7F7FC;
+
+  /* Text colors */
+  --color-text-primary: #34266C;
+  --color-text-secondary: #BFB9D8;
+  --color-text-on-primary: #FFFFFF;
+
+  /* Status colors */
+  --color-success: #A577FF;
+  --color-warning: #FDB641;
+  --color-error: #F9725B;
+
+  --color-overlay: rgba(0, 0, 0, 0.3);
+
+  /* ========== Spacing ========== */
+  /* Numeric scale to align with Tailwind classes (p-1, p-2, etc.) */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-4: 16px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+
+  /* ========== Radius ========== */
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+  /* Custom named token (use via rounded-fab) */
+  --radius-fab: 24px;
+
+  /* ========== Shadows ========== */
+  --shadow-card: 0 4px 16px rgba(21, 10, 53, 0.06);
+  --shadow-fab: 0 4px 4px rgba(21, 10, 53, 0.25);
+  --shadow-bottom-sheet: 0 -4px 4px rgba(21, 10, 53, 0.25);
+
+  /* ========== Motion ========== */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ========== Misc ========== */
+  --opacity-transaction-type: 0.8;
+}
