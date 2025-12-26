@@ -1,0 +1,90 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  height: fit-content;
+
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+
+  font-family: var(--font-family-sans);
+  font-weight: var(--text-weight-semibold);
+
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    border var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
+}
+
+/* Sizes */
+.button[data-size="small"] {
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--text-sm);
+}
+
+.button[data-size="medium"] {
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--text-md);
+}
+
+/* Variants */
+.button[data-variant="primary"] {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+
+.button[data-variant="primary"]:hover {
+  opacity: 0.92;
+}
+
+.button[data-variant="secondary"] {
+  background: var(--background-card);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+.button[data-variant="secondary"]:hover {
+  border: 1px solid var(--color-primary);
+}
+
+.button[data-variant="ghost"] {
+  background: transparent;
+  color: var(--color-text-primary);
+}
+
+.button[data-variant="ghost"]:hover {
+  background: color-mix(in srgb, var(--background-card) 60%, transparent);
+}
+
+/* Press */
+.button:active {
+  transform: scale(0.98);
+}
+
+.button[data-state="pressed"] {
+  transform: scale(0.98);
+}
+
+/* Focus */
+.button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-focus) 20%, transparent);
+}
+
+/* Disabled */
+.button:disabled {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+.button:disabled:hover {
+  opacity: var(--opacity-disabled);
+}
