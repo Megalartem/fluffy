@@ -40,11 +40,7 @@
 
 /* Error */
 .input[data-state="error"] {
-  border-color: var(--color-status-error);
-}
-
-.input[data-state="error"]:focus-visible {
-  border-color: var(--color-status-error);
+  border-color: var(--color-error);
 }
 
 /* Disabled */
