@@ -20,3 +20,7 @@ export type { SegmentedControlProps, SegmentedOption } from "./SegmentedControl/
 
 export { ListRowBase } from "./ListRowBase/ListRowBase";
 export type { ListRowBaseTone, ListRowBaseSize } from "./ListRowBase/ListRowBase";
+
+
+export { EmptyState } from "./EmptyState/EmptyState";
+export type { EmptyStateTone, EmptyStateSize } from "./EmptyState/EmptyState";
