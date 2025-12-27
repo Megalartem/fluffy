@@ -11,6 +11,7 @@ export interface ButtonBaseProps extends React.ButtonHTMLAttributes<HTMLButtonEl
   variant?: ButtonVariant;
   pressed?: boolean;
   onClick?: () => void;
+  ariaLabel?: string;
 }
 
 export function ButtonBase({
@@ -20,7 +21,8 @@ export function ButtonBase({
   className = "",
   disabled = false,
   type = "button",
-  onClick,
+  onClick = () => {},
+  ariaLabel = undefined,
   ...props
 }: ButtonBaseProps) {
   const state: ButtonState = pressed ? "pressed" : "default";
@@ -34,6 +36,7 @@ export function ButtonBase({
       data-variant={variant}
       data-state={state}
       onClick={onClick}
+      aria-label={ariaLabel}
       className={[styles.button, className].filter(Boolean).join(" ")}
     />
   );
