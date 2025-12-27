@@ -6,10 +6,11 @@ export type ButtonVariant = "default" | "muted" | "ghost";
 
 type ButtonState = "default" | "pressed";
 
-interface ButtonBaseProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonBaseProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: ButtonSize;
   variant?: ButtonVariant;
   pressed?: boolean;
+  onClick?: () => void;
 }
 
 export function ButtonBase({
@@ -19,6 +20,7 @@ export function ButtonBase({
   className = "",
   disabled = false,
   type = "button",
+  onClick,
   ...props
 }: ButtonBaseProps) {
   const state: ButtonState = pressed ? "pressed" : "default";
@@ -31,6 +33,7 @@ export function ButtonBase({
       data-size={size}
       data-variant={variant}
       data-state={state}
+      onClick={onClick}
       className={[styles.button, className].filter(Boolean).join(" ")}
     />
   );

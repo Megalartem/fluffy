@@ -13,7 +13,7 @@ export { CategoryIcon } from './CategoryIcon/CategoryIcon';
 
 // Buttons
 export { ButtonBase } from './ButtonBase/ButtonBase';
-export { IconButton } from './IconButton/IconButton';
+export { IconButton, type IconButtonProps } from './IconButton/IconButton';
 export { FAB } from './FAB/FAB';
 
 // Inputs

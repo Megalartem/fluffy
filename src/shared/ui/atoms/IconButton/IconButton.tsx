@@ -1,12 +1,12 @@
 import React from "react";
 import type { LucideIcon } from "lucide-react";
-import { ButtonBase, type ButtonSize, type ButtonVariant } from "../ButtonBase/ButtonBase";
+import { ButtonBase, type ButtonBaseProps, type ButtonSize, type ButtonVariant } from "../ButtonBase/ButtonBase";
 import { Icon, type IconSize, type IconVariant } from "../Icon/Icon";
 import styles from "./IconButton.module.css";
 
 export type IconButtonVariant = "default" | "muted" | "ghost";
 
-interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface IconButtonProps extends ButtonBaseProps {
   icon: LucideIcon;
 
   /** Unified variant that controls BOTH the button container and the icon color */
