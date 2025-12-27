@@ -17,3 +17,6 @@ export type {
 
 export { SegmentedControl } from "./SegmentedControl/SegmentedControl";
 export type { SegmentedControlProps, SegmentedOption } from "./SegmentedControl/SegmentedControl";
+
+export { ListRowBase } from "./ListRowBase/ListRowBase";
+export type { ListRowBaseTone, ListRowBaseSize } from "./ListRowBase/ListRowBase";
