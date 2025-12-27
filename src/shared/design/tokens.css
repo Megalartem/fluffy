@@ -19,8 +19,8 @@
   /* Letter spacing */
   --letter-spacing-tight: -0.01em;
 
-  --input-height: 52px;
-  --button-height: 52px;
+  --height-md: 52px;
+  --height-sm: 44px;
 
 
   /* Font weights */

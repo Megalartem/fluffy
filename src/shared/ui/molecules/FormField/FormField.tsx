@@ -17,10 +17,6 @@ export interface FormFieldProps {
   children: React.ReactElement;
 }
 
-function makeId() {
-  return `ff_${Math.random().toString(36).slice(2, 10)}`;
-}
-
 export const FormField: React.FC<FormFieldProps> = ({
   label,
   helperText,
@@ -30,13 +26,21 @@ export const FormField: React.FC<FormFieldProps> = ({
   children,
   onChange,
 }) => {
-  const id = (children.props as { id?: string }).id ?? makeId();
+  // Генерируем стабильный id, одинаковый на сервере и клиенте
+  const reactId = React.useId();
+  const id =
+    (children.props as { id?: string }).id ?? `ff_${reactId}`;
+
   return (
     <div className={clsx(styles.root, className)}>
       {label ? (
         <label htmlFor={id} className={styles.label}>
           <Text variant="label">{label}</Text>
-          {required ? <span className={styles.required} aria-hidden="true">*</span> : null}
+          {required ? (
+            <span className={styles.required} aria-hidden="true">
+              *
+            </span>
+          ) : null}
         </label>
       ) : null}
 
@@ -46,7 +50,7 @@ export const FormField: React.FC<FormFieldProps> = ({
         aria-describedby={helperText || error ? `${id}__hint` : undefined}
         {...(children.props as object)}
         onChange={onChange}
-       />
+      />
 
       {error ? (
         <div id={`${id}__hint`} className={styles.error} role="alert">

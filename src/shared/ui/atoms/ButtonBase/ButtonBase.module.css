@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-2);
-  height: var(--button-height);
+  height: fit-content;
 
   border-radius: var(--radius-md);
   border: 1px solid transparent;
@@ -28,11 +28,14 @@
 .button[data-size="s"] {
   padding: var(--spacing-1) var(--spacing-2);
   font-size: var(--text-sm);
+  /* height: var(--height-sm); */
 }
 
 .button[data-size="m"] {
   padding: var(--spacing-2) var(--spacing-4);
-  font-size: var(--text-md);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  /* height: var(--height-md); */
 }
 
 /* Variants */
@@ -61,9 +64,9 @@
   color: var(--color-text-secondary);
 }
 
-.button[data-variant="ghost"]:hover {
+/* .button[data-variant="ghost"]:hover {
   border-color: var(--color-secondary);
-}
+} */
 
 /* Press */
 .button:active {

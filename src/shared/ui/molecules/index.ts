@@ -14,3 +14,6 @@ export type {
   ModalActionsLayout,
   ModalAction,
 } from "./ModalActions/ModalActions";
+
+export { SegmentedControl } from "./SegmentedControl/SegmentedControl";
+export type { SegmentedControlProps, SegmentedOption } from "./SegmentedControl/SegmentedControl";
