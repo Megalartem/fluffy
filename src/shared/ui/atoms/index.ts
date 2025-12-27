@@ -27,7 +27,7 @@ export { Checkmark } from './Checkmark/Checkmark';
 // Feedback
 export { Badge } from './Badge/Badge';
 export { Dot } from './Dot/Dot';
-export { Overlay } from './Overlay';
+export { Overlay } from './Overlay/Overlay';
 
 // Motion
 export { transitionClasses, TransitionWrapper } from './Transition';
