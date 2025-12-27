@@ -21,7 +21,7 @@ export { InputBase } from './InputBase/InputBase';
 export { SearchInput } from './SearchInput/SearchInput';
 
 // Selection
-export { Toggle } from './Toggle';
+export { Toggle } from './Toggle/Toggle';
 export { Checkmark } from './Checkmark/Checkmark';
 
 // Feedback
