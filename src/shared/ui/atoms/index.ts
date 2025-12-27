@@ -1,6 +1,6 @@
 // Typography
 export { Text } from './Text';
-export { Heading } from './Heading';
+export { Heading } from './Heading/Heading';
 export { Amount } from './Amount/Amount';
 
 // Color Primitives

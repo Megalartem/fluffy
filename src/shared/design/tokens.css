@@ -10,7 +10,15 @@
   --text-sm: 12px;
   --text-base: 16px;
   --text-lg: 20px;
-  --text-2xl: 32px;
+  --text-xl: 32px;
+
+    /* Line heights */
+  --line-height-tight: 1.15;
+  /* Line heights */
+  --line-height-base: 1.4;
+  /* Letter spacing */
+  --letter-spacing-tight: -0.01em;
+
 
   /* Font weights */
   --font-weight-medium: 500;

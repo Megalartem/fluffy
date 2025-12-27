@@ -1,0 +1,24 @@
+.heading {
+  font-family: var(--font-sans);
+  color: var(--color-text-secondary);
+}
+
+.heading[data-variant="page"] {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.heading[data-variant="section"] {
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-base);
+}
+
+.heading[data-variant="amount"] {
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  font-variant-numeric: tabular-nums;
+}
