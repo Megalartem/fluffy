@@ -7,6 +7,11 @@
 }
 
 /* sizes */
+.root[data-size="xs"] {
+  width: 12px;
+  height: 12px;
+}
+
 .root[data-size="s"] {
   width: 32px;
   height: 32px;
@@ -26,6 +31,11 @@
   width: 20px;
   height: 20px;
   color: var(--color-text-primary);
+}
+
+.root[data-size="xs"] .icon {
+  width: 10px;
+  height: 10px;
 }
 
 .root[data-size="s"] .icon {

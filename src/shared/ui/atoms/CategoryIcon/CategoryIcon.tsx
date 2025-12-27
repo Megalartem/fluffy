@@ -8,7 +8,7 @@ type CategoryColor =
   | "pink" | "magenta" | "plum"
   | "slate" | "steel" | "graphite" | "sand" | "brown";
 
-type CategorySize = "s" | "m" | "l";
+type CategorySize = "xs" | "s" | "m" | "l";
 type Importance = "primary" | "secondary";
 
 interface CategoryIconProps extends React.HTMLAttributes<HTMLDivElement> {
