@@ -1,0 +1,54 @@
+.fab {
+  position: fixed;
+  right: var(--spacing-4);
+  bottom: var(--spacing-4);
+  z-index: var(--z-fab);
+
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-fab);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+
+  box-shadow: var(--shadow-fab);
+  border: 0;
+
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    transform var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard),
+    opacity var(--duration-fast) var(--ease-standard);
+}
+
+.fab:hover {
+  /* subtle, non-dopamine */
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-fab-hover);
+}
+
+.fab:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.fab:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-focus) 20%, transparent), var(--shadow-fab);
+}
+
+.fab:disabled {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+}

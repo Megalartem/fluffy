@@ -14,7 +14,7 @@ export { CategoryIcon } from './CategoryIcon/CategoryIcon';
 // Buttons
 export { ButtonBase } from './ButtonBase/ButtonBase';
 export { IconButton } from './IconButton';
-export { FAB } from './FAB';
+export { FAB } from './FAB/FAB';
 
 // Inputs
 export { InputBase } from './InputBase/InputBase';

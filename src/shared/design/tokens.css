@@ -57,6 +57,12 @@
   /* Custom named token (use via rounded-fab) */
   --radius-fab: 24px;
 
+  /* ========== Z-Index ========== */
+  --z-fab: 1000;
+  --z-bottom-sheet: 1100;
+  --z-overlay: 1200;
+  --z-modal: 1300;
+
   /* ========== Shadows ========== */
   --shadow-card: 0 4px 16px rgba(21, 10, 53, 0.06);
   --shadow-fab: 0 4px 4px rgba(21, 10, 53, 0.25);
