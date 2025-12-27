@@ -3,7 +3,7 @@ import styles from "./ButtonBase.module.css";
 
 type ButtonSize = "small" | "medium";
 
-type ButtonVariant = "primary" | "secondary" | "ghost";
+type ButtonVariant = "default" | "muted" | "gost";
 
 type ButtonState = "default" | "pressed";
 
@@ -15,7 +15,7 @@ interface ButtonBaseProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
 
 export function ButtonBase({
   size = "medium",
-  variant = "primary",
+  variant = "default",
   pressed = false,
   className = "",
   disabled = false,
