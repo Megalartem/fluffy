@@ -1,0 +1,42 @@
+.dot {
+  display: inline-block;
+  border-radius: var(--radius-full);
+  background-color: var(--color-text-primary);
+}
+
+/* sizes */
+.dot[data-size="s"] {
+  width: 6px;
+  height: 6px;
+}
+
+.dot[data-size="m"] {
+  width: 8px;
+  height: 8px;
+}
+
+.dot[data-size="l"] {
+  width: 12px;
+  height: 12px;
+}
+
+/* color keys (extend if needed) */
+.dot[data-color="default"] {
+  background-color: var(--color-text-primary);
+}
+
+.dot[data-color="muted"] {
+  background-color: var(--color-text-secondary);
+}
+
+.dot[data-color="success"] {
+  background-color: var(--color-success);
+}
+
+.dot[data-color="warning"] {
+  background-color: var(--color-warning);
+}
+
+.dot[data-color="error"] {
+  background-color: var(--color-error);
+}
