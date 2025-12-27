@@ -1,0 +1,38 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* sizes */
+.root[data-size="s"] .svg {
+  width: 16px;
+  height: 16px;
+}
+
+.root[data-size="m"] .svg {
+  width: 20px;
+  height: 20px;
+}
+
+.root[data-size="l"] .svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* variants */
+.root[data-variant="default"] .svg {
+  color: var(--color-text-primary);
+}
+
+.root[data-variant="muted"] .svg {
+  color: var(--color-text-secondary);
+}
+
+.root[data-variant="accent"] .svg {
+  color: var(--color-primary);
+}
+
+.svg {
+  flex: 0 0 auto;
+}
