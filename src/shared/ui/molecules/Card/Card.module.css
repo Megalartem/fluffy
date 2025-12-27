@@ -1,0 +1,7 @@
+.card[data-padding="md"] {
+  padding: var(--spacing-4); /* 16px */
+}
+
+.card[data-padding="lg"] {
+  padding: var(--spacing-6); /* 24px */
+}
