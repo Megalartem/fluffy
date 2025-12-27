@@ -2,9 +2,9 @@ import React from 'react';
 import styles from './Text.module.css';
 import clsx from 'clsx';
 
-type TextVariant = 'body' | 'caption' | 'label' | 'muted';
+export type TextVariant = 'body' | 'caption' | 'label' | 'muted';
 
-interface TextProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface TextProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: TextVariant;
 }
 

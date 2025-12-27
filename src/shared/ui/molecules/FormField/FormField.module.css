@@ -1,0 +1,27 @@
+
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.label {
+  display: inline-flex;
+  align-items: baseline;
+  color: var(--color-text-secondary);
+}
+
+.required {
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  line-height: 1;
+}
+
+.control {
+  width: 100%;
+}
+
+.error {
+  color: var(--color-error);
+}

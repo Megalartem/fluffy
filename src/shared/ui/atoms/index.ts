@@ -1,5 +1,5 @@
 // Typography
-export { Text } from './Text/Text';
+export { Text, type TextProps, type TextVariant } from './Text/Text';
 export { Heading } from './Heading/Heading';
 export { Amount } from './Amount/Amount';
 
