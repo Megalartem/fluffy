@@ -2,7 +2,7 @@ import React from "react";
 import type { LucideIcon } from "lucide-react";
 import styles from "./Icon.module.css";
 
-export type IconVariant = "default" | "muted" | "accent";
+export type IconVariant = "default" | "on-default" | "muted" | "accent";
 export type IconSize = "s" | "m" | "l";
 
 interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {

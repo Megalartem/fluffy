@@ -84,6 +84,7 @@
 
   /* ========== Misc ========== */
   --opacity-transaction-type: 0.8;
+  --opacity-disabled: 0.5;
 
   /* ================================
   Category color palette (bg only)

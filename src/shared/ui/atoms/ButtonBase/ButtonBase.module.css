@@ -9,7 +9,7 @@
   border: 1px solid transparent;
 
   font-family: var(--font-family-sans);
-  font-weight: var(--text-weight-semibold);
+  font-weight: var(--font-weight-semibold);
 
   cursor: pointer;
   user-select: none;
@@ -25,12 +25,12 @@
 }
 
 /* Sizes */
-.button[data-size="small"] {
+.button[data-size="s"] {
   padding: var(--spacing-1) var(--spacing-2);
   font-size: var(--text-sm);
 }
 
-.button[data-size="medium"] {
+.button[data-size="m"] {
   padding: var(--spacing-2) var(--spacing-4);
   font-size: var(--text-md);
 }
@@ -48,7 +48,7 @@
 .button[data-variant="muted"] {
   background: var(--background-card);
   color: var(--color-text-secondary);
-  border-color: var(--color-border);
+  border-color: var(--color-secondary);
 }
 
 .button[data-variant="muted"]:hover {
@@ -58,20 +58,20 @@
 
 .button[data-variant="ghost"] {
   background: transparent;
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
 }
 
 .button[data-variant="ghost"]:hover {
-  background: color-mix(in srgb, var(--background-card) 60%, transparent);
+  border-color: var(--color-secondary);
 }
 
 /* Press */
 .button:active {
-  transform: scale(0.98);
+  transform: scale(0.96);
 }
 
 .button[data-state="pressed"] {
-  transform: scale(0.98);
+  transform: scale(0.96);
 }
 
 /* Focus */

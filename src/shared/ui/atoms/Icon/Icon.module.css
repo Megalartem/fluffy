@@ -33,6 +33,10 @@
   color: var(--color-primary);
 }
 
+.root[data-variant="on-default"] .svg {
+  color: var(--color-text-on-primary);
+}
+
 .svg {
   flex: 0 0 auto;
 }

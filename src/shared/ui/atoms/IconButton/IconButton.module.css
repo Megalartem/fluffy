@@ -1,0 +1,12 @@
+.root {
+  /* IconButton is a control, not layout. Keep spacing minimal and token-driven. */
+  padding: var(--spacing-2);
+}
+
+.root[data-size="s"] {
+  padding: var(--spacing-1);
+}
+
+.root :global(svg) {
+  pointer-events: none;
+}
