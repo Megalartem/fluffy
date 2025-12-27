@@ -5,7 +5,7 @@ export { Amount } from './Amount/Amount';
 
 // Color Primitives
 export { Surface } from './Surface';
-export { Divider } from './Divider';
+export { Divider } from './Divider/Divider';
 
 // Iconography
 export { Icon } from './Icon';
