@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-2);
-  height: fit-content;
+  height: var(--button-height);
 
   border-radius: var(--radius-md);
   border: 1px solid transparent;

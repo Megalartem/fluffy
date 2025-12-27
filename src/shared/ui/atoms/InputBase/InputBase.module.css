@@ -1,6 +1,7 @@
 
 .input {
   width: 100%;
+  height: var(--input-height);
 
   /* spacing */
   padding: var(--spacing-2) var(--spacing-4);
