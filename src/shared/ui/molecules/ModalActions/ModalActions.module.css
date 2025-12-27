@@ -1,0 +1,13 @@
+.root {
+  margin-top: var(--spacing-4);
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.column {
+  grid-template-columns: 1fr;
+}
+
+.row {
+  grid-template-columns: 1fr 1fr;
+}

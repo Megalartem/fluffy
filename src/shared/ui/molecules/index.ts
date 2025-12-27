@@ -7,3 +7,10 @@ export type { TopBarProps } from './TopBar/TopBar';
 
 export { ModalHeader } from "./ModalHeader/ModalHeader";
 export type { ModalHeaderProps } from "./ModalHeader/ModalHeader";
+
+export { ModalActions } from "./ModalActions/ModalActions";
+export type {
+  ModalActionsProps,
+  ModalActionsLayout,
+  ModalAction,
+} from "./ModalActions/ModalActions";
