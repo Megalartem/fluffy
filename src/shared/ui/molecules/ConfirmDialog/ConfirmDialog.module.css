@@ -1,0 +1,39 @@
+.root {
+  display: grid;
+  gap: var(--spacing-6);
+}
+
+.header {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.title {
+  color: var(--color-text-primary);
+}
+
+.description {
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-base);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-2);
+}
+
+/* Кнопки — только layout, без визуала */
+.cancel {
+  width: 100%;
+}
+
+.confirm {
+  width: 100%;
+}
+
+/* Danger-акцент для destructive action */
+.danger {
+  background-color: var(--color-error);
+  color: var(--color-text-on-primary);
+}
