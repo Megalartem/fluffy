@@ -31,3 +31,6 @@ export { Modal } from "./Modal/Modal";
 export type { ModalSize } from "./Modal/Modal";
 
 export { SearchBar } from "./SearchBar/SearchBar";
+
+export { BottomSheet } from "./BottomSheet/BottomSheet";
+export type { BottomSheetHeight } from "./BottomSheet/BottomSheet";

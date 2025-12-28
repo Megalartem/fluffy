@@ -1,0 +1,62 @@
+.root {
+  position: fixed;
+  inset: 0;
+}
+
+.sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-bottom-sheet);
+
+  background: var(--color-surface);
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-bottom-sheet);
+
+  overflow: hidden;
+}
+
+.auto {
+  max-height: 85vh;
+}
+
+.half {
+  height: 50vh;
+}
+
+.full {
+  height: 92vh;
+}
+
+.handleWrap {
+  position: relative;
+  z-index: var(--z-bottom-sheet-handle);
+  display: grid;
+  place-items: center;
+  padding: var(--spacing-2) 0;
+}
+
+.handle {
+  width: 44px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+
+.header {
+  padding: 0 var(--spacing-6) var(--spacing-2) var(--spacing-6);
+
+  font-size: var(--text-lg);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-text-primary);
+}
+
+.body {
+  padding: var(--spacing-6);
+  padding-bottom: calc(var(--spacing-6) + env(safe-area-inset-bottom));
+}
