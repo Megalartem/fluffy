@@ -1,0 +1,36 @@
+.root {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.inputWrap {
+  position: relative;
+  width: 100%;
+}
+
+.leftIcon {
+  position: absolute;
+  left: var(--spacing-4);
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.input {
+  padding-left: calc(var(--spacing-6) + 20px); /* spacing + icon width */
+}
+
+.filtersWrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}

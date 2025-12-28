@@ -4,7 +4,7 @@ import { on } from "events";
 
 type InputState = "default" | "focused" | "error" | "disabled";
 
-interface InputBaseProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputBaseProps extends React.InputHTMLAttributes<HTMLInputElement> {
   /**
    * Visual state override. In normal usage you should NOT pass "focused".
    * Focus styles are handled by :focus-visible in CSS.

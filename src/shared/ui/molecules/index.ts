@@ -30,3 +30,4 @@ export type { EmptyStateTone, EmptyStateSize } from "./EmptyState/EmptyState";
 export { Modal } from "./Modal/Modal";
 export type { ModalSize } from "./Modal/Modal";
 
+export { SearchBar } from "./SearchBar/SearchBar";

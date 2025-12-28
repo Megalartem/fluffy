@@ -1,9 +1,10 @@
 import React from "react";
 import { Search, X } from "lucide-react";
-import { InputBase } from "../InputBase/InputBase";
+import { InputBase, InputBaseProps } from "../InputBase/InputBase";
 import styles from "./SearchInput.module.css";
 
-interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface SearchInputProps extends InputBaseProps {
+  
   onClear?: () => void;
 }
 
