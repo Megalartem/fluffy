@@ -55,3 +55,6 @@ export type { NoticeItem } from "./NoticeStack/NoticeStack";
 
 export { Skeleton, SkeletonText } from "./Skeleton/Skeleton";
 export type { SkeletonVariant } from "./Skeleton/Skeleton";
+
+export { LoadMoreBar } from "./LoadMoreBar/LoadMoreBar";
+export type { LoadMoreBarState } from "./LoadMoreBar/LoadMoreBar";

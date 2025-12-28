@@ -30,6 +30,7 @@
   --color-secondary: #BFB9D8;
   --color-accent: #150A35;
   --color-focus: var(--color-primary);
+  --color-card: #FFFFFF;
   --color-disabled: #C4C4C4;
   --color-border: rgba(21, 10, 53, 0.06);
 
