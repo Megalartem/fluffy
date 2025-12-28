@@ -52,3 +52,6 @@ export type { InlineNoticeTone } from "./InlineNotice/InlineNotice";
 
 export { NoticeStack } from "./NoticeStack/NoticeStack";
 export type { NoticeItem } from "./NoticeStack/NoticeStack";
+
+export { Skeleton, SkeletonText } from "./Skeleton/Skeleton";
+export type { SkeletonVariant } from "./Skeleton/Skeleton";

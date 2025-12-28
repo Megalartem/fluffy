@@ -1,0 +1,61 @@
+.root {
+  width: var(--sk-w, 100%);
+  height: var(--sk-h, 12px);
+  border-radius: var(--sk-r, 12px);
+
+  background: rgba(165, 119, 255, 0.10);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle shimmer */
+.root::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.55),
+    transparent
+  );
+  animation: shimmer var(--duration-extra-slow) var(--ease-standard) infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Variants */
+.line {
+  height: var(--sk-h, 12px);
+  border-radius: var(--sk-r, 12px);
+}
+
+.block {
+  height: var(--sk-h, 96px);
+  border-radius: var(--sk-r, var(--radius-md));
+}
+
+.circle {
+  width: var(--sk-w, 40px);
+  height: var(--sk-h, 40px);
+  border-radius: 999px;
+}
+
+.text {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root::after {
+    animation: none;
+  }
+}

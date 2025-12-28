@@ -44,7 +44,7 @@
   --color-text-on-primary: #FFFFFF;
 
   /* Status colors */
-  --color-success: #A577FF;
+  --color-success: var(--color-primary);
   --color-warning: #FDB641;
   --color-error: #F9725B;
 
@@ -82,6 +82,7 @@
   --duration-fast: 150ms;
   --duration-base: 250ms;
   --duration-slow: 400ms;
+  --duration-extra-slow: 800ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 
   /* ========== Misc ========== */
