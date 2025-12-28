@@ -36,3 +36,11 @@ export { BottomSheet } from "./BottomSheet/BottomSheet";
 export type { BottomSheetHeight } from "./BottomSheet/BottomSheet";
 
 export { FiltersSheet } from "./FiltersSheet/FiltersSheet";
+
+export { SortSheet } from "./SortSheet/SortSheet";
+export { SortControl } from "./SortControl/SortControl";
+export type {
+  SortOption,
+  SortValue,
+  SortDirection,
+} from "./SortControl/SortControl";
