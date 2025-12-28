@@ -34,3 +34,5 @@ export { SearchBar } from "./SearchBar/SearchBar";
 
 export { BottomSheet } from "./BottomSheet/BottomSheet";
 export type { BottomSheetHeight } from "./BottomSheet/BottomSheet";
+
+export { FiltersSheet } from "./FiltersSheet/FiltersSheet";
