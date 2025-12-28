@@ -1,0 +1,19 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+}
+
+.left {
+  min-width: 0;
+  display: grid;
+  gap: var(--spacing-1);
+}
+
+.action {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}

@@ -44,3 +44,5 @@ export type {
   SortValue,
   SortDirection,
 } from "./SortControl/SortControl";
+
+export { SectionHeader } from "./SectionHeader/SectionHeader";
