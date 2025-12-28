@@ -5,7 +5,7 @@
   right: var(--spacing-2);
   top: var(--spacing-2);
 
-  width: 60vw; /* 60% экрана справа */
+  width: 40vw; /* 60% экрана справа */
 
   display: flex;
   flex-direction: column;
