@@ -1,0 +1,54 @@
+.root {
+  position: fixed;
+  inset: 0;
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+
+  padding: var(--spacing-6);
+}
+
+/* сам диалог */
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  z-index: var(--z-modal);
+
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+
+  overflow: hidden;
+}
+
+.s {
+  max-width: 360px;
+}
+
+.m {
+  max-width: 420px;
+}
+
+.l {
+  max-width: 520px;
+}
+
+.title {
+  padding: var(--spacing-6) var(--spacing-6) 0 var(--spacing-6);
+
+  font-size: var(--text-lg);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-text-primary);
+}
+
+.body {
+  padding: var(--spacing-6);
+}
