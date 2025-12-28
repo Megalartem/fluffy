@@ -1,0 +1,70 @@
+.root {
+  display: flex;
+  align-items: flex-start;
+  left: 4px;
+
+  gap: var(--spacing-2);
+
+  padding: var(--spacing-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.rootClickable {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.rootClickable:hover {
+  background-color: rgba(165, 119, 255, 0.12);
+}
+
+.rootClickable:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.body {
+  min-width: 0;
+  display: grid;
+  gap: var(--spacing-1);
+  flex: 1;
+}
+
+.title {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.message {
+  color: var(--color-text-secondary);
+}
+
+.icon {
+  flex: none;
+  margin-top: 2px;
+}
+
+.close {
+  flex: none;
+}
+
+/* Tones */
+.info {
+  border-color: var(--color-success);
+}
+
+.success {
+  border-color: var(--color-success);
+}
+
+.warning {
+  border-color: var(--color-warning);
+}
+
+.error {
+  border-color: var(--color-error);
+}

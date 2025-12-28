@@ -46,3 +46,9 @@ export type {
 } from "./SortControl/SortControl";
 
 export { SectionHeader } from "./SectionHeader/SectionHeader";
+
+export { InlineNotice } from "./InlineNotice/InlineNotice";
+export type { InlineNoticeTone } from "./InlineNotice/InlineNotice";
+
+export { NoticeStack } from "./NoticeStack/NoticeStack";
+export type { NoticeItem } from "./NoticeStack/NoticeStack";
