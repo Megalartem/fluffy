@@ -1,2 +1,2 @@
 
-export { TransactionCategoryIcon } from "./TransactionCategoryIcon/TransactionCategoryIcon"
+export { TransactionCategoryIcon, type TxType } from "./TransactionCategoryIcon/TransactionCategoryIcon"
