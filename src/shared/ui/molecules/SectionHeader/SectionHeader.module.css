@@ -11,7 +11,7 @@
   gap: var(--spacing-1);
 }
 
-.action {
+.rightSec {
   flex: none;
   display: flex;
   align-items: center;

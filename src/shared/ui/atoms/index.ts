@@ -4,7 +4,7 @@ export { Heading } from './Heading/Heading';
 export { Amount } from './Amount/Amount';
 
 // Color Primitives
-export { Surface } from './Surface/Surface';
+export { Surface, type SurfaceVariant, type SurfaceBgVariant } from './Surface/Surface';
 export { Divider } from './Divider/Divider';
 
 // Iconography

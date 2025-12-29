@@ -1,0 +1,27 @@
+.dailyHeader {
+    display: flex;
+    width: 100%;
+
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total {
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    white-space: nowrap;
+}
+
+.list {
+    margin-top: var(--spacing-2);
+    display: grid;
+    gap: 0;
+}
+
+/* Divider смещаем вправо, чтобы начинался под текстом, а не под иконкой */
+.divider {
+    margin-left: 56px;
+    /* под leading (иконка) */
+    opacity: 0.6;
+}

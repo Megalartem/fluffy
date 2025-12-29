@@ -5,25 +5,29 @@ import clsx from "clsx";
 import styles from "./SectionHeader.module.css";
 import { Text, Heading } from "@/shared/ui/atoms";
 
+type HeaderText = "primary" | "secondary"
+
 export function SectionHeader({
   title,
   subtitle,
-  action,
   className,
+  rightSec,
+  headerText = "secondary"
 }: {
   title: React.ReactNode;
   subtitle?: React.ReactNode;
-  action?: React.ReactNode;
+  rightSec?: React.ReactNode;
+  headerText?: HeaderText;
   className?: string;
 }) {
   return (
     <div className={clsx(styles.root, className)}>
       <div className={styles.left}>
         <Heading
-            variant="section"
-            as="h3"
+          variant={headerText === "primary" ? "amount" : "section"}
+          as="h3"
         >
-            {title}
+          {title}
         </Heading>
         {subtitle ? (
           <Text variant="caption">
@@ -31,8 +35,7 @@ export function SectionHeader({
           </Text>
         ) : null}
       </div>
-
-      {action ? <div className={styles.action}>{action}</div> : null}
+      {rightSec ? <div className={styles.rightSec}>{rightSec}</div> : null}
     </div>
   );
 }

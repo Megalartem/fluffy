@@ -17,8 +17,9 @@
 }
 
 .heading[data-variant="amount"] {
+  color: var(--color-text-primary);
   font-size: var(--text-md);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
   font-variant-numeric: tabular-nums;
 }
