@@ -1,12 +1,12 @@
 import React from "react";
 import styles from "./CategoryIcon.module.css";
 
-type CategoryColor =
+export type CategoryColor =
   | "default" | "violet" | "indigo" | "blue" | "cyan" | "teal"
   | "amber" | "orange" | "coral" | "red"
   | "green" | "lime" | "mint"
   | "pink" | "magenta" | "plum"
-  | "slate" | "steel" | "graphite" | "sand" | "brown";
+  | "slate" | "steel" | "graphite" | "sand" | "brown" | "tx-type";
 
 type CategorySize = "xs" | "s" | "m" | "l";
 type Importance = "primary" | "secondary";

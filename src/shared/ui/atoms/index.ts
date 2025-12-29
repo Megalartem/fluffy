@@ -9,7 +9,7 @@ export { Divider } from './Divider/Divider';
 
 // Iconography
 export { Icon } from './Icon/Icon';
-export { CategoryIcon } from './CategoryIcon/CategoryIcon';
+export { CategoryIcon, type CategoryColor } from './CategoryIcon/CategoryIcon';
 
 // Buttons
 export { ButtonBase } from './ButtonBase/ButtonBase';

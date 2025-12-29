@@ -30,7 +30,7 @@
 .icon {
   width: 20px;
   height: 20px;
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
 }
 
 .root[data-size="xs"] .icon {
@@ -75,6 +75,7 @@
 .root[data-color="graphite"] { background-color: var(--category-graphite-bg); }
 .root[data-color="sand"] { background-color: var(--category-sand-bg); }
 .root[data-color="brown"] { background-color: var(--category-brown-bg); }
+.root[data-color="tx-type"] { background-color: var(--color-category-tx-type); }
 
 
 .root[data-importance="primary"] .icon {

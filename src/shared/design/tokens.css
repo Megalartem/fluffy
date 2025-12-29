@@ -30,12 +30,13 @@
   --color-secondary: #BFB9D8;
   --color-accent: #150A35;
   --color-focus: var(--color-primary);
-  --color-card: #FFFFFF;
+  --color-card: var(--color-bg);
+  --color-category-tx-type: #F3EEFC;
   --color-disabled: #C4C4C4;
   --color-border: rgba(21, 10, 53, 0.06);
 
   /* Surfaces & backgrounds */
-  --color-bg: #F7F6FC;
+  --color-bg: #FFFFFF;
   --color-surface: #F6F7FB;
   --color-bg-subtitle-border: #F7F7FC;
 
