@@ -1,6 +1,5 @@
 import React from "react";
 import styles from "./InputBase.module.css";
-import { on } from "events";
 
 type InputState = "default" | "focused" | "error" | "disabled";
 
@@ -12,30 +11,21 @@ export interface InputBaseProps extends React.InputHTMLAttributes<HTMLInputEleme
   state?: Exclude<InputState, "focused">;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   /** Convenience flag for error state. */
-  error?: boolean;
 }
 
 export function InputBase({
   state = "default",
-  error = false,
-  disabled = false,
   className = "",
   onChange,
   ...props
 }: InputBaseProps) {
-  const currentState: InputState = disabled
-    ? "disabled"
-    : error
-      ? "error"
-      : state;
-
   return (
     <input
       {...props}
-      disabled={disabled}
-      data-state={currentState}
+      disabled={state === "disabled"}
+      data-state={state}
       onChange={onChange}
-      aria-invalid={currentState === "error" ? true : undefined}
+      aria-invalid={state === "error" ? true : undefined}
       className={[styles.input, className].filter(Boolean).join(" ")}
     />
   );

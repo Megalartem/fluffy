@@ -18,6 +18,7 @@ export { FAB } from './FAB/FAB';
 
 // Inputs
 export { InputBase } from './InputBase/InputBase';
+export { SelectBase } from './SelectBase/SelectBase';
 export { SearchInput } from './SearchInput/SearchInput';
 
 // Selection
