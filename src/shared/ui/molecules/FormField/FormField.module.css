@@ -25,3 +25,28 @@
 .error {
   color: var(--color-error);
 }
+
+.root[data-variant="select"] button {
+  cursor: pointer;
+}
+.input[data-variant="select"] button:disabled,
+.input[data-variant="select"][data-state="disabled"] button {
+  cursor: not-allowed;
+}
+
+.input[data-variant="number"] input::-webkit-outer-spin-button,
+.input[data-variant="number"] input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input[data-variant="number"] input[type=number] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.input[data-variant="number"] {
+    appearance: textfield;
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+}

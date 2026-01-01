@@ -10,18 +10,12 @@ export interface SelectBaseProps extends React.ButtonHTMLAttributes<HTMLButtonEl
    * Focus styles are handled by :focus-visible in CSS.
    */
   state?: Exclude<InputState, "focused">;
-  error?: boolean;
-  leading?: React.ReactNode;
-  trailing?: React.ReactNode;
-  text?: React.ReactNode;
-  hasValue?: boolean;
-  ariaHaspopup?: "dialog" | "listbox" | "menu" | "tree" | "grid";
-}
+  children: React.ReactNode;
+  ariaHaspopup?: "listbox" | "dialog" | "menu" | "tree" | "grid";}
 
 export function SelectBase({
   state = "default",
   className = "",
-  hasValue = false,
   ariaHaspopup,
   children,
   ...props
@@ -33,7 +27,6 @@ export function SelectBase({
       type="button"
       disabled={state === "disabled"}
       data-state={state}
-      data-empty={!hasValue ? "true" : undefined}
       aria-invalid={state === "error" ? true : undefined}
       aria-haspopup={ariaHaspopup ?? "dialog"}
       className={clsx(styles.input, className)}
