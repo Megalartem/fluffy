@@ -3,22 +3,29 @@ import { InputBase } from "@/shared/ui/atoms";
 import { FormFieldBase, FormFieldBaseProps } from "./FormFieldBase";
 
 export interface FormNumberFieldProps extends Omit<FormFieldBaseProps, "children"> {
-  value: number;
+  /** UI value as string to allow empty state */
+  value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
   disabled?: boolean;
 }
 
-export function FormNumberField({ value, onChange, disabled, error, ...base }: FormNumberFieldProps) {
+export function FormNumberField({
+  value,
+  onChange,
+  placeholder,
+  disabled,
+  error,
+  ...base
+}: FormNumberFieldProps) {
   return (
-    <FormFieldBase 
-    error={error} {...base}
-    fieldType="number"
-    >
+    <FormFieldBase error={error} {...base} fieldType="number">
       <InputBase
         type="number"
         inputMode="decimal"
         value={value}
         onChange={onChange}
+        placeholder={placeholder}
         state={error ? "error" : disabled ? "disabled" : "default"}
         disabled={disabled}
       />

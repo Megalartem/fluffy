@@ -65,12 +65,12 @@ export type { SkeletonVariant } from "./Skeleton/Skeleton";
 export { LoadMoreBar } from "./LoadMoreBar/LoadMoreBar";
 export type { LoadMoreBarState } from "./LoadMoreBar/LoadMoreBar";
 
-// export { FilterControl } from "./FilterControl/FilterControl";
-// export type {
-//   FilterOption,
-//   FilterValue,
-//   FilterValues,
-// } from "./FilterControl/FilterControl";
+export { FilterControl } from "./FilterControl/FilterControl";
+export type {
+  FilterOption,
+  FilterValue,
+  FilterValues,
+} from "./FilterControl/FilterControl";
 
 export { ConfirmDialog } from "./ConfirmDialog/ConfirmDialog";
 export type { ConfirmTone } from "./ConfirmDialog/ConfirmDialog";
