@@ -4,29 +4,39 @@ import styles from "./SelectBase.module.css";
 
 type InputState = "default" | "focused" | "error" | "disabled";
 
-export interface SelectBaseProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface SelectBaseProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /**
    * Visual state override. In normal usage you should NOT pass "focused".
    * Focus styles are handled by :focus-visible in CSS.
    */
   state?: Exclude<InputState, "focused">;
   children: React.ReactNode;
-  ariaHaspopup?: "listbox" | "dialog" | "menu" | "tree" | "grid";}
+  ariaHaspopup?: "listbox" | "dialog" | "menu" | "tree" | "grid";
+  /** Whether the trigger has a selected value (affects data-empty for styling). */
+  hasValue?: boolean;
+  "data-variant"?: string;
+}
 
 export function SelectBase({
   state = "default",
   className = "",
   ariaHaspopup,
   children,
+  hasValue = false,
   ...props
 }: SelectBaseProps) {
+  const dataVariant = props["data-variant"] ?? "select";
+  const isDisabled = Boolean(props.disabled) || state === "disabled";
 
   return (
     <button
       {...props}
       type="button"
-      disabled={state === "disabled"}
+      disabled={isDisabled}
       data-state={state}
+      data-variant={dataVariant}
+      data-empty={!hasValue ? "true" : undefined}
       aria-invalid={state === "error" ? true : undefined}
       aria-haspopup={ariaHaspopup ?? "dialog"}
       className={clsx(styles.input, className)}

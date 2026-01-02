@@ -79,31 +79,32 @@ export function FilterControl({
       .map((v) => option.options.find((o) => o.value === v)?.label)
       .filter(Boolean) as string[];
 
+    const hasValue =
+      mode === "multi" ? selectedValues.length > 0 : selectedValues.length === 1;
 
-    // Default text UI (can be overridden via renderValue)
     const defaultNode =
       mode === "multi"
-        ? `${selectedValues.length} выбрано`
-        : (labels[0] ?? option.placeholder ?? "Выберите…");
+        ? (hasValue ? `${selectedValues.length} выбрано` : (option.placeholder ?? "Выберите…"))
+        : (hasValue ? (labels[0] ?? option.placeholder ?? "Выберите…") : (option.placeholder ?? "Выберите…"));
 
-    const node = option.renderValue
+    const node = option.renderValue && hasValue
       ? option.renderValue({
-        mode,
-        value: mode === "multi" ? selectedValues : (selectedValues[0] ?? null),
-        labels,
-      })
+          mode,
+          value: mode === "multi" ? selectedValues : (selectedValues[0] ?? null),
+          labels,
+        })
       : defaultNode;
 
     const placeholder = option.placeholder ?? "Выберите…";
 
-    return { mode, node, placeholder };
+    return { mode, hasValue, node, placeholder };
   }
 
   return (
     <div className={clsx(styles.root, className)}>
       {options.map((option) => {
         if (option.type === "select") {
-          const { mode, node, placeholder } = getSelectDisplay(option);
+          const { mode, hasValue, node, placeholder } = getSelectDisplay(option);
 
           return (
             <FormSelectField
@@ -112,6 +113,7 @@ export function FilterControl({
               mode={mode}
               value={node}
               placeholder={placeholder}
+              hasValue={hasValue}
               onClick={() => onOpenSelect(option.key)}
             />
           );
@@ -126,7 +128,7 @@ export function FilterControl({
             label={option.label}
             value={numberString}
             onChange={handleNumberChange(option.key)}
-            helperText={option.placeholder}
+            placeholder={option.placeholder}
           />
         );
       })}
