@@ -1,9 +1,9 @@
 .input {
   width: 100%;
   display: flex;
+  justify-content: space-between;
   align-content: center;
-  /* justify-content: space-between; */
-  /* flex-wrap: nowrap; */
+  align-items: center;
   height: var(--input-height);
 
   /* spacing */
@@ -49,4 +49,14 @@
   cursor: not-allowed;
   opacity: var(--opacity-disabled);
   border: 1px solid var(--color-disabled);
+}
+
+/* Chevron */
+.chevron {
+  flex-shrink: 0;
+  transition: transform var(--duration-base) var(--ease-standard);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
 }
