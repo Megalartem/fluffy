@@ -12,7 +12,7 @@ export { FormNumberField } from "./FormField/FormNumberField";
 export type { FormNumberFieldProps } from "./FormField/FormNumberField";
 
 export { FormSelectField } from "./FormField/FormSelectField";
-export type { FormSelectFieldProps } from "./FormField/FormSelectField";
+export type { FormSelectFieldProps, FormValue } from "./FormField/FormSelectField";
 
 export { ModalHeader } from "./ModalHeader/ModalHeader";
 export type { ModalHeaderProps } from "./ModalHeader/ModalHeader";
@@ -65,12 +65,13 @@ export type { SkeletonVariant } from "./Skeleton/Skeleton";
 export { LoadMoreBar } from "./LoadMoreBar/LoadMoreBar";
 export type { LoadMoreBarState } from "./LoadMoreBar/LoadMoreBar";
 
-export { FilterControl } from "./FilterControl/FilterControl";
-export type {
-  FilterOption,
-  FilterValue,
-  FilterValues,
-} from "./FilterControl/FilterControl";
 
 export { ConfirmDialog } from "./ConfirmDialog/ConfirmDialog";
 export type { ConfirmTone } from "./ConfirmDialog/ConfirmDialog";
+
+export { OptionControl } from "./OptionControl/OptionControl";
+export type {
+  OptionControlProps,
+  OptionItem,
+  OptionMode,
+} from "./OptionControl/OptionControl";

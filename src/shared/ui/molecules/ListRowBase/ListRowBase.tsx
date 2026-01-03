@@ -16,6 +16,8 @@ export function ListRowBase({
     className,
     role,
     ariaLabel,
+    ariaSelected,
+    disabled = false,
 }: {
     leading?: React.ReactNode;
     title: React.ReactNode;
@@ -27,6 +29,8 @@ export function ListRowBase({
     className?: string;
     role?: React.AriaRole;
     ariaLabel?: string;
+    ariaSelected?: boolean;
+    disabled?: boolean;
 }) {
     const isInteractive = Boolean(onClick);
 
@@ -46,6 +50,8 @@ export function ListRowBase({
             onClick={onClick}
             role={role}
             aria-label={ariaLabel}
+            aria-selected={ariaSelected}
+            disabled={disabled}
         >
             {leading ? <div className={styles.leading}>{leading}</div> : null}
 
