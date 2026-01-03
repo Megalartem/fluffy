@@ -12,7 +12,7 @@ export type ModalAction = {
 };
 
 export interface ModalActionsProps {
-  primary: ModalAction;
+  primary?: ModalAction;
   secondary?: ModalAction;
   layout?: ModalActionsLayout; // default: column (mobile-friendly)
   className?: string;
@@ -43,14 +43,16 @@ export const ModalActions: React.FC<ModalActionsProps> = ({
         </ButtonBase>
       ) : null}
 
-      <ButtonBase
-        variant="default"
-        size="m"
-        onClick={primary.onClick}
-        disabled={primary.disabled}
-      >
-        {primary.label}
-      </ButtonBase>
+      {primary ? (
+        <ButtonBase
+          variant="default"
+          size="m"
+          onClick={primary.onClick}
+          disabled={primary.disabled}
+        >
+          {primary.label}
+        </ButtonBase>
+      ) : null}
     </div>
   );
 };
