@@ -38,6 +38,12 @@
   border-color: var(--color-focus);
 }
 
+.input[data-state="focused"] {
+  outline: none;
+  color: var(--color-text-primary);
+  border-color: var(--color-focus);
+}
+
 /* Error */
 .input[data-state="error"] {
   border-color: var(--color-error);

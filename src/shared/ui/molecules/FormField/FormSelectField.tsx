@@ -2,7 +2,8 @@ import React from "react";
 import { Heading, Icon, SelectBase } from "@/shared/ui/atoms";
 import styles from "./FormField.module.css";
 import { FormFieldBase, FormFieldBaseProps } from "./FormFieldBase";
-import { LucideIcon } from "lucide-react";
+import { ChevronDown, LucideIcon } from "lucide-react";
+import clsx from "clsx";
 
 type SelectMode = "single" | "multi";
 
@@ -23,6 +24,7 @@ export interface FormSelectFieldProps extends Omit<FormFieldBaseProps, "children
   /** Rendered when hasValue=false */
   placeholder?: React.ReactNode;
   error?: string;
+  showChevron?: boolean;
   isOpen?: boolean;
 }
 
@@ -34,6 +36,7 @@ export function FormSelectField({
   disabled,
   error,
   isOpen = false,
+  showChevron = true,
   ...base
 }: FormSelectFieldProps) {
 
@@ -45,12 +48,10 @@ export function FormSelectField({
         onClick={onClick}
         hasValue={value !== undefined}
         data-value={value}
-        isOpen={isOpen}
         state={error ? "error" : disabled ? "disabled" : "default"}
       >
         {
-          value
-            ? (
+          value ? (
                 mode === "single" && value && !Array.isArray(value) ? (
                   <div
                     className={styles.selectBody}
@@ -86,6 +87,7 @@ export function FormSelectField({
             )
             : placeholder
         }
+        { showChevron && <ChevronDown className={clsx(styles.chevron, isOpen && styles.chevronOpen)} /> }
       </SelectBase>
     </FormFieldBase>
   );

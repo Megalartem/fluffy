@@ -57,3 +57,14 @@
     -webkit-appearance: textfield;
     -moz-appearance: textfield;
 }
+
+
+/* Chevron */
+.chevron {
+  flex-shrink: 0;
+  transition: transform var(--duration-base) var(--ease-standard);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
