@@ -13,7 +13,7 @@ export interface OptionBaseProps {
     icon?: React.ReactNode;
     disabled?: boolean;
     isChecked?: boolean;
-    onClick?: () => void;
+    onSelect?: () => void;
 }
 
 export function OptionBase({
@@ -22,7 +22,7 @@ export function OptionBase({
     icon,
     disabled,
     isChecked,
-    onClick,
+    onSelect,
 }: OptionBaseProps) {
 
     return (
@@ -33,7 +33,7 @@ export function OptionBase({
                 styles.option, 
                 disabled && styles.disabled, 
                 isChecked && styles.active)}
-            onClick={onClick}
+            onClick={onSelect}
         >
             <div className={styles.optionBody}>
                 {icon}

@@ -32,7 +32,7 @@
 .disabled {
   cursor: not-allowed;
   opacity: var(--opacity-disabled);
-  border: 1px solid var(--color-disabled);
+  border: 1px solid transparent;
 }
 
 .optionBody {

@@ -72,6 +72,5 @@ export type { ConfirmTone } from "./ConfirmDialog/ConfirmDialog";
 export { OptionControl } from "./OptionControl/OptionControl";
 export type {
   OptionControlProps,
-  OptionItem,
   OptionMode,
 } from "./OptionControl/OptionControl";

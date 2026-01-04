@@ -1,0 +1,76 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.search {
+  width: 100%;
+}
+
+.topSlot {
+  width: 100%;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.optionRow {
+  border: 1px solid transparent;
+  border-radius: var(--radius-12);
+  background: transparent;
+}
+
+.selected {
+  border-color: var(--accent-3);
+  background: var(--surface-1);
+}
+
+.selectedBody {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.disabled {
+  opacity: 0.6;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+}
+
+.footerLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.actionButton {
+  border: 1px solid var(--border-1);
+  background: var(--surface-1);
+  padding: var(--spacing-3);
+  border-radius: var(--radius-12);
+  cursor: pointer;
+}
+
+.actionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.primary {
+  border-color: var(--accent-3);
+}
+
+.empty {
+  padding: var(--spacing-4);
+  border-radius: var(--radius-12);
+  border: 1px dashed var(--border-1);
+}
