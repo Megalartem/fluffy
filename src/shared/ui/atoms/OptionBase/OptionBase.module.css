@@ -1,0 +1,65 @@
+.option {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  align-items: center;
+  height: var(--input-height);
+
+  /* spacing */
+  padding: var(--spacing-2) var(--spacing-4);
+
+  /* surface */
+  background: var(--background-card);
+
+  /* shape */
+  border-radius: var(--radius-md);
+
+  /* border */
+  border: 1px solid transparent;
+  background: transparent;
+  box-shadow: none;
+
+  /* motion */
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
+}
+
+/* Disabled */
+.disabled {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+  border: 1px solid var(--color-disabled);
+}
+
+.optionBody {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+  gap: var(--spacing-2);
+}
+
+.title {
+  font-size: var(--text-base);
+  line-height: var(--line-height-base);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.active {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-card);
+}
+
+.active .title {
+  color: var(--color-text-primary);
+}

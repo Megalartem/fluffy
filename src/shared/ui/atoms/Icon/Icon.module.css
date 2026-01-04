@@ -37,6 +37,10 @@
   color: var(--color-text-on-primary);
 }
 
+.root[data-variant="ghost"] .svg {
+  color: transparent;
+}
+
 .svg {
   flex: 0 0 auto;
 }

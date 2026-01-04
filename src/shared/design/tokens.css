@@ -46,9 +46,9 @@
   --color-text-on-primary: #FFFFFF;
 
   /* Status colors */
-  --color-success: var(--color-primary);
-  --color-warning: #FDB641;
-  --color-error: #F9725B;
+  --color-success: rgba(165, 119, 255, 0.4);
+  --color-warning: rgba(253, 182, 65, 0.4);
+  --color-error: rgba(249, 114, 91, 0.4);
 
   --color-overlay: rgba(0, 0, 0, 0.3);
 
