@@ -12,7 +12,7 @@ export { FormNumberField } from "./FormField/FormNumberField";
 export type { FormNumberFieldProps } from "./FormField/FormNumberField";
 
 export { FormSelectField } from "./FormField/FormSelectField";
-export type { FormSelectFieldProps, FormValue } from "./FormField/FormSelectField";
+export type { FormSelectFieldProps } from "./FormField/FormSelectField";
 
 export { ModalHeader } from "./ModalHeader/ModalHeader";
 export type { ModalHeaderProps } from "./ModalHeader/ModalHeader";
