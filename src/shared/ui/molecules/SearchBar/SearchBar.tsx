@@ -6,7 +6,6 @@ import styles from "./SearchBar.module.css";
 import { Dot, SearchInput } from "@/shared/ui/atoms";
 import { IconButton } from "@/shared/ui/atoms";
 import { SlidersHorizontal } from "lucide-react";
-import { on } from "events";
 
 export function SearchBar({
     value,
@@ -40,12 +39,12 @@ export function SearchBar({
                         iconSize="l"
                         icon={SlidersHorizontal}
                         onClick={onOpenFilters}
-                        aria-label="Фильтры"
+                        aria-label="Open filters"
                     />
                     {filtersActive ? 
                     <Dot 
-                        size="s"
-                        colorKey="default" 
+                        size="l"
+                        colorKey="muted" 
                         className={styles.dot}
                     /> : null}
                 </div>
