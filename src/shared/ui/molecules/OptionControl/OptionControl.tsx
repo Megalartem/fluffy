@@ -136,18 +136,20 @@ export function OptionControl({
       </div>
 
       {mode === "multi" && isApplyMode && (
-        <ModalActions
-          layout="row"
-          secondary={{
-            label: "Reset",
-            onClick: handleReset,
-            disabled: draftValues.length === 0,
-          }}
-          primary={{
-            label: "Apply",
-            onClick: handleApply,
-          }}
-        />
+        <div className={styles.footerSticky}>
+          <ModalActions
+            layout="row"
+            secondary={{
+              label: "Reset",
+              onClick: handleReset,
+              disabled: draftValues.length === 0,
+            }}
+            primary={{
+              label: "Apply",
+              onClick: handleApply,
+            }}
+          />
+        </div>
       )}
     </div>
   );
