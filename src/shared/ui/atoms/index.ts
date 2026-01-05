@@ -31,4 +31,4 @@ export { Dot } from './Dot/Dot';
 export { Overlay } from './Overlay/Overlay';
 
 
-export { OptionBase, type OptionBaseProps } from './OptionBase/OptionBase';
+export { OptionBase, type OptionBaseProps, type OptionItem } from './OptionBase/OptionBase';

@@ -1,18 +1,13 @@
 import React from "react";
-import { Heading, Icon, SelectBase } from "@/shared/ui/atoms";
+import { Heading, OptionBaseProps, SelectBase } from "@/shared/ui/atoms";
 import styles from "./FormField.module.css";
 import { FormFieldBase, FormFieldBaseProps } from "./FormFieldBase";
-import { ChevronDown, LucideIcon } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import clsx from "clsx";
 
 type SelectMode = "single" | "multi";
 
-export interface FormValue {
-  label: string;
-  value: string;
-  icon?: LucideIcon;
-  iconSize?: "s" | "m" | "l";
-}
+
 
 export interface FormSelectFieldProps extends Omit<FormFieldBaseProps, "children"> {
   mode: SelectMode;
@@ -20,7 +15,7 @@ export interface FormSelectFieldProps extends Omit<FormFieldBaseProps, "children
   disabled?: boolean;
 
   /** Rendered when hasValue=true (can be icon + text, chips, etc.) */
-  value?: FormValue | FormValue[] | null;
+  values?: OptionBaseProps[] | null;
   /** Rendered when hasValue=false */
   placeholder?: React.ReactNode;
   error?: string;
@@ -30,7 +25,7 @@ export interface FormSelectFieldProps extends Omit<FormFieldBaseProps, "children
 
 export function FormSelectField({
   mode,
-  value,
+  values,
   placeholder = "Choose...",
   onClick,
   disabled,
@@ -46,40 +41,29 @@ export function FormSelectField({
     <FormFieldBase error={error} {...base} fieldType="select">
       <SelectBase
         onClick={onClick}
-        hasValue={value !== undefined}
-        data-value={value}
+        hasValue={values !== undefined && values !== null && values.length > 0}
+        data-value={values}
         state={error ? "error" : disabled ? "disabled" : "default"}
       >
         {
-          value ? (
-                mode === "single" && value && !Array.isArray(value) ? (
+          values ? (
+                values.length === 1 ? (
                   <div
                     className={styles.selectBody}
-                    data-value={value.value}
+                    data-value={values[0].value}
                     >
-                    {
-                    value.icon 
-                    ? <Icon icon={value.icon} size={value.iconSize ?? "m"} variant="muted"/> 
-                    : null
-                    }
-                    <Heading as="h2">{value.label}</Heading>
+                    {values[0].icon}
+                    <Heading as="h2">{values[0].label}</Heading>
                   </div>
-                ) : mode === "multi" && Array.isArray(value) ? (
+                ) : values.length > 1 ? (
                   <div className={styles.selectBody}>
-                    {value.map((val) => (
+                    {values.map((value) => (
                       <div
-                        key={val.value}
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          padding: "2px 6px",
-                          borderRadius: 12,
-                          backgroundColor: "var(--color-bg-secondary)",
-                          fontSize: 12,
-                        }}
+                        key={value.value}
+                        className={styles.selectOptionLabels}
                       >
-                        {val.icon ? React.createElement(val.icon, { width: 12, height: 12, style: { marginRight: 4 } }) : null}
-                        <span>{val.label}</span>
+                        {value.icon}
+                        <span>{value.label}</span>
                       </div>
                     ))}
                   </div>

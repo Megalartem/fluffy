@@ -125,13 +125,12 @@ export function OptionControl({
       <div className={styles.list}>
         {options.map((opt) => (
           <OptionBase
+            state={opt.state === "disabled" ? "disabled" : activeSet.has(opt.value) ? "active" : "default"} 
             key={opt.value}
             value={opt.value}
             label={opt.label}
             icon={opt.icon}
-            disabled={opt.disabled}
-            isChecked={activeSet.has(opt.value)}
-            onSelect={() => handleSelect(opt.value, opt.disabled)}
+            onSelect={() => handleSelect(opt.value, opt.state === "disabled")}
           />
         ))}
       </div>

@@ -40,6 +40,7 @@ export function SelectBase({
       aria-haspopup={ariaHaspopup ?? "dialog"}
       aria-label={ariaLabel}
       className={clsx(styles.input, className)}
+      {...props}
     >
       {children}
     </button>
