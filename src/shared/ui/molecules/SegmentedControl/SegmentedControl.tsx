@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import styles from "./SegmentedControl.module.css";
-import { ButtonBase, Text } from "@/shared/ui/atoms";
+import { ButtonBase, Heading } from "@/shared/ui/atoms";
 
 export type SegmentedOption<T extends string> = {
   value: T;
@@ -72,12 +72,12 @@ export function SegmentedControl<T extends string>({
             disabled={disabled}
             aria-pressed={isActive}
           >
-            <Text
-              variant="label"
+            <Heading
+              as="span"
               className={clsx(styles.label, isActive && styles.labelActive)}
             >
               {opt.label}
-            </Text>
+            </Heading>
           </ButtonBase>
         );
       })}

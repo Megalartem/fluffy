@@ -12,6 +12,8 @@
   --text-lg: 20px;
   --text-xl: 32px;
 
+  --input-height: 52px;
+
     /* Line heights */
   --line-height-tight: 1.15;
   /* Line heights */
@@ -90,6 +92,10 @@
   /* ========== Misc ========== */
   --opacity-transaction-type: 0.8;
   --opacity-disabled: 0.5;
+
+  /* ========= Scrollbar ========= */
+  --scroll-thumb: rgba(255, 255, 255, 0.18);
+  --scroll-thumb-hover: rgba(255, 255, 255, 0.28);
 
   /* ================================
   Category color palette (bg only)
