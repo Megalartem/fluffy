@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Text,
   Heading,
@@ -20,18 +20,17 @@ import {
   Dot,
   Overlay,
   SelectBase,
+  OptionBase,
 } from '@/shared/ui/atoms';
 import {
   Heart,
   Home,
   Settings,
-  Search,
   Plus,
   Trash2,
   ShoppingCart,
   TrendingUp,
   AlertCircle,
-  ChevronDownIcon,
 } from 'lucide-react';
 
 export default function TestUIAtomsPage() {
@@ -41,6 +40,7 @@ export default function TestUIAtomsPage() {
   const [checkbox2, setCheckbox2] = useState(true);
   const [input1, setInput1] = useState('');
   const [search, setSearch] = useState('');
+  const [isOptionChecked, setIsOptionChecked] = useState(false);
   const [overlayVisible, setOverlayVisible] = useState(false);
 
   return (
@@ -297,7 +297,7 @@ export default function TestUIAtomsPage() {
 
         <div className="space-y-m">
           <Text variant="caption">
-            Overlay используется для затемнения фона при модальных окнах и sheet'ах
+            Overlay используется для затемнения фона при модальных окнах и sheets
           </Text>
           <ButtonBase onClick={() => setOverlayVisible(!overlayVisible)}>
             {overlayVisible ? 'Скрыть Overlay' : 'Показать Overlay'}
@@ -310,11 +310,9 @@ export default function TestUIAtomsPage() {
       <FAB icon={Plus} onClick={() => alert('FAB clicked!')} />
 
         <SelectBase
-          text={"Все категории"}
           ariaHaspopup="listbox"
-          hasValue={true}
+          state='focused'
           onClick={() => {alert('Select clicked')}}
-          className='w-full justify-between'
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <CategoryIcon
@@ -324,8 +322,17 @@ export default function TestUIAtomsPage() {
             />
             <Heading as="h2">Grocery</Heading>
           </div>
-          <ChevronDownIcon />
         </SelectBase>
+        <br/>
+        <OptionBase
+            state={isOptionChecked ? "active" : "default"}
+            value="rental"
+            label="Rental"
+            icon={
+              <CategoryIcon icon={Home} color='violet' size='m'/>
+          }
+            onSelect={() => {setIsOptionChecked(!isOptionChecked)}}
+        />
     </div>
   );
 }
