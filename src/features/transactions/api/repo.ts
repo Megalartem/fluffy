@@ -1,4 +1,4 @@
-import type { Transaction, TransactionType, CreateTransactionInput } from "../model/types";
+import type { Transaction, TransactionType } from "../model/types";
 
 export type TransactionListQuery = {
   from?: string;

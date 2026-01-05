@@ -7,6 +7,7 @@ import type { Transaction } from "@/features/transactions/model/types";
 import { DexieCategoriesRepo } from "@/features/categories/api/repo.dexie";
 import type { Category } from "@/features/categories/model/types";
 import type { TxFilters, SortState, SortKey } from "@/features/transactions/ui/filters-modal";
+import { sortByKey, type SortOrder } from "@/shared/lib/sort";
 
 export type TxState =
   | { status: "loading" }
@@ -43,6 +44,8 @@ export function useTransactions() {
   }, []);
 
   const filtersActive = filters.type !== "all" || !!filters.categoryId || sort.key !== "none";
+  const filtersActiveCount =
+    (filters.type !== "all" ? 1 : 0) + (filters.categoryId ? 1 : 0) + (sort.key !== "none" ? 1 : 0);
 
   const toggleSort = useCallback((key: Exclude<SortKey, "none">) => {
     setSort((prev) => {
@@ -92,7 +95,7 @@ export function useTransactions() {
           : "";
 
         const qNumber = Number(q.replace(",", "."));
-        const amountStr = String(t.amount);
+        const amountStr = String(t.amountMinor);
 
         const matchText = note.includes(q) || catName.includes(q);
         const matchAmount = Number.isFinite(qNumber) && amountStr.includes(String(qNumber));
@@ -105,25 +108,22 @@ export function useTransactions() {
 
     if (sort.key === "none") return res;
 
-    const dirMul = sort.dir === "asc" ? 1 : -1;
+    const order: SortOrder = sort.dir === "asc" ? "asc" : "desc";
 
-    return [...res].sort((a, b) => {
-      if (sort.key === "amount") {
-        return (a.amount - b.amount) * dirMul;
-      }
+    if (sort.key === "category") {
+      // Для категорий делаем сортировку по имени категории
+      const withCategoryNames = res.map((t) => ({
+        ...t,
+        categoryName: t.categoryId ? (categoriesMap.get(t.categoryId)?.name ?? "") : "",
+      }));
+      return sortByKey(withCategoryNames, "categoryName" as keyof typeof withCategoryNames[0], order);
+    }
 
-      if (sort.key === "type") {
-        return String(a.type).localeCompare(String(b.type)) * dirMul;
-      }
+    if (sort.key === "amount") {
+      return sortByKey(res, "amountMinor", order);
+    }
 
-      if (sort.key === "category") {
-        const an = a.categoryId ? (categoriesMap.get(a.categoryId)?.name ?? "") : "";
-        const bn = b.categoryId ? (categoriesMap.get(b.categoryId)?.name ?? "") : "";
-        return an.localeCompare(bn, "ru") * dirMul;
-      }
-
-      return 0;
-    });
+    return sortByKey(res, sort.key as keyof Transaction, order);
   }, [state, filters.type, filters.categoryId, debouncedQuery, categoriesMap, sort]);
 
   const totalCount = state.status === "ready" ? state.items.length : 0;
@@ -138,6 +138,7 @@ export function useTransactions() {
     setFilters,
     setQuery,
     filtersActive,
+    filtersActiveCount,
     sort,
     toggleSort,
     resetSort,

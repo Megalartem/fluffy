@@ -33,13 +33,13 @@ export class DexieTransactionsRepo implements ITransactionsRepository {
       if (query.type) coll = coll.filter((t) => t.type === query.type);
       if (query.categoryId !== undefined) coll = coll.filter((t) => (t.categoryId ?? null) === query.categoryId);
 
-      if (query.from && query.from !== undefined) coll = coll.filter((t) => t.date >= query.from!);
-      if (query.to && query.to !== undefined) coll = coll.filter((t) => t.date <= query.to!);
+      if (query.from) coll = coll.filter((t) => t.dateKey >= query.from!);
+      if (query.to) coll = coll.filter((t) => t.dateKey <= query.to!);
 
-      // Dexie: сортировка по date desc + createdAt desc вручную
+      // Dexie: сортировка по dateKey desc + createdAt desc вручную
       const arr = await coll.toArray();
       arr.sort((a, b) => {
-        if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+        if (a.dateKey !== b.dateKey) return a.dateKey < b.dateKey ? 1 : -1;
         return a.createdAt < b.createdAt ? 1 : -1;
       });
 
@@ -67,10 +67,10 @@ export class DexieTransactionsRepo implements ITransactionsRepository {
       .toArray();
 
     // 2) Фильтруем удалённые и по типу
-    coll = coll.filter((t: any) => !t.deletedAt && (!type || t.type === type));
+    coll = coll.filter((t: Transaction) => !t.deletedAt && (!type || t.type === type));
 
     // 3) Сортируем по времени убыванию
-    coll.sort((a: any, b: any) => String(b[sortField] ?? "").localeCompare(String(a[sortField] ?? "")));
+    coll.sort((a: Transaction, b: Transaction) => String(b[sortField] ?? "").localeCompare(String(a[sortField] ?? "")));
 
     // 4) Ограничиваем
     return coll.slice(0, limit);

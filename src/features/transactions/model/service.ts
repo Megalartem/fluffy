@@ -1,13 +1,18 @@
-import type { CreateTransactionInput, Transaction, TransactionType } from "../model/types";
+import type { CreateTransactionInput, Transaction } from "../model/types";
 import type { TransactionsRepo } from "../api/repo";
 import type { SettingsRepo } from "../../settings/api/repo";
 import { AppError } from "@/shared/errors/app-error";
 import { nowIso, todayIsoDate } from "@/shared/lib/storage/db";
 import type { UpdateTransactionInput } from "./types";
+import { toDateKey } from "./helpers/date";
 
 function makeId(prefix: string): string {
-  // достаточно для local-first MVP
-  return `${prefix}_${crypto.randomUUID()}`;
+  // SSR-safe uuid generation
+  const uuid = typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
+  return `${prefix}_${uuid}`;
 }
 
 export class TransactionService {
@@ -17,7 +22,7 @@ export class TransactionService {
   ) {}
 
   async addTransaction(workspaceId: string, input: CreateTransactionInput): Promise<Transaction> {
-    if (!Number.isFinite(input.amount) || input.amount <= 0) {
+    if (!Number.isFinite(input.amountMinor) || input.amountMinor <= 0) {
       throw new AppError("VALIDATION_ERROR", "Amount must be greater than 0", { field: "amount" });
     }
 
@@ -27,9 +32,9 @@ export class TransactionService {
       id: makeId("tx"),
       workspaceId,
       type: input.type,
-      amount: input.amount,
-      currency: settings.defaultCurrency,
-      date: input.date ?? todayIsoDate(),
+      amountMinor: input.amountMinor,
+      currency: input.currency || settings.defaultCurrency,
+      dateKey: input.dateKey ?? todayIsoDate(),
       categoryId: input.categoryId ?? null,
       note: input.note ?? null,
       createdAt: nowIso(),
@@ -40,22 +45,27 @@ export class TransactionService {
     return this.transactionsRepo.create(workspaceId, tx);
   }
 
-  async updateTransaction(workspaceId: string, id: string, p0: { type: TransactionType; amount: number; note: string | null; categoryId: string | null; }, input: UpdateTransactionInput) {
-  if (input.patch.amount !== undefined) {
-    if (!Number.isFinite(input.patch.amount) || input.patch.amount <= 0) {
-      throw new AppError("VALIDATION_ERROR", "Amount must be greater than 0", { field: "amount" });
+  async updateTransaction(workspaceId: string, input: UpdateTransactionInput) {
+    // Validate amount if provided
+    if (input.patch.amountMinor !== undefined) {
+      if (!Number.isFinite(input.patch.amountMinor) || input.patch.amountMinor <= 0) {
+        throw new AppError("VALIDATION_ERROR", "Amount must be greater than 0", { field: "amount" });
+      }
     }
-  }
 
-  // если кто-то передаст пустую дату
-  if (input.patch.date === "") {
-    input.patch.date = todayIsoDate();
-  }
+    // If someone passes an empty date string
+    if (input.patch.dateKey === "") {
+      input.patch.dateKey = todayIsoDate();
+    }
 
-  return this.transactionsRepo.update(workspaceId, input.id, {
-    ...input.patch,
-    updatedAt: nowIso(),
-  });
+    if (input.patch.dateKey !== undefined) {
+      input.patch.dateKey = toDateKey(input.patch.dateKey || todayIsoDate());
+    }
+
+    return this.transactionsRepo.update(workspaceId, input.id, {
+      ...input.patch,
+      updatedAt: nowIso(),
+    });
   }
 
   async deleteTransaction(workspaceId: string, id: string) {

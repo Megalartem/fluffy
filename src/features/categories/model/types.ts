@@ -1,20 +1,21 @@
 export type CategoryType = "expense" | "income" | "both";
 
-export type Category = {
-  id: string;
+export interface Category {
+  id: string;               // uuid
   workspaceId: string;
+
   name: string;
-  type: CategoryType;
-  icon?: string | null;   // optional
-  color?: string | null;  // optional
-  isDefault: boolean;
-  order: number;
+  type: CategoryType;      // "expense" | "income" | "both"
+  iconKey: string;          // "shopping_cart" / "coffee" — ключ, а не компонент
+  colorKey: string;         // из твоих 20 токенов: "violet" | "steel" | ...
+
+  order: number;            // для сортировки списка
+  isArchived: boolean;
+
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
-};
+}
 
-export type CreateCategoryInput = {
-  name: string;
-  type?: CategoryType; // default "expense"
-};
+export type CreateCategoryInput = Omit<Category, "id" | "createdAt" | "updatedAt" | "isArchived">;
+export type UpdateCategoryPatch = Partial<Pick<Category, "name" | "iconKey" | "colorKey" | "order" | "isArchived">>;
