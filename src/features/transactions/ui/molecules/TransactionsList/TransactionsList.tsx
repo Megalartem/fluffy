@@ -40,14 +40,12 @@ export function TransactionsList({
 }: TransactionsListProps) {
   if (state === "loading") {
     return (
-      <div className={[styles.root, className].filter(Boolean).join(" ")}>
+      <div className={[styles.root, styles.skeleton, className].filter(Boolean).join(" ")}>
         {Array.from({ length: skeletonCount }).map((_, index) => (
             <Skeleton
               key={index}
               variant="line"
-              width="40%"
-              height={16}
-              style={{ marginBottom: 12 }}
+              height={48}
             />
         ))}
       </div>

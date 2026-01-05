@@ -5,3 +5,7 @@
 .loadMore {
   padding-top: var(--spacing-2);
 }
+
+.skeleton {
+  row-gap: var(--spacing-4);
+}
