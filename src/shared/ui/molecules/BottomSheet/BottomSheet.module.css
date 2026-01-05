@@ -58,6 +58,7 @@
 }
 
 .body {
+  height: 100%;
   padding: var(--spacing-6);
   padding-bottom: calc(var(--spacing-6) + env(safe-area-inset-bottom));
 }
