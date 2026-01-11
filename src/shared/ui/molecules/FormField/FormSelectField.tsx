@@ -102,6 +102,8 @@ export function FormSelectField({
                         leaving[key] && styles.selectOptionLeaving
                       )}
                       data-leaving={leaving[key] ? "true" : undefined}
+                      onClick={(e) => handleRemoveChip(e, value)}
+                      
                     >
                       {value.icon}
                       <span>{value.label}</span>
@@ -109,7 +111,6 @@ export function FormSelectField({
                         <Icon
                           icon={X}
                           size="s"
-                          onClick={(e) => handleRemoveChip(e, value)}
                         />
                       )}
                     </div>
