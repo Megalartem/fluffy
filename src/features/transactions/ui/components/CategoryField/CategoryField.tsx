@@ -1,5 +1,5 @@
 import { OptionBaseProps } from "@/shared/ui/atoms";
-import styles from '../TransactionsFilter.module.css';
+// import styles from '../TransactionsFilter.module.css';
 import { FormSelectField } from "@/shared/ui/molecules";
 
 
@@ -17,7 +17,7 @@ export function CategoryField({
   onRemove: (removed: OptionBaseProps) => void;
 }) {
   return (
-    <div className={styles.section}>
+    <div>
       <FormSelectField
         label="Category"
         mode="multi"

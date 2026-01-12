@@ -6,9 +6,9 @@ import styles from "./TransactionsFilter.module.css";
 
 import { OptionBaseProps, Text } from "@/shared/ui/atoms";
 import { type TransactionsTypeFilter, TransactionTypeSection } from "./sections/TransactionTypeSection";
-import { CategoryField } from "./sections/CategoryField";
+import { CategoryField } from "../CategoryField/CategoryField";
 import type { TransactionsSortOption, TransactionsSortValue } from "./sheets/SortOptionsSheet";
-import { CategoriesSheet } from "./sheets/CategoriesSheet";
+import { CategoriesSheet } from "../CategoryField/CategoriesSheet";
 
 
 import { FiltersSheet, SearchBar, ModalActions, SortControl } from "@/shared/ui/molecules";
