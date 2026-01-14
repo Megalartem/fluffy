@@ -463,6 +463,7 @@ export default function TestUIAtomsPage() {
 
       <OptionControl
         mode="multi"
+        btnBgColorVariant="ghost"
         options={categoryOptions}
         chosenOptions={chosenOptions}
         onChange={(val) => {

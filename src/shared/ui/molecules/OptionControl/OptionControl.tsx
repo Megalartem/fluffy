@@ -7,6 +7,7 @@ import { OptionBase, type OptionBaseProps } from "@/shared/ui/atoms";
 import { ModalActions } from "@/shared/ui/molecules";
 
 export type OptionMode = "single" | "multi";
+export type BgColorVariant = "default" | "ghost";
 
 /**
  * - `options` — это список всех доступных опций (value/label/icon/disabled)
@@ -36,6 +37,7 @@ export interface OptionControlProps {
   onApply?: (next: OptionBaseProps[]) => void;
 
   className?: string;
+  btnBgColorVariant?: BgColorVariant;
 }
 
 function mapValuesToOptions(values: string[], options: OptionBaseProps[]): OptionBaseProps[] {
@@ -50,6 +52,7 @@ export function OptionControl({
   onChange,
   onApply,
   className,
+  btnBgColorVariant = "default",
 }: OptionControlProps) {
   const isApplyMode = mode === "multi" && typeof onApply === "function";
 
@@ -121,7 +124,9 @@ export function OptionControl({
   }, [isApplyMode, draftValues, options, onApply]);
 
   return (
-    <div className={clsx(styles.root, className)}>
+    <div className={clsx(styles.root, className, {
+      [styles.ghost]: btnBgColorVariant === "ghost",
+    })}>
       <div className={styles.list}>
         {options.map((opt) => (
           <OptionBase
@@ -136,7 +141,10 @@ export function OptionControl({
       </div>
 
       {mode === "multi" && isApplyMode && (
-        <div className={styles.footerSticky}>
+        <div className={clsx(
+          styles.footerSticky, {
+          [styles.ghost]: btnBgColorVariant === "ghost",
+        })}>
           <ModalActions
             layout="row"
             secondary={{

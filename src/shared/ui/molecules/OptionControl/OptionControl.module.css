@@ -24,13 +24,20 @@
   padding-bottom: var(--spacing-4);
 }
 
+
+
 .footerSticky {
   position: sticky;
+  background: var(--color-surface);
   bottom: 0;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   padding-top: var(--spacing-2);
   padding-bottom: var(--spacing-2);
   z-index: 1;
+}
+
+.ghost {
+  background: transparent;
 }
 
 .optionRow {
