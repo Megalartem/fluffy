@@ -29,7 +29,7 @@
 
   /* ========== Color (UI) ========== */
   --color-primary: #A577FF;
-  --color-secondary: #BFB9D8;
+  --color-secondary: rgba(191, 185, 216, 0.4);
   --color-accent: #150A35;
   --color-focus: var(--color-primary);
   --color-card: var(--color-bg);
