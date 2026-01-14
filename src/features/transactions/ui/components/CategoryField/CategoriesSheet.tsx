@@ -1,7 +1,18 @@
 import { OptionBaseProps } from "@/shared/ui/atoms";
 import { BottomSheet, ModalHeader, OptionControl } from "@/shared/ui/molecules";
 
+type OptionMode = "single" | "multi";
 
+interface CategoriesSheetProps {
+  open: boolean;
+  title: string;
+  onClose: () => void;
+  options: OptionBaseProps[];
+  chosenOptions: OptionBaseProps[] | null;
+  onChange: (val: OptionBaseProps[] | null) => void;
+  onApply: (chosen: OptionBaseProps[] | null) => void;
+  mode?: OptionMode;
+}
 
 export function CategoriesSheet({
   open,
@@ -11,15 +22,8 @@ export function CategoriesSheet({
   chosenOptions,
   onChange,
   onApply,
-}: {
-  open: boolean;
-  title: string;
-  onClose: () => void;
-  options: OptionBaseProps[];
-  chosenOptions: OptionBaseProps[] | null;
-  onChange: (val: OptionBaseProps[] | null) => void;
-  onApply: (chosen: OptionBaseProps[] | null) => void;
-}) {
+  mode = "multi",
+}: CategoriesSheetProps) {
   return (
     <BottomSheet
       open={open}
@@ -28,7 +32,7 @@ export function CategoriesSheet({
       onClose={onClose}
     >
       <OptionControl
-        mode="multi"
+        mode={mode}
         options={options}
         chosenOptions={chosenOptions}
         onChange={onChange}
