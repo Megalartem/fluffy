@@ -18,6 +18,7 @@ export function InputBase({
   state = "default",
   className = "",
   onChange,
+  rightSlot,
   ...props
 }: InputBaseProps) {
   return (
@@ -30,7 +31,7 @@ export function InputBase({
       aria-invalid={state === "error" ? true : undefined}
       className={[styles.input, className].filter(Boolean).join(" ")}
     />
-    {props.rightSlot && <div className={styles.rightSlot}>{props.rightSlot}</div>}
+    {rightSlot && <div className={styles.rightSlot}>{rightSlot}</div>}
     </div>
   );
 }
