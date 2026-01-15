@@ -10,6 +10,7 @@ export interface InputBaseProps extends React.InputHTMLAttributes<HTMLInputEleme
    */
   state?: Exclude<InputState, "focused">;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  rightSlot?: React.ReactNode;
   /** Convenience flag for error state. */
 }
 
@@ -20,14 +21,17 @@ export function InputBase({
   ...props
 }: InputBaseProps) {
   return (
-    <input
-      {...props}
-      disabled={state === "disabled"}
-      data-state={state}
-      onChange={onChange}
+    <div className={styles.wrapper}>
+      <input
+        {...props}
+        disabled={state === "disabled"}
+        data-state={state}
+        onChange={onChange}
       aria-invalid={state === "error" ? true : undefined}
       className={[styles.input, className].filter(Boolean).join(" ")}
     />
+    {props.rightSlot && <div className={styles.rightSlot}>{props.rightSlot}</div>}
+    </div>
   );
 }
 

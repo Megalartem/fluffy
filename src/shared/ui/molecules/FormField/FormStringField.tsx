@@ -10,6 +10,7 @@ export interface FormStringFieldProps extends Omit<FormFieldBaseProps, "children
   placeholder?: string;
   disabled?: boolean;
   type?: InputType;
+  rightSlot?: React.ReactNode;
 }
 
 export function FormStringField({
@@ -19,6 +20,7 @@ export function FormStringField({
   disabled,
   error,
   type = "text",
+  rightSlot = null,
   ...base
 }: FormStringFieldProps) {
   return (
@@ -33,6 +35,7 @@ export function FormStringField({
         placeholder={placeholder}
         state={error ? "error" : disabled ? "disabled" : "default"}
         disabled={disabled}
+        rightSlot={rightSlot}
       />
     </FormFieldBase>
   );

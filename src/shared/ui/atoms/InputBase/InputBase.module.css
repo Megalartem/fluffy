@@ -1,10 +1,29 @@
 
+ .wrapper {
+   position: relative;
+   width: 100%;
+ }
+
+ .rightSlot {
+   position: absolute;
+   right: var(--spacing-4);
+   top: 50%;
+   transform: translateY(-50%);
+
+   display: inline-flex;
+   align-items: center;
+
+   pointer-events: none;
+   opacity: 0.7;
+ }
+
 .input {
   width: 100%;
   height: var(--input-height);
 
   /* spacing */
   padding: var(--spacing-2) var(--spacing-4);
+  padding-right: var(--spacing-10);
 
   /* typography */
   font-family: var(--font-family-sans);
