@@ -4,7 +4,6 @@ import React from "react";
 import clsx from "clsx";
 import styles from "./OptionControl.module.css";
 import { OptionBase, type OptionBaseProps } from "@/shared/ui/atoms";
-import { ModalActions } from "@/shared/ui/molecules";
 
 export type OptionMode = "single" | "multi";
 export type BgColorVariant = "default" | "ghost";
@@ -26,15 +25,9 @@ export interface OptionControlProps {
   /**
    * Immediate change handler:
    * - single: вызывается сразу при выборе
-   * - multi: вызывается сразу, если не передан onApply
+   * - multi: вызывается сразу при каждом изменении
    */
   onChange?: (next: OptionBaseProps[] | null) => void;
-
-  /**
-   * If provided in multi mode, OptionControl will keep a local draft and call onApply(draft).
-   * This enables an "Apply" UX.
-   */
-  onApply?: (next: OptionBaseProps[]) => void;
 
   className?: string;
   btnBgColorVariant?: BgColorVariant;
@@ -50,12 +43,9 @@ export function OptionControl({
   mode = "single",
   chosenOptions,
   onChange,
-  onApply,
   className,
   btnBgColorVariant = "default",
 }: OptionControlProps) {
-  const isApplyMode = mode === "multi" && typeof onApply === "function";
-
   // Normalize controlled selection into value(s)
   const controlledValues = React.useMemo(() => {
     if (!chosenOptions?.length) return [];
@@ -63,19 +53,9 @@ export function OptionControl({
 
     return Array.from(new Set(chosenOptions.map((o) => o.value)));
   }, [chosenOptions, mode]);
-
-  // Draft values (only for apply-mode multi)
-  const [draftValues, setDraftValues] = React.useState<string[]>(controlledValues);
-
-  // Sync draft with controlled value changes
-  React.useEffect(() => {
-    if (isApplyMode) setDraftValues(controlledValues);
-  }, [isApplyMode, controlledValues]);
-
-  const activeValues = isApplyMode ? draftValues : controlledValues;
   
   // Use Set for O(1) lookup instead of O(n) array.includes
-  const activeSet = React.useMemo(() => new Set(activeValues), [activeValues]);
+  const activeSet = React.useMemo(() => new Set(controlledValues), [controlledValues]);
 
   // Create options map for O(1) lookup
   const optionsMap = React.useMemo(
@@ -95,33 +75,13 @@ export function OptionControl({
 
       // Multi mode toggle
       const nextValues = activeSet.has(value)
-        ? activeValues.filter((v) => v !== value)
-        : [...activeValues, value];
+        ? controlledValues.filter((v) => v !== value)
+        : [...controlledValues, value];
 
-      if (isApplyMode) {
-        setDraftValues(nextValues);
-      } else {
-        onChange?.(mapValuesToOptions(nextValues, options));
-      }
+      onChange?.(mapValuesToOptions(nextValues, options));
     },
-    [mode, activeSet, activeValues, isApplyMode, optionsMap, options, onChange]
+    [mode, activeSet, controlledValues, optionsMap, options, onChange]
   );
-
-  const handleReset = React.useCallback(() => {
-    if (mode === "single") {
-      onChange?.(null);
-    } else if (isApplyMode) {
-      setDraftValues([]);
-    } else {
-      onChange?.([]);
-    }
-  }, [mode, isApplyMode, onChange]);
-
-  const handleApply = React.useCallback(() => {
-    if (isApplyMode) {
-      onApply?.(mapValuesToOptions(draftValues, options));
-    }
-  }, [isApplyMode, draftValues, options, onApply]);
 
   return (
     <div className={clsx(styles.root, className, {
@@ -139,26 +99,6 @@ export function OptionControl({
           />
         ))}
       </div>
-
-      {mode === "multi" && isApplyMode && (
-        <div className={clsx(
-          styles.footerSticky, {
-          [styles.ghost]: btnBgColorVariant === "ghost",
-        })}>
-          <ModalActions
-            layout="row"
-            secondary={{
-              label: "Reset",
-              onClick: handleReset,
-              disabled: draftValues.length === 0,
-            }}
-            primary={{
-              label: "Apply",
-              onClick: handleApply,
-            }}
-          />
-        </div>
-      )}
     </div>
   );
 }

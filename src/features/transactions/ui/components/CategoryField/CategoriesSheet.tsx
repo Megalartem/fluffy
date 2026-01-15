@@ -1,5 +1,6 @@
-import { OptionBaseProps } from "@/shared/ui/atoms";
-import { BottomSheet, ModalHeader, OptionControl } from "@/shared/ui/molecules";
+import { ButtonBase, OptionBaseProps } from "@/shared/ui/atoms";
+import { BottomSheet, Modal, ModalActions, ModalHeader, OptionControl } from "@/shared/ui/molecules";
+import { useCallback } from "react";
 
 type OptionMode = "single" | "multi";
 
@@ -24,19 +25,33 @@ export function CategoriesSheet({
   onApply,
   mode = "multi",
 }: CategoriesSheetProps) {
+  
   return (
     <BottomSheet
       open={open}
       title={<ModalHeader title={title} onClose={onClose} />}
       height="half"
       onClose={onClose}
+      footer={
+        <ModalActions
+          primary={{
+            label: "Apply",
+            onClick: () => onApply(chosenOptions),
+          }}
+          secondary={{
+            label: "Cancel",
+            onClick: onClose,
+          }}
+          layout="row"
+        />
+      }
+        
     >
       <OptionControl
         mode={mode}
         options={options}
         chosenOptions={chosenOptions}
         onChange={onChange}
-        onApply={onApply}
       />
     </BottomSheet>
   );
