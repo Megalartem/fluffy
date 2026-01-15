@@ -78,7 +78,9 @@ export function BottomSheet({
           </div>
         ) : null}
 
-        <div className={styles.body}>{children}</div>
+        <div className={styles.body}>
+          {children}
+          </div>
 
         {footer ? <div className={styles.footer}>{footer}</div> : null}
       </div>
