@@ -65,9 +65,7 @@
   min-height: 0;
   overflow-y: auto;
 
-  padding: var(--spacing-6);
-  padding-top: 0;
-  padding-bottom: calc(var(--spacing-6) + env(safe-area-inset-bottom));
+  padding: 0 var(--spacing-6);
 }
 
 
