@@ -2,6 +2,7 @@
 
 import * as React from "react";
 
+import styles from "./TransactionUpsertSheet.module.css";
 import type { Category } from "@/features/categories/model/types";
 import type {
     Transaction,
@@ -201,7 +202,7 @@ export function TransactionUpsertSheet({
                     </ButtonBase>
                 }
             >
-                <>
+                <div className={styles.form}>
                     <TransactionTypeField
                         value={transType.value}
                         options={transOptions}
@@ -236,7 +237,7 @@ export function TransactionUpsertSheet({
                         value={dateKey}
                         onChange={(e) => setDateKey(e.target.value)}
                     />
-                </>
+                </div>
             </BottomSheet>
 
             {type !== "transfer" && (

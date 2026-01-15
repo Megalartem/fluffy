@@ -6,4 +6,5 @@ export { TransactionsDayGroup, type TransactionsDayGroupItem, type TransactionsD
 
 export { TransactionsList, type TransactionsListProps, type TransactionsDayGroupModel } from "./TransactionsList/TransactionsList";
 
-export { TransactionsFilter, type TransactionsFiltersValue } from "@/features/transactions/ui/components/TransactionsFilter/TransactionsFilter";
+export { TransactionTypeField, type TransactionsTypes, type TransactionTypeOption } from "./TransactionTypeField/TransactionTypeField";
+
