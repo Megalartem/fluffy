@@ -19,6 +19,25 @@ export const CURRENCY_DECIMALS: Record<string, number> = {
   IDR: 2,
 };
 
+export type AmountValidationOptions = {
+  required?: boolean;
+  allowNegative?: boolean;
+  maxDecimals?: number;        // если не задано — берём decimals
+  minMinor?: number;           // минимальная сумма в minor
+  maxMinor?: number;           // лимит в minor
+  allowZero?: boolean;         // можно ли 0
+  soft?: boolean;              // "мягкая" проверка (для onChange)
+};
+
+/** Убираем пробелы, NBSP, приводим запятую к точке. Не форматируем. */
+export function normalizeAmountInput(raw: string): string {
+  if (raw == null) return "";
+  return String(raw)
+    .trim()
+    .replace(/[\s\u00A0]/g, "") // обычные пробелы + NBSP
+    .replace(",", ".");
+}
+
 export function currencyDecimals(code: CurrencyCode): number {
   return CURRENCY_DECIMALS[String(code).toUpperCase()] ?? 2;
 }
@@ -32,33 +51,53 @@ export function currencyDecimals(code: CurrencyCode): number {
  * Examples (decimals=0):
  *  "12000" -> 12000
  */
-export function toMinor(amount: string, decimals = 2): number | null {
+export function toMinor(
+  amount: string,
+  decimals = 2,
+  opts?: { allowNegative?: boolean; strictDecimals?: boolean }
+): number | null {
   if (amount == null) return null;
 
-  // Normalize: trim, remove spaces, comma -> dot
-  const normalized = amount.trim().replace(/\s/g, "").replace(",", ".");
+  const { allowNegative = false, strictDecimals = true } = opts ?? {};
+
+  const normalized = normalizeAmountInput(amount);
   if (!normalized) return null;
 
-  // Only digits with optional one dot part
-  if (!/^\d+(\.\d+)?$/.test(normalized)) return null;
+  // Разрешаем минус только в начале
+  const signRe = allowNegative ? "-?" : "";
+  const re = new RegExp(`^${signRe}\\d+(?:\\.\\d+)?$`);
+  if (!re.test(normalized)) return null;
 
-  const [intPart, fracRaw = ""] = normalized.split(".");
+  const neg = normalized.startsWith("-");
+  const unsigned = neg ? normalized.slice(1) : normalized;
 
-  // Guard: int part must be digits (regex already does it, but keep explicit)
+  const [intPart, fracRaw = ""] = unsigned.split(".");
+
   if (!/^\d+$/.test(intPart)) return null;
 
+  // decimals=0: дробная часть запрещена, если strictDecimals
   if (decimals === 0) {
+    if (strictDecimals && fracRaw.length > 0) return null;
     const n = Number(intPart);
-    return Number.isFinite(n) ? n : null;
+    if (!Number.isFinite(n)) return null;
+    return neg ? -n : n;
   }
+
+  // Если strictDecimals — запрещаем больше знаков, чем decimals
+  if (strictDecimals && fracRaw.length > decimals) return null;
 
   const fracDigits = fracRaw.replace(/[^\d]/g, "");
   const frac = fracDigits.slice(0, decimals).padEnd(decimals, "0");
 
   const minorStr = intPart + frac;
-  const minor = Number(minorStr);
 
-  return Number.isFinite(minor) ? minor : null;
+  // простая защита от сверхдлинных чисел
+  if (minorStr.length > 18) return null;
+
+  const minor = Number(minorStr);
+  if (!Number.isFinite(minor)) return null;
+
+  return neg ? -minor : minor;
 }
 
 /**
@@ -92,4 +131,59 @@ export function toMinorByCurrency(amount: string, currency: CurrencyCode): numbe
  */
 export function fromMinorByCurrency(amountMinor: number, currency: CurrencyCode): string {
   return fromMinor(amountMinor, currencyDecimals(currency));
+}
+
+export function validateAmountString(
+  valueRaw: string,
+  decimals: number,
+  options: AmountValidationOptions = {}
+): true | string {
+  const {
+    required = true,
+    allowNegative = false,
+    maxDecimals,
+    minMinor,
+    maxMinor,
+    allowZero = true,
+    soft = false,
+  } = options;
+
+  const v = normalizeAmountInput(valueRaw);
+
+  if (!v) return required ? "Введите сумму" : true;
+
+  // soft: разрешаем промежуточные состояния при вводе
+  // например "-", "0.", "12." (без цифр после точки)
+  if (soft) {
+    const signRe = allowNegative ? "-?" : "";
+    const softRe = new RegExp(`^${signRe}(\\d+)?(\\.\\d*)?$`);
+    if (!softRe.test(v)) return "Некорректный формат";
+    // Не проверяем лимиты/zero здесь — это сделаем на blur/submit
+    return true;
+  }
+
+  const d = maxDecimals ?? decimals;
+
+  // строгий формат: цифры, опционально дробь до d
+  const signRe = allowNegative ? "-?" : "";
+  const strictRe = new RegExp(`^${signRe}\\d+(?:\\.\\d{0,${d}})?$`);
+  if (!strictRe.test(v)) return "Некорректный формат суммы";
+
+  const minor = toMinor(v, decimals, { allowNegative, strictDecimals: true });
+  if (minor == null) return "Некорректная сумма";
+
+  if (!allowZero && minor === 0) return "Сумма должна быть больше 0";
+  if (minMinor !== undefined && minor < minMinor) return "Сумма меньше допустимой";
+  if (maxMinor !== undefined && minor > maxMinor) return "Сумма превышает лимит";
+
+  return true;
+}
+
+export function validateAmountStringByCurrency(
+  valueRaw: string,
+  currency: CurrencyCode,
+  options: AmountValidationOptions = {}
+): true | string {
+  const decimals = currencyDecimals(currency);
+  return validateAmountString(valueRaw, decimals, { ...options, maxDecimals: options.maxDecimals ?? decimals });
 }

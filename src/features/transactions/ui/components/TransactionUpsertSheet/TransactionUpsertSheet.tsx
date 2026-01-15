@@ -1,262 +1,343 @@
 "use client";
 
 import * as React from "react";
+import {
+  FormProvider,
+  useForm,
+  useWatch,
+  type SubmitHandler,
+} from "react-hook-form";
 
 import styles from "./TransactionUpsertSheet.module.css";
 import type { Category } from "@/features/categories/model/types";
 import type {
-    Transaction,
-    TransactionType,
-    CurrencyCode,
-    CreateTransactionInput,
-    UpdateTransactionInput,
+  Transaction,
+  TransactionType,
+  CurrencyCode,
+  CreateTransactionInput,
+  UpdateTransactionInput,
 } from "@/features/transactions/model/types";
 
 import type { OptionBaseProps } from "@/shared/ui/atoms";
 import { ButtonBase } from "@/shared/ui/atoms";
-import { BottomSheet, FormStringField, ModalHeader } from "@/shared/ui/molecules";
+import { BottomSheet, ModalHeader } from "@/shared/ui/molecules";
 
-import CategoryField from "../CategoryField/CategoryField";
+import { FormFieldString } from "@/shared/ui/molecules/FormField/FormFieldString";
+import { FormFieldSelect } from "@/shared/ui/molecules/FormField/FormFieldSelect";
+import { FormFieldSegment } from "@/shared/ui/molecules/FormField/FormFieldSegment";
+import { FormFieldDate } from "@/shared/ui/molecules/FormField/FormFieldDate";
+
 import { CategoriesSheet } from "../CategoryField/CategoriesSheet";
 
-import { buildCategoryOptions, findCategoryOption } from "@/features/transactions/lib/categoryOptions";
-import { normalizeSingleChosen, toSingle } from "@/features/transactions/lib/optionSingle";
 import {
-    toMinorByCurrency,
-    fromMinorByCurrency,
-} from "@/shared/lib/money/helper";
+  buildCategoryOptions,
+  findCategoryOption,
+} from "@/features/transactions/lib/categoryOptions";
+
+import { toMinorByCurrency, fromMinorByCurrency } from "@/shared/lib/money/helper";
 import { AppError } from "@/shared/errors/app-error";
 
-import TransactionTypeField, { TransactionTypeOption } from "@/features/transactions/ui/molecules/TransactionTypeField/TransactionTypeField";
-
 type Props = {
-    open: boolean;
-    onClose: () => void;
+  open: boolean;
+  onClose: () => void;
 
-    workspaceId: string;
-    type: TransactionType;
-    currency: CurrencyCode;
+  workspaceId: string;
+  /**
+   * Initial transaction type context.
+   * For MVP we still allow switching between expense/income inside the form
+   * (unless `type === "transfer"`, then type is fixed).
+   */
+  type: TransactionType;
+  currency: CurrencyCode;
 
-    categories: Category[];
+  categories: Category[];
 
-    /**
-     * Если передали initial — считаем, что это edit.
-     * (Можно заменить на mode, но так проще в интеграции: initial? значит edit)
-     */
-    initial?: Transaction;
+  /**
+   * Если передали initial — считаем, что это edit.
+   * (Можно заменить на mode, но так проще в интеграции: initial? значит edit)
+   */
+  initial?: Transaction;
 
-    /** Можно оставить note на потом: в MVP держим null/как есть */
-    onCreate: (input: CreateTransactionInput) => Promise<void> | void;
-    onUpdate: (input: UpdateTransactionInput) => Promise<void> | void;
+  /** Можно оставить note на потом: в MVP держим null/как есть */
+  onCreate: (input: CreateTransactionInput) => Promise<void> | void;
+  onUpdate: (input: UpdateTransactionInput) => Promise<void> | void;
 };
-const categorySelectMode = "single";
 
 const todayKey = () => new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
+const TYPE_OPTIONS: Array<{ value: TransactionType; label: string }> = [
+  { value: "expense", label: "Expense" },
+  { value: "income", label: "Income" },
+];
 
-const transOptions: Array<TransactionTypeOption> = [
-    { value: "expense", label: "Expense" },
-    { value: "income", label: "Income" },
-]
+type FormValues = {
+  type: TransactionType;
+  amount: string;
+  categoryId: string | null;
+  dateKey: string | null; // YYYY-MM-DD
+};
 
 export function TransactionUpsertSheet({
-    open,
-    onClose,
-    workspaceId,
-    type,
-    currency,
-    categories,
-    initial,
-    onCreate,
-    onUpdate,
+  open,
+  onClose,
+  workspaceId,
+  type,
+  currency,
+  categories,
+  initial,
+  onCreate,
+  onUpdate,
 }: Props) {
-    const isEdit = Boolean(initial);
+  const isEdit = Boolean(initial);
 
-    // --- options for CategorySheet
-    const categoryOptions = React.useMemo<OptionBaseProps[]>(
-        () =>
-            buildCategoryOptions({
-                categories,
-                txType: type,
-                // renderIcon: (c) => <CategoryIcon iconKey={c.iconKey} colorKey={c.colorKey} />,
-            }),
-        [categories, type]
-    );
+  const form = useForm<FormValues>({
+    defaultValues: {
+      type: type === "transfer" ? "transfer" : TYPE_OPTIONS[0].value,
+      amount: "",
+      categoryId: null,
+      dateKey: todayKey(),
+    },
+    mode: "onSubmit",
+  });
 
-    // --- form state
-    const [amountRaw, setAmountRaw] = React.useState("");
-    const [transType, setTransType] = React.useState<TransactionTypeOption>(transOptions[0]);
-    const [dateKey, setDateKey] = React.useState(todayKey());
-    const [chosenCategory, setChosenCategory] = React.useState<OptionBaseProps[] | null>(null);
+  const [catOpen, setCatOpen] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
 
-    const [catOpen, setCatOpen] = React.useState(false);
-    const [saving, setSaving] = React.useState(false);
-    const [amountError, setAmountError] = React.useState<string | null>(null);
+  // Watch type to adjust category options if needed.
+  const watchedType = useWatch({ control: form.control, name: "type" });
+  const txTypeForOptions = type === "transfer" ? "transfer" : watchedType;
 
-    // --- prefill / reset on open
-    React.useEffect(() => {
-        if (!open) return;
+  // Options for CategoriesSheet and for FormSelectField (display)
+  const categoryOptions = React.useMemo<OptionBaseProps[]>(
+    () =>
+      buildCategoryOptions({
+        categories,
+        txType: txTypeForOptions,
+      }),
+    [categories, txTypeForOptions]
+  );
 
-        setAmountError(null);
-        setSaving(false);
-        setCatOpen(false);
+  const categoryOptionsByValue = React.useMemo<Record<string, OptionBaseProps>>(
+    () =>
+      categoryOptions.reduce<Record<string, OptionBaseProps>>((acc, opt) => {
+        acc[String(opt.value)] = opt;
+        return acc;
+      }, {}),
+    [categoryOptions]
+  );
 
-        if (!initial) {
-            // create
-            setAmountRaw("");
-            setDateKey(todayKey());
-            setChosenCategory(null);
-            return;
-        }
+  // Prefill / reset on open
+  React.useEffect(() => {
+    if (!open) return;
 
-        // edit
-        setAmountRaw(fromMinorByCurrency(initial.amountMinor, currency));
-        setDateKey(initial.dateKey);
+    setSaving(false);
+    setCatOpen(false);
 
-        const preselected = findCategoryOption(categoryOptions, initial.categoryId);
-        setChosenCategory(preselected ? [preselected] : null);
-    }, [open, initial, currency, categoryOptions]);
-
-    // transfer: category всегда null и поле можно скрыть
-    React.useEffect(() => {
-        if (type === "transfer") {
-            setChosenCategory(null);
-            setCatOpen(false);
-        }
-    }, [type]);
-
-    const selectedCategory = toSingle(chosenCategory);
-
-    async function handleSave() {
-        setAmountError(null);
-
-        const amountMinor = toMinorByCurrency(amountRaw, currency);
-        if (amountMinor == null || amountMinor <= 0) {
-            setAmountError("Введите сумму больше нуля");
-            return;
-        }
-
-        const categoryId =
-            type === "transfer" ? null : (selectedCategory?.value ?? null);
-
-        setSaving(true);
-        try {
-            if (!isEdit) {
-                const input: CreateTransactionInput = {
-                    workspaceId,
-                    type,
-                    amountMinor,
-                    currency,
-                    categoryId,
-                    note: null,
-                    dateKey,
-                };
-
-                await onCreate(input);
-            } else {
-                const patch = {
-                    amountMinor,
-                    dateKey,
-                    categoryId,
-                    // type/currency/note — не трогаем, так как в форме их нет
-                };
-
-                const input: UpdateTransactionInput = {
-                    id: initial!.id,
-                    patch,
-                };
-
-                await onUpdate(input);
-            }
-
-            onClose();
-        } catch (e) {
-            if (e instanceof AppError &&
-                e.code === "VALIDATION_ERROR" &&
-                e.meta?.field === "amount"
-            ) {
-                setAmountError(e.message);
-                return;
-            }
-            throw e;
-        } finally {
-            setSaving(false);
-        }
+    if (!initial) {
+      // create
+      form.reset({
+        type: type === "transfer" ? "transfer" : TYPE_OPTIONS[0].value,
+        amount: "",
+        categoryId: null,
+        dateKey: todayKey(),
+      });
+      return;
     }
 
-    return (
-        <>
-            <BottomSheet
-                open={open}
-                title={
-                    <ModalHeader
-                        title={isEdit ? "Edit transaction" : "New transaction"}
-                        onClose={onClose}
-                    />
-                }
-                height="half"
-                onClose={onClose}
-                footer={
-                    <ButtonBase fullWidth onClick={handleSave} disabled={saving}>
-                        {saving ? "Saving…" : "Save"}
-                    </ButtonBase>
-                }
-            >
-                <div className={styles.form}>
-                    <TransactionTypeField
-                        value={transType.value}
-                        options={transOptions}
-                        onChange={(next) => setTransType(transOptions.find(opt => opt.value === next)!)}
-                    />
+    // edit
+    form.reset({
+      type: type === "transfer" ? "transfer" : type,
+      amount: fromMinorByCurrency(initial.amountMinor, currency),
+      categoryId: type === "transfer" ? null : initial.categoryId,
+      dateKey: initial.dateKey,
+    });
+  }, [open, initial, currency, form, type]);
 
-                    {/* Amount */}
-                    <FormStringField
-                        label="Amount"
-                        placeholder="0"
-                        type="number"
-                        value={amountRaw}
-                        onChange={(e) => setAmountRaw(e.target.value)}
-                        error={amountError || undefined}
-                        rightSlot={currency}
-                    />
+  // transfer: category always null and picker must be closed
+  React.useEffect(() => {
+    if (type !== "transfer") return;
+    setCatOpen(false);
+    form.setValue("categoryId", null, { shouldValidate: true });
+    form.setValue("type", "transfer", { shouldValidate: true });
+  }, [type, form]);
 
-                    {type !== "transfer" && (
-                        <CategoryField
-                            mode={categorySelectMode}
-                            values={selectedCategory ? [selectedCategory] : []}
-                            isOpen={catOpen}
-                            onOpen={() => setCatOpen(true)}
-                            onRemove={() => setChosenCategory(null)}
-                        />
-                    )}
+  const categoryId = useWatch({ control: form.control, name: "categoryId" });
+  const chosenCategory = React.useMemo<OptionBaseProps[] | null>(() => {
+    if (!categoryId) return null;
+    const opt = findCategoryOption(categoryOptions, categoryId);
+    return opt ? [opt] : null;
+  }, [categoryId, categoryOptions]);
 
-                    {/* Date */}
-                    <FormStringField
-                        label="Date"
-                        type="date"
-                        value={dateKey}
-                        onChange={(e) => setDateKey(e.target.value)}
-                    />
-                </div>
-            </BottomSheet>
+  const onSubmit: SubmitHandler<FormValues> = async (values) => {
+    form.clearErrors("amount");
 
+    const amountMinor = toMinorByCurrency(values.amount, currency);
+    if (amountMinor == null || amountMinor <= 0) {
+      form.setError("amount", {
+        type: "validate",
+        message: "Введите сумму больше нуля",
+      });
+      return;
+    }
+
+    const dateKey = values.dateKey ?? todayKey();
+
+    const categoryIdValue =
+      values.type === "transfer" ? null : (values.categoryId ?? null);
+
+    setSaving(true);
+    try {
+      if (!isEdit) {
+        const input: CreateTransactionInput = {
+          workspaceId,
+          type: values.type,
+          amountMinor,
+          currency,
+          categoryId: categoryIdValue,
+          note: null,
+          dateKey,
+        };
+
+        await onCreate(input);
+      } else {
+        const patch = {
+          amountMinor,
+          dateKey,
+          categoryId: categoryIdValue,
+          // type/currency/note — не трогаем, так как в форме их нет (кроме type в MVP)
+          // NOTE: if you want to allow editing type here, move it into patch on backend.
+        };
+
+        const input: UpdateTransactionInput = {
+          id: initial!.id,
+          patch,
+        };
+
+        await onUpdate(input);
+      }
+
+      onClose();
+    } catch (e) {
+      if (
+        e instanceof AppError &&
+        e.code === "VALIDATION_ERROR" &&
+        e.meta?.field === "amount"
+      ) {
+        form.setError("amount", { type: "server", message: e.message });
+        return;
+      }
+      throw e;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <BottomSheet
+        open={open}
+        title={
+          <ModalHeader
+            title={isEdit ? "Edit transaction" : "New transaction"}
+            onClose={onClose}
+          />
+        }
+        height="half"
+        onClose={onClose}
+        footer={
+          <ButtonBase
+            fullWidth
+            onClick={form.handleSubmit(onSubmit)}
+            disabled={saving}
+          >
+            {saving ? "Saving…" : "Save"}
+          </ButtonBase>
+        }
+      >
+        <FormProvider {...form}>
+          <div className={styles.form}>
+            {/* Type (MVP): allow switching expense/income unless transfer */}
             {type !== "transfer" && (
-                <CategoriesSheet
-                    open={catOpen}
-                    mode={categorySelectMode}
-                    title="Category"
-                    onClose={() => setCatOpen(false)}
-                    options={categoryOptions}
-                    chosenOptions={chosenCategory}
-                    onChange={(val) => setChosenCategory(normalizeSingleChosen(val))}
-                    onApply={(chosen) => {
-                        setChosenCategory(normalizeSingleChosen(chosen));
-                        setCatOpen(false);
-                    }}
-                />
+              <FormFieldSegment<FormValues, TransactionType>
+                name="type"
+                label="Transaction type"
+                options={TYPE_OPTIONS}
+                size="m"
+              />
             )}
-        </>
-    );
+
+            {/* Amount */}
+            <FormFieldString<FormValues>
+              name="amount"
+              label="Amount"
+              placeholder="0"
+              rightSlot={currency}
+              rules={{
+                required: "Введите сумму",
+                validate: (v) => {
+                  if (!v) return "Введите сумму";
+                  const minor = toMinorByCurrency(v, currency);
+                  if (minor == null || minor <= 0) {
+                    return "Введите сумму больше нуля";
+                  }
+                  return true;
+                },
+              }}
+            />
+
+            {/* Category */}
+            {type !== "transfer" && (
+              <FormFieldSelect<FormValues>
+                name="categoryId"
+                label="Category"
+                mode="single"
+                placeholder="Choose category"
+                onOpen={() => setCatOpen(true)}
+                optionsByValue={categoryOptionsByValue}
+                rules={{
+                  validate: (v) => {
+                    const currentType = form.getValues("type");
+                    if (currentType === "transfer") return true;
+                    return v ? true : "Choose category";
+                  },
+                }}
+                showChevron
+                isOpen={catOpen}
+              />
+            )}
+
+            {/* Date */}
+            <FormFieldDate<FormValues>
+              name="dateKey"
+              label="Date"
+              rules={{ required: "Choose a date" }}
+            />
+          </div>
+        </FormProvider>
+      </BottomSheet>
+
+      {type !== "transfer" && (
+        <CategoriesSheet
+          open={catOpen}
+          mode="single"
+          title="Category"
+          onClose={() => setCatOpen(false)}
+          options={categoryOptions}
+          chosenOptions={chosenCategory}
+          onChange={(val) => {
+            // live preview: update field value while browsing
+            const next = Array.isArray(val) && val[0] ? String(val[0].value) : null;
+            form.setValue("categoryId", next, { shouldValidate: true });
+          }}
+          onApply={(chosen) => {
+            const next = Array.isArray(chosen) && chosen[0] ? String(chosen[0].value) : null;
+            form.setValue("categoryId", next, { shouldValidate: true });
+            setCatOpen(false);
+          }}
+        />
+      )}
+    </>
+  );
 }
 
 export default TransactionUpsertSheet;

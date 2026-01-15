@@ -4,23 +4,56 @@ import React from "react";
 import clsx from "clsx";
 import styles from "./TransactionsFilter.module.css";
 
+import {
+  Controller,
+  FormProvider,
+  useForm,
+  useWatch,
+  type SubmitHandler,
+} from "react-hook-form";
+
 import { OptionBaseProps, Text } from "@/shared/ui/atoms";
-import { CategoryField } from "../CategoryField/CategoryField";
-import type { TransactionsSortOption, TransactionsSortValue } from "./sheets/SortOptionsSheet";
+import {
+  FiltersSheet,
+  SearchBar,
+  ModalActions,
+  SortControl,
+} from "@/shared/ui/molecules";
+
 import { CategoriesSheet } from "../CategoryField/CategoriesSheet";
 
+import { FormFieldSelect } from "@/shared/ui/molecules/FormField/FormFieldSelect";
+import { FormFieldSegment } from "@/shared/ui/molecules/FormField/FormFieldSegment";
 
-import { FiltersSheet, SearchBar, ModalActions, SortControl } from "@/shared/ui/molecules";
-import { TransactionsTypes, TransactionTypeField } from "../../molecules/TransactionTypeField/TransactionTypeField";
+import type {
+  TransactionsSortOption,
+  TransactionsSortValue,
+} from "./sheets/SortOptionsSheet";
 
+export type TransactionsTypes = "all" | "expense" | "income" | "transfer";
+
+type SegmentOption<T extends string> = { value: T; label: string };
+
+const TYPE_OPTIONS: Array<SegmentOption<TransactionsTypes>> = [
+  { value: "all", label: "All" },
+  { value: "expense", label: "Expense" },
+  { value: "income", label: "Income" },
+  { value: "transfer", label: "Transfer" },
+];
 
 export type TransactionsFiltersValue = {
   query: string;
   type: TransactionsTypes;
-  categories: OptionBaseProps[];
+  /** Store only ids for filtering */
+  categoryIds: string[];
   sort: TransactionsSortValue;
 };
 
+type FormValues = {
+  type: TransactionsTypes;
+  categoryIds: string[];
+  sort: TransactionsSortValue;
+};
 
 export function TransactionsFilter({
   value,
@@ -38,35 +71,87 @@ export function TransactionsFilter({
   const [openFilters, setOpenFilters] = React.useState(false);
   const [openCategories, setOpenCategories] = React.useState(false);
 
-  // draft state for OptionControl (so it doesn't instantly commit until Apply)
-  const [draftCategories, setDraftCategories] = React.useState<OptionBaseProps[] | null>(null);
+  // RHF draft state for the filters sheet
+  const form = useForm<FormValues>({
+    defaultValues: {
+      type: value.type,
+      categoryIds: value.categoryIds,
+      sort: value.sort,
+    },
+    mode: "onSubmit",
+  });
 
+  // Map options by id for FormFieldSelect (label/icon rendering)
+  const optionsByValue = React.useMemo<Record<string, OptionBaseProps>>(
+    () =>
+      categoryOptions.reduce<Record<string, OptionBaseProps>>((acc, opt) => {
+        acc[String(opt.value)] = opt;
+        return acc;
+      }, {}),
+    [categoryOptions]
+  );
+
+  // Keep form in sync when sheet opens (so draft starts from committed value)
   React.useEffect(() => {
-    if (openCategories) {
-      setDraftCategories(value.categories);
-    }
-  }, [openCategories, value.categories]);
+    if (!openFilters) return;
+    form.reset({
+      type: value.type,
+      categoryIds: value.categoryIds,
+      sort: value.sort,
+    });
+  }, [openFilters, value.type, value.categoryIds, value.sort, form]);
 
+  // Helper to update only some committed fields
   function setPartial(patch: Partial<TransactionsFiltersValue>) {
     onChange({ ...value, ...patch });
   }
 
   function resetAll() {
-    onChange({
+    const next: TransactionsFiltersValue = {
       query: "",
       type: "all",
-      categories: [],
+      categoryIds: [],
       sort: { key: null, direction: null },
+    };
+    onChange(next);
+    // if sheet is open, reset draft too
+    form.reset({
+      type: next.type,
+      categoryIds: next.categoryIds,
+      sort: next.sort,
     });
   }
 
   const filtersActive = Boolean(
     value.query.trim() ||
       value.type !== "all" ||
-      value.categories.length > 0 ||
+      value.categoryIds.length > 0 ||
       value.sort.key ||
       value.sort.direction
   );
+
+  // --- Categories sheet draft (OptionBaseProps[]) ---
+  const watchedCategoryIds = useWatch({ control: form.control, name: "categoryIds" });
+  const [draftCategories, setDraftCategories] = React.useState<OptionBaseProps[] | null>(null);
+
+  React.useEffect(() => {
+    if (!openCategories) return;
+    const ids = watchedCategoryIds ?? [];
+    const chosen = ids
+      .map((id) => optionsByValue[String(id)])
+      .filter(Boolean) as OptionBaseProps[];
+    setDraftCategories(chosen);
+  }, [openCategories, watchedCategoryIds, optionsByValue]);
+
+  const onApply: SubmitHandler<FormValues> = (draft) => {
+    onChange({
+      ...value,
+      type: draft.type,
+      categoryIds: draft.categoryIds,
+      sort: draft.sort,
+    });
+    setOpenFilters(false);
+  };
 
   return (
     <div className={clsx(styles.root, className)}>
@@ -84,35 +169,55 @@ export function TransactionsFilter({
         title="Filters"
         footer={
           <ModalActions
-            secondary={{ label: "Reset All", onClick: () => { resetAll(); }, disabled: !filtersActive }}
-            primary={{ label: "Apply", onClick: () => setOpenFilters(false) }}
+            secondary={{
+              label: "Reset All",
+              onClick: () => {
+                resetAll();
+              },
+              disabled: !filtersActive,
+            }}
+            primary={{
+              label: "Apply",
+              onClick: form.handleSubmit(onApply),
+            }}
             layout="row"
           />
         }
       >
-        <TransactionTypeField
-          value={value.type}
-          onChange={(next) => setPartial({ type: next })}
-        />
-
-        <CategoryField
-          values={value.categories}
-          isOpen={openCategories}
-          onOpen={() => setOpenCategories(true)}
-          onRemove={(removed) =>
-            setPartial({
-              categories: value.categories.filter((c) => c.value !== removed.value),
-            })
-          }
-        />
-        <div className={styles.section}>
-          <Text variant="label">Sorting</Text>
-          <SortControl
-            options={sortOptions}
-            value={value.sort}
-            onChange={(next) => setPartial({ sort: next })}
+        <FormProvider {...form}>
+          <FormFieldSegment<FormValues, TransactionsTypes>
+            name="type"
+            label="Transaction type"
+            options={TYPE_OPTIONS}
+            size="m"
           />
-        </div>
+
+          <FormFieldSelect<FormValues>
+            name="categoryIds"
+            label="Categories"
+            mode="multi"
+            isOpen={openCategories}
+            placeholder="All categories"
+            onOpen={() => setOpenCategories(true)}
+            optionsByValue={optionsByValue}
+            removable
+          />
+
+          <div className={styles.section}>
+            <Text variant="label">Sorting</Text>
+            <Controller
+              control={form.control}
+              name="sort"
+              render={({ field }) => (
+                <SortControl
+                  options={sortOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </div>
+        </FormProvider>
       </FiltersSheet>
 
       <CategoriesSheet
@@ -123,7 +228,8 @@ export function TransactionsFilter({
         chosenOptions={draftCategories}
         onChange={setDraftCategories}
         onApply={(chosen) => {
-          setPartial({ categories: chosen || [] });
+          const ids = (chosen ?? []).map((c) => String(c.value));
+          form.setValue("categoryIds", ids, { shouldDirty: true });
           setOpenCategories(false);
         }}
       />
