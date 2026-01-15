@@ -8,8 +8,6 @@ export type { TopBarProps } from './TopBar/TopBar';
 export { FormStringField } from "./FormField/FormStringField";
 export type { FormStringFieldProps } from "./FormField/FormStringField";
 
-export { FormNumberField } from "./FormField/FormNumberField";
-export type { FormNumberFieldProps } from "./FormField/FormNumberField";
 
 export { FormSelectField } from "./FormField/FormSelectField";
 export type { FormSelectFieldProps } from "./FormField/FormSelectField";
