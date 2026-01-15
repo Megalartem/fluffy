@@ -23,10 +23,9 @@ export type TransactionRowProps = {
   onClick?: () => void;
 };
 
-function formatAmount(amount: number, currency: string, txType: TxType) {
-  const sign = txType === "expense" ? "-" : txType === "income" ? "+" : "±";
+function formatAmount(amount: number, currency: string) {
   // без i18n пока — минимально предсказуемо
-  return `${sign}${amount} ${currency}`;
+  return `${amount} ${currency}`;
 }
 
 export function TransactionRow({
@@ -57,7 +56,7 @@ export function TransactionRow({
         <Amount
           state={txType === "expense" ? "negative" : "positive"}
         >
-            {formatAmount(amount, currency, txType)}
+            {formatAmount(amount, currency)}
         </Amount>
       }
       size={size}
