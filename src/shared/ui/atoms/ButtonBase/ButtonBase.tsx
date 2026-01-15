@@ -12,6 +12,7 @@ export interface ButtonBaseProps extends React.ButtonHTMLAttributes<HTMLButtonEl
   pressed?: boolean;
   onClick?: () => void;
   ariaLabel?: string;
+  fullWidth?: boolean;
 }
 
 export function ButtonBase({
@@ -20,6 +21,7 @@ export function ButtonBase({
   pressed = false,
   className = "",
   disabled = false,
+  fullWidth = false,
   type = "button",
   onClick = () => {},
   ariaLabel = undefined,
@@ -37,7 +39,10 @@ export function ButtonBase({
       data-state={state}
       onClick={onClick}
       aria-label={ariaLabel}
-      className={[styles.button, className].filter(Boolean).join(" ")}
+      className={[
+        styles.button, 
+        fullWidth ? styles.fullWidth : "", 
+        className].filter(Boolean).join(" ")}
     />
   );
 }

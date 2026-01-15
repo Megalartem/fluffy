@@ -92,3 +92,8 @@
 .button:disabled:hover {
   opacity: var(--opacity-disabled);
 }
+
+
+.fullWidth {
+  width: 100%;
+}
