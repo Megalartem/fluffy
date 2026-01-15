@@ -7,23 +7,27 @@ import { Overlay } from "@/shared/ui/atoms";
 
 export type BottomSheetHeight = "auto" | "half" | "full";
 
-export function BottomSheet({
-  open,
-  title,
-  children,
-  onClose,
-  dismissible = true,
-  height = "auto",
-  className,
-}: {
+export interface BottomSheetProps {
   open: boolean;
   title?: React.ReactNode;
+  footer?: React.ReactNode;
   children: React.ReactNode;
   onClose: () => void;
   dismissible?: boolean;
   height?: BottomSheetHeight;
   className?: string;
-}) {
+}
+
+export function BottomSheet({
+  open,
+  title,
+  footer,
+  children,
+  onClose,
+  dismissible = true,
+  height = "auto",
+  className,
+}: BottomSheetProps) {
   const titleId = useId();
 
   useEffect(() => {
@@ -75,6 +79,8 @@ export function BottomSheet({
         ) : null}
 
         <div className={styles.body}>{children}</div>
+
+        {footer ? <div className={styles.footer}>{footer}</div> : null}
       </div>
     </div>
   );
