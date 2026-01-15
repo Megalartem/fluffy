@@ -4,7 +4,7 @@ import { SegmentedControl } from '@/shared/ui/molecules';
 import { Text } from '@/shared/ui/atoms';
 import styles from './TransactionTypeField.module.css';
 
-export type TransactionsTypes = "all" | "expense" | "income";
+export type TransactionsTypes = "all" | "expense" | "income" | "transfer";
 
 export interface TransactionTypeOption {
     value: TransactionsTypes;
