@@ -86,3 +86,163 @@
   transform: translateY(-2px) scale(0.96);
   pointer-events: none;
 }
+
+/* DatePicker (React Aria) */
+.datePicker {
+  width: 100%;
+}
+
+.dateGroup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  width: 100%;
+}
+
+.dateInput {
+  width: 100%;
+  height: var(--input-height);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+
+  /* spacing */
+  padding: var(--spacing-2) var(--spacing-4);
+
+  /* typography */
+  font-family: var(--font-family-sans);
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+
+  /* surface */
+  background: var(--background-card);
+
+  /* shape */
+  border-radius: var(--radius-md);
+
+  /* border */
+  border: 1px solid var(--color-secondary);
+
+  /* motion */
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
+}
+
+/* Focus (closest equivalent): highlight when any segment is focused */
+.dateInput:focus-within {
+  outline: none;
+  color: var(--color-text-primary);
+  border-color: var(--color-focus);
+}
+
+/* Error */
+.dateInput[data-state="error"] {
+  border-color: var(--color-error);
+}
+
+/* Disabled */
+.dateInput[data-state="disabled"] {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+  border: 1px solid var(--color-disabled);
+}
+
+.dateButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--input-height);
+  height: var(--input-height);
+
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-secondary);
+  background: var(--background-card);
+
+  cursor: pointer;
+  opacity: 0.8;
+
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard),
+    opacity var(--duration-base) var(--ease-standard);
+}
+
+.dateButton:focus-visible {
+  outline: none;
+  border-color: var(--color-focus);
+  opacity: 1;
+}
+
+.dateButton[data-state="disabled"] {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+  border: 1px solid var(--color-disabled);
+}
+
+.datePopover {
+  z-index: 50;
+}
+
+.dateDialog {
+  padding: var(--spacing-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, rgba(0,0,0,0.12));
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+}
+
+.calendar {
+  width: 320px;
+}
+
+.calendarHeader {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+  margin-bottom: var(--spacing-2);
+}
+
+.calendarHeading {
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+}
+
+.calendarNavButton {
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border, rgba(0,0,0,0.12));
+  background: transparent;
+  cursor: pointer;
+}
+
+.calendarGrid {
+  width: 100%;
+}
+
+.calendarCell {
+  border-radius: var(--radius-sm);
+}
+
+/* React Aria marks states with data attributes; keep it lightweight for MVP */
+.calendarCell[data-selected] {
+  background: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+}
+
+.calendarCell[data-disabled] {
+  opacity: 0.5;
+}
+
+.calendarCell:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

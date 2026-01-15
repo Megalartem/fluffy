@@ -87,3 +87,93 @@
     -webkit-appearance: textfield;
     -moz-appearance: textfield;
 }
+
+
+/* FormField.module.css */
+.dateInput {
+  width: 100%;
+  height: var(--input-height);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+
+  /* spacing */
+  padding: var(--spacing-2) var(--spacing-4);
+
+  /* typography */
+  font-family: var(--font-family-sans);
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+
+  /* surface */
+  background: var(--background-card);
+
+  /* shape */
+  border-radius: var(--radius-md);
+
+  /* border */
+  border: 1px solid var(--color-secondary);
+
+  /* motion */
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
+}
+
+/* Focus (closest equivalent): highlight when any segment is focused */
+.dateInput:focus-within {
+  outline: none;
+  color: var(--color-text-primary);
+  border-color: var(--color-focus);
+}
+
+/* Error */
+.dateInput[data-state="error"] {
+  border-color: var(--color-error);
+}
+
+/* Disabled */
+.dateInput[data-state="disabled"] {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+  border: 1px solid var(--color-disabled);
+}
+
+.dateButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--input-height);
+  height: var(--input-height);
+
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-secondary);
+  background: var(--background-card);
+
+  cursor: pointer;
+  opacity: 0.8;
+
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard),
+    opacity var(--duration-base) var(--ease-standard);
+}
+
+.dateButton:focus-visible {
+  outline: none;
+  border-color: var(--color-focus);
+  opacity: 1;
+}
+
+.dateButton[data-state="disabled"] {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+  border: 1px solid var(--color-disabled);
+}
+
+/* Keep the rest of the calendar/popover styles unchanged. */

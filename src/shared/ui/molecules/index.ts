@@ -5,12 +5,10 @@ export type { CardProps, CardVariant, CardPadding } from './Card/Card';
 export { TopBar } from './TopBar/TopBar';
 export type { TopBarProps } from './TopBar/TopBar';
 
-export { FormStringField } from "./FormField/FormStringField";
-export type { FormStringFieldProps } from "./FormField/FormStringField";
-
-
-export { FormSelectField } from "./FormField/FormSelectField";
-export type { FormSelectFieldProps } from "./FormField/FormSelectField";
+export { FormFieldString } from "./FormField/FormFieldString";
+export { FormFieldSelect } from "./FormField/FormFieldSelect";
+export { FormFieldDate } from "./FormField/FormFieldDate";
+export { FormFieldSegment } from "./FormField/FormFieldSegment";
 
 export { ModalHeader } from "./ModalHeader/ModalHeader";
 export type { ModalHeaderProps } from "./ModalHeader/ModalHeader";
