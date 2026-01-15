@@ -26,7 +26,7 @@ import {
 } from "@/shared/lib/money/helper";
 import { AppError } from "@/shared/errors/app-error";
 
-import styles from "./TransactionUpsertSheet.module.css";
+import TransactionTypeField, { TransactionTypeOption } from "@/features/transactions/ui/molecules/TransactionTypeField/TransactionTypeField";
 
 type Props = {
     open: boolean;
@@ -51,6 +51,12 @@ type Props = {
 const categorySelectMode = "single";
 
 const todayKey = () => new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+
+const transOptions: Array<TransactionTypeOption> = [
+    { value: "expense", label: "Expense" },
+    { value: "income", label: "Income" },
+]
 
 export function TransactionUpsertSheet({
     open,
@@ -78,6 +84,7 @@ export function TransactionUpsertSheet({
 
     // --- form state
     const [amountRaw, setAmountRaw] = React.useState("");
+    const [transType, setTransType] = React.useState<TransactionTypeOption>(transOptions[0]);
     const [dateKey, setDateKey] = React.useState(todayKey());
     const [chosenCategory, setChosenCategory] = React.useState<OptionBaseProps[] | null>(null);
 
@@ -189,43 +196,47 @@ export function TransactionUpsertSheet({
                 height="half"
                 onClose={onClose}
                 footer={
-                    <ButtonBase className={styles.actionsButton} onClick={handleSave} disabled={saving}>
+                    <ButtonBase fullWidth onClick={handleSave} disabled={saving}>
                         {saving ? "Saving…" : "Save"}
                     </ButtonBase>
                 }
             >
-                <div className={styles.sheetInner}>
-                    <div className={styles.body}>
-                        {/* Amount */}
-                        <FormStringField
-                            label="Amount"
-                            placeholder="0"
-                            type="number"
-                            value={amountRaw}
-                            onChange={(e) => setAmountRaw(e.target.value)}
-                            error={amountError || undefined}
-                            rightSlot={currency}
-                        />
+                <>
+                    <TransactionTypeField
+                        value={transType.value}
+                        options={transOptions}
+                        onChange={(next) => setTransType(transOptions.find(opt => opt.value === next)!)}
+                    />
 
-                        {type !== "transfer" && (
-                            <CategoryField
-                                mode={categorySelectMode}
-                                values={selectedCategory ? [selectedCategory] : []}
-                                isOpen={catOpen}
-                                onOpen={() => setCatOpen(true)}
-                                onRemove={() => setChosenCategory(null)}
-                            />
-                        )}
+                    {/* Amount */}
+                    <FormStringField
+                        label="Amount"
+                        placeholder="0"
+                        type="number"
+                        value={amountRaw}
+                        onChange={(e) => setAmountRaw(e.target.value)}
+                        error={amountError || undefined}
+                        rightSlot={currency}
+                    />
 
-                        {/* Date */}
-                        <FormStringField
-                            label="Date"
-                            type="date"
-                            value={dateKey}
-                            onChange={(e) => setDateKey(e.target.value)}
+                    {type !== "transfer" && (
+                        <CategoryField
+                            mode={categorySelectMode}
+                            values={selectedCategory ? [selectedCategory] : []}
+                            isOpen={catOpen}
+                            onOpen={() => setCatOpen(true)}
+                            onRemove={() => setChosenCategory(null)}
                         />
-                    </div>
-                </div>
+                    )}
+
+                    {/* Date */}
+                    <FormStringField
+                        label="Date"
+                        type="date"
+                        value={dateKey}
+                        onChange={(e) => setDateKey(e.target.value)}
+                    />
+                </>
             </BottomSheet>
 
             {type !== "transfer" && (
