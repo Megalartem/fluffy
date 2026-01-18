@@ -54,7 +54,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
 }
 
 .labelActive {

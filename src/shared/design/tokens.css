@@ -126,4 +126,7 @@
   --category-graphite-bg: rgba(75, 85, 99, 0.3);
   --category-sand-bg: rgba(199, 184, 161, 0.3);
   --category-brown-bg: rgba(139, 94, 60, 0.3);
+  --category-olive-bg: rgba(120, 130, 40, 0.3);
+
+  --color-olive: rgba(120, 130, 40, 1);
 }
