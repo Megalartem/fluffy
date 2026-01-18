@@ -1,9 +1,12 @@
-import React from "react";
-import styles from "./TransactionRow.module.css";
+import React, { Suspense } from "react";
+// import styles from "./TransactionRow.module.css";
 
 import { ListRowBase } from "@/shared/ui/molecules";
 import { TransactionCategoryIcon, type TxType } from "@/features/transactions/ui/atoms";
-import { Amount, type CategoryColor } from "@/shared/ui/atoms";
+import { Amount, Icon } from "@/shared/ui/atoms";
+import { CategoryColor } from "@/features/categories/model/types";
+import { Circle } from "lucide-react";
+import { fromMinorByCurrency, toMinor, toMinorByCurrency } from "@/shared/lib/money/helper";
 
 export type TransactionRowProps = {
   title: string;
@@ -23,9 +26,8 @@ export type TransactionRowProps = {
   onClick?: () => void;
 };
 
-function formatAmount(amount: number, currency: string) {
-  // без i18n пока — минимально предсказуемо
-  return `${amount} ${currency}`;
+function formatAmount(amount: number | string, currency: string) {
+  return toMinorByCurrency(amount.toString(), currency)
 }
 
 export function TransactionRow({
@@ -43,12 +45,14 @@ export function TransactionRow({
   return (
     <ListRowBase
       leading={
-        <TransactionCategoryIcon
-          icon={icon}
-          size={size === "l" ? "m" : "s"}
-          color={categoryColor}
-          txType={txType}
-        />
+        <Suspense fallback={<Icon icon={Circle} size={size === "l" ? "m" : "s"} />}>
+          <TransactionCategoryIcon
+            icon={icon}
+            size={size === "l" ? "m" : "s"}
+            color={categoryColor}
+            txType={txType}
+          />
+        </Suspense>
       }
       title={title}
       subtitle={subtitle ?? undefined}
@@ -56,7 +60,7 @@ export function TransactionRow({
         <Amount
           state={txType === "expense" ? "negative" : "positive"}
         >
-            {formatAmount(amount, currency)}
+          {fromMinorByCurrency(amount, currency)}
         </Amount>
       }
       size={size}

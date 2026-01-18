@@ -6,40 +6,56 @@ import { Amount, Divider } from "@/shared/ui/atoms";
 import { SectionHeader } from "@/shared/ui/molecules";
 
 import { TransactionRow } from "@/features/transactions/ui/molecules";
-import type { TxType } from "@/features/transactions/ui/atoms";
-import type { CategoryColor } from "@/shared/ui/atoms";
+import { Transaction } from "@/features/transactions/model/types";
+import { Category } from "@/features/categories/model/types";
+import { dynamicIconImports, IconName } from "lucide-react/dynamic";
 
-export type TransactionsDayGroupItem = {
-    id: string;
-    title: string;
-    subtitle?: string | null;
-
-    amount: number;
-    currency: string;
-    txType: TxType;
-
-    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-    categoryColor?: CategoryColor;
-
-    onClick?: () => void;
-};
-
-export type TransactionsDayGroupProps = {
+export type ITransactionsDayGroup = {
     title: string;      // "Saturday, 21 June"
     totalText: string;  // "$272.5" (готовая строка)
-    items: TransactionsDayGroupItem[];
+    transactions: Transaction[];
+    categories: Category[];
 
-    onHeaderClick?: () => void; // опционально
+    onHeaderClick?: () => void;
+    onTransactionClick?: (tx: Transaction) => void;
     className?: string;
 };
+
+const lazyIconCache = new Map<IconName, React.LazyExoticComponent<React.ComponentType<{ className?: string; size?: string | number }>>>();
+
+function getLazyLucideIcon(name: IconName) {
+    const cached = lazyIconCache.get(name);
+    if (cached) return cached;
+
+    const importer = dynamicIconImports[name];
+    if (!importer) {
+        console.warn(`[TransactionsDayGroup] Unknown iconKey: ${String(name)}`);
+        const Fallback = () => null;
+        return Fallback;
+    }
+
+    const LazyIcon = React.lazy(importer);
+    lazyIconCache.set(name, LazyIcon);
+    return LazyIcon;
+}
+
 
 export function TransactionsDayGroup({
     title,
     totalText,
-    items,
+    transactions,
+    categories,
     onHeaderClick,
+    onTransactionClick,
     className,
-}: TransactionsDayGroupProps) {
+}: ITransactionsDayGroup) {
+
+    const categoryById = React.useMemo(() => {
+        const m = new Map<string, Category>();
+        for (const c of categories) m.set(c.id, c);
+        return m;
+    }, [categories]);
+
     return (
         <Card
             variant="default"
@@ -59,26 +75,34 @@ export function TransactionsDayGroup({
                 }
             />
             <div className={styles.list}>
-                {items.map((t, idx) => (
-                    <React.Fragment key={t.id}>
-                        <TransactionRow
-                            title={t.title}
-                            subtitle={t.subtitle ?? undefined}
-                            amount={t.amount}
-                            currency={t.currency}
-                            txType={t.txType}
-                            icon={t.icon}
-                            categoryColor={t.categoryColor}
-                            onClick={t.onClick}
-                            tone="ghost"
-                            size="m"
-                        />
+                {transactions.map((t, idx) => {
+                    const category = categoryById.get(t.categoryId ?? "");
+                    if (!category) {
+                        console.warn(`Category with id=${t.categoryId} not found for transaction id=${t.id}`);
+                        return null;
+                    }
 
-                        {idx < items.length - 1 ? (
-                            <Divider className={styles.divider} />
-                        ) : null}
-                    </React.Fragment>
-                ))}
+                    return (
+                        <React.Fragment key={t.id}>
+                            <TransactionRow
+                                title={category.name}
+                                subtitle={undefined}
+                                amount={t.amountMinor}
+                                currency={t.currency}
+                                txType={t.type}
+                                icon={getLazyLucideIcon(category.iconKey)}
+                                categoryColor={category.colorKey}
+                                onClick={() => onTransactionClick?.(t)}
+                                tone="ghost"
+                                size="m"
+                            />
+
+                            {idx < transactions.length - 1 ? (
+                                <Divider className={styles.divider} />
+                            ) : null}
+                        </React.Fragment>
+                    );
+                })}
             </div>
         </Card>
     );
