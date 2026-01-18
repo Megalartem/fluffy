@@ -26,6 +26,8 @@ import { FormFieldBase, type FormFieldBaseProps } from "./FormFieldBase";
 
 import clsx from "clsx";
 import styles from "./FormField.module.css";
+import { Icon } from "../../atoms";
+import { Calendar as CalendarIcon } from "lucide-react";
 
 export type FormFieldDateValue = string | null;
 
@@ -112,7 +114,7 @@ export function FormFieldDate<TFormValues extends FieldValues>({
               type="button"
               data-state={visualState}
             >
-              📅
+              <Icon icon={CalendarIcon} size="s" variant={visualState === "error" ? "accent" : "default"} /> 
             </AriaButton>
           </Group>
 

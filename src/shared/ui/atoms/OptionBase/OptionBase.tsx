@@ -15,7 +15,7 @@ export type OptionItem = {
   icon?: React.ReactNode;
 };
 
-export interface OptionBaseProps extends OptionItem {
+export interface IOptionBase extends OptionItem {
   onSelect?: () => void;
 }
 
@@ -25,7 +25,7 @@ export function OptionBase({
     label,
     icon,
     onSelect,
-}: OptionBaseProps) {
+}: IOptionBase) {
 
     return (
         <button

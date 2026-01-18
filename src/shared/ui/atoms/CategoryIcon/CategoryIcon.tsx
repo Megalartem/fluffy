@@ -1,12 +1,7 @@
 import React from "react";
 import styles from "./CategoryIcon.module.css";
+import { CategoryColor } from "@/features/categories/model/types";
 
-export type CategoryColor =
-  | "default" | "violet" | "indigo" | "blue" | "cyan" | "teal"
-  | "amber" | "orange" | "coral" | "red"
-  | "green" | "lime" | "mint"
-  | "pink" | "magenta" | "plum"
-  | "slate" | "steel" | "graphite" | "sand" | "brown" | "tx-type";
 
 type CategorySize = "xs" | "s" | "m" | "l";
 type Importance = "primary" | "secondary";
@@ -41,7 +36,7 @@ export function CategoryIcon({
   icon: Icon,
   size = "m",
   color,
-  backgroundColor, // do not forward to DOM
+  backgroundColor,
   importance = "secondary",
   className,
   ...rest

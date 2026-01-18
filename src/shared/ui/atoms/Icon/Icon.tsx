@@ -6,7 +6,7 @@ export type IconVariant = "default" | "on-default" | "muted" | "accent" | "ghost
 export type IconSize = "s" | "m" | "l";
 
 interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
-  icon: LucideIcon;
+  icon: LucideIcon | React.ReactElement;
   size?: IconSize;
   variant?: IconVariant;
 }
@@ -25,10 +25,14 @@ export const Icon: React.FC<IconProps> = ({
       className={[styles.root, className].filter(Boolean).join(" ")}
       {...props}
     >
-      <IconComponent 
-      className={styles.svg} 
-      aria-hidden="true" 
-      />
+      {React.isValidElement(IconComponent) ? (
+        IconComponent
+      ) : (
+        <IconComponent 
+          className={styles.svg} 
+          aria-hidden="true" 
+        />
+      )}
     </span>
   );
 };
