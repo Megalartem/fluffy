@@ -34,6 +34,7 @@
 .root[data-variant="select"] button {
   cursor: pointer;
 }
+
 .input[data-variant="select"] button:disabled,
 .input[data-variant="select"][data-state="disabled"] button {
   cursor: not-allowed;
@@ -41,19 +42,19 @@
 
 .input[data-variant="number"] input::-webkit-outer-spin-button,
 .input[data-variant="number"] input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .input[data-variant="number"] input[type=number] {
-    appearance: textfield;
-    -moz-appearance: textfield;
+  appearance: textfield;
+  -moz-appearance: textfield;
 }
 
 .input[data-variant="number"] {
-    appearance: textfield;
-    -webkit-appearance: textfield;
-    -moz-appearance: textfield;
+  appearance: textfield;
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
 }
 
 
@@ -67,7 +68,7 @@
   transform: rotate(180deg);
 }
 
-.selectOptionLabels{
+.selectOptionLabels {
   display: flex;
   align-items: center;
   align-content: center;
@@ -156,22 +157,40 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: var(--input-height);
+  gap: var(--spacing-2);
   height: var(--input-height);
 
   border-radius: var(--radius-md);
   border: 1px solid var(--color-secondary);
-  background: var(--background-card);
+
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-semibold);
 
   cursor: pointer;
-  opacity: 0.8;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
 
   transition:
-    border-color var(--duration-base) var(--ease-standard),
-    box-shadow var(--duration-base) var(--ease-standard),
     background-color var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    border var(--duration-base) var(--ease-standard),
     color var(--duration-base) var(--ease-standard),
-    opacity var(--duration-base) var(--ease-standard);
+    box-shadow var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
+
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dateButton:active {
+  transform: scale(0.96);
+}
+
+.dateButton[data-state="pressed"] {
+  transform: scale(0.96);
 }
 
 .dateButton:focus-visible {
@@ -191,10 +210,9 @@
 }
 
 .dateDialog {
-  padding: var(--spacing-3);
+  padding: var(--spacing-4);
   border-radius: var(--radius-md);
   background: var(--color-surface, #fff);
-  border: 1px solid var(--color-border, rgba(0,0,0,0.12));
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
 }
 
@@ -219,7 +237,6 @@
   min-width: 36px;
   min-height: 36px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border, rgba(0,0,0,0.12));
   background: transparent;
   cursor: pointer;
 }
@@ -229,6 +246,13 @@
 }
 
 .calendarCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  text-align: center;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-sm);
 }
 
