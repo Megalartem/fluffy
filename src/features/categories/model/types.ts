@@ -1,13 +1,22 @@
+import { IconName } from "lucide-react/dynamic";
+
 export type CategoryType = "expense" | "income" | "both";
+
+export type CategoryColor =
+  | "default" | "violet" | "indigo" | "blue" | "cyan" | "teal"
+  | "amber" | "orange" | "coral" | "red"
+  | "green" | "lime" | "mint"
+  | "pink" | "magenta" | "plum"
+  | "slate" | "steel" | "graphite" | "sand" | "brown" | "tx-type";
 
 export interface Category {
   id: string;               // uuid
   workspaceId: string;
 
   name: string;
-  type: CategoryType;      // "expense" | "income" | "both"
-  iconKey: string;          // "shopping_cart" / "coffee" — ключ, а не компонент
-  colorKey: string;         // из твоих 20 токенов: "violet" | "steel" | ...
+  type: CategoryType;
+  iconKey: IconName;
+  colorKey: CategoryColor;
 
   order: number;            // для сортировки списка
   isArchived: boolean;

@@ -1,4 +1,4 @@
- import type { OptionBaseProps } from "@/shared/ui/atoms";
+ import type { IOptionBase } from "@/shared/ui/atoms";
 
 /**
  * Гарантирует single-семантику для chosenOptions (массив/nullable контракт).
@@ -6,26 +6,26 @@
  * - [a, b, ...] -> [a]
  */
 export function normalizeSingleChosen(
-  chosen: OptionBaseProps[] | null
-): OptionBaseProps[] | null {
+  chosen: IOptionBase[] | null
+): IOptionBase[] | null {
   if (!chosen || chosen.length === 0) return null;
   return [chosen[0]];
 }
 
 /**
- * Convenience: OptionBaseProps[] | null -> OptionBaseProps | null
+ * Convenience: IOptionBase[] | null -> IOptionBase | null
  */
 export function toSingle(
-  chosen: OptionBaseProps[] | null
-): OptionBaseProps | null {
+  chosen: IOptionBase[] | null
+): IOptionBase | null {
   return chosen?.[0] ?? null;
 }
 
 /**
- * Convenience: OptionBaseProps | null -> OptionBaseProps[] | null
+ * Convenience: IOptionBase | null -> IOptionBase[] | null
  */
 export function fromSingle(
-  value: OptionBaseProps | null
-): OptionBaseProps[] | null {
+  value: IOptionBase | null
+): IOptionBase[] | null {
   return value ? [value] : null;
 }

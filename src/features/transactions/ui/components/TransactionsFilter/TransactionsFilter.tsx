@@ -12,7 +12,7 @@ import {
   type SubmitHandler,
 } from "react-hook-form";
 
-import { OptionBaseProps, Text } from "@/shared/ui/atoms";
+import { IOptionBase, Text } from "@/shared/ui/atoms";
 import {
   FiltersSheet,
   SearchBar,
@@ -38,7 +38,7 @@ const TYPE_OPTIONS: Array<SegmentOption<TransactionsTypes>> = [
   { value: "all", label: "All" },
   { value: "expense", label: "Expense" },
   { value: "income", label: "Income" },
-  { value: "transfer", label: "Transfer" },
+  // { value: "transfer", label: "Transfer" },
 ];
 
 export type TransactionsFiltersValue = {
@@ -63,8 +63,8 @@ export function TransactionsFilter({
   className,
 }: {
   value: TransactionsFiltersValue;
-  onChange: (next: TransactionsFiltersValue) => void;
-  categoryOptions: OptionBaseProps[];
+  onChange: (newFilters: TransactionsFiltersValue) => void;
+  categoryOptions: IOptionBase[];
   sortOptions: TransactionsSortOption[];
   className?: string;
 }) {
@@ -82,9 +82,9 @@ export function TransactionsFilter({
   });
 
   // Map options by id for FormFieldSelect (label/icon rendering)
-  const optionsByValue = React.useMemo<Record<string, OptionBaseProps>>(
+  const optionsByValue = React.useMemo<Record<string, IOptionBase>>(
     () =>
-      categoryOptions.reduce<Record<string, OptionBaseProps>>((acc, opt) => {
+      categoryOptions.reduce<Record<string, IOptionBase>>((acc, opt) => {
         acc[String(opt.value)] = opt;
         return acc;
       }, {}),
@@ -132,14 +132,14 @@ export function TransactionsFilter({
 
   // --- Categories sheet draft (OptionBaseProps[]) ---
   const watchedCategoryIds = useWatch({ control: form.control, name: "categoryIds" });
-  const [draftCategories, setDraftCategories] = React.useState<OptionBaseProps[] | null>(null);
+  const [draftCategories, setDraftCategories] = React.useState<IOptionBase[] | null>(null);
 
   React.useEffect(() => {
     if (!openCategories) return;
     const ids = watchedCategoryIds ?? [];
     const chosen = ids
       .map((id) => optionsByValue[String(id)])
-      .filter(Boolean) as OptionBaseProps[];
+      .filter(Boolean) as IOptionBase[];
     setDraftCategories(chosen);
   }, [openCategories, watchedCategoryIds, optionsByValue]);
 

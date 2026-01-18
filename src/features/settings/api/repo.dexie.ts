@@ -54,3 +54,6 @@ export class DexieSettingsRepo implements ISettingsRepository {
     }
   }
 }
+
+
+export const settingsRepo = new DexieSettingsRepo();

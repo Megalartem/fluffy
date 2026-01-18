@@ -5,7 +5,7 @@ import { AppError } from "@/shared/errors/app-error";
 import { db, ensureDbInitialized } from "@/shared/lib/storage/db";
 import { nowIso } from "@/shared/lib/storage/db";
 
-export class DexieTransactionsRepo implements ITransactionsRepository {
+class DexieTransactionsRepo implements ITransactionsRepository {
   async create(workspaceId: string, tx: Transaction): Promise<Transaction> {
     try {
       await ensureDbInitialized();
@@ -115,3 +115,4 @@ export class DexieTransactionsRepo implements ITransactionsRepository {
 
 }
 
+export const transactionsRepo = new DexieTransactionsRepo();

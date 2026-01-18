@@ -32,3 +32,15 @@ export type UpdateTransactionInput = {
   id: string;
   patch: UpdateTransactionPatch;
 };
+
+export type TransactionsSortValue =
+  | { key: null; direction: null }
+  | { key: "date"; direction: "asc" | "desc" }
+  | { key: "amount"; direction: "asc" | "desc" };
+
+export type TransactionsFilterValues = {
+  query: string;
+  type: "all" | TransactionType;
+  categoryIds: string[];
+  sort: TransactionsSortValue;
+};

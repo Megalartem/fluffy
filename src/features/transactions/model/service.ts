@@ -5,6 +5,8 @@ import { AppError } from "@/shared/errors/app-error";
 import { nowIso, todayIsoDate } from "@/shared/lib/storage/db";
 import type { UpdateTransactionInput } from "./types";
 import { toDateKey } from "./helpers/date";
+import { transactionsRepo } from "../api/repo.dexie";
+import { settingsRepo } from "@/features/settings/api/repo.dexie";
 
 function makeId(prefix: string): string {
   // SSR-safe uuid generation
@@ -72,3 +74,9 @@ export class TransactionService {
     return this.transactionsRepo.softDelete(workspaceId, id);
   }
 }
+
+
+export const transactionService = new TransactionService(
+  transactionsRepo,
+  settingsRepo
+);

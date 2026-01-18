@@ -18,7 +18,7 @@ import type {
   UpdateTransactionInput,
 } from "@/features/transactions/model/types";
 
-import type { OptionBaseProps } from "@/shared/ui/atoms";
+import type { IOptionBase } from "@/shared/ui/atoms";
 import { ButtonBase } from "@/shared/ui/atoms";
 import { BottomSheet, ModalHeader } from "@/shared/ui/molecules";
 
@@ -37,7 +37,12 @@ import {
 import { toMinorByCurrency, fromMinorByCurrency } from "@/shared/lib/money/helper";
 import { AppError } from "@/shared/errors/app-error";
 
-type Props = {
+interface defaultCategoryState {
+  id: string;
+  type: TransactionType;
+}
+
+interface ITransactionUpsertSheet {
   open: boolean;
   onClose: () => void;
 
@@ -51,6 +56,7 @@ type Props = {
   currency: CurrencyCode;
 
   categories: Category[];
+  defaultCategoryState?: defaultCategoryState;
 
   /**
    * Если передали initial — считаем, что это edit.
@@ -84,10 +90,11 @@ export function TransactionUpsertSheet({
   type,
   currency,
   categories,
+  defaultCategoryState,
   initial,
   onCreate,
   onUpdate,
-}: Props) {
+}: ITransactionUpsertSheet) {
   const isEdit = Boolean(initial);
 
   const form = useForm<FormValues>({
@@ -108,7 +115,7 @@ export function TransactionUpsertSheet({
   const txTypeForOptions = type === "transfer" ? "transfer" : watchedType;
 
   // Options for CategoriesSheet and for FormSelectField (display)
-  const categoryOptions = React.useMemo<OptionBaseProps[]>(
+  const categoryOptions = React.useMemo<IOptionBase[]>(
     () =>
       buildCategoryOptions({
         categories,
@@ -117,9 +124,9 @@ export function TransactionUpsertSheet({
     [categories, txTypeForOptions]
   );
 
-  const categoryOptionsByValue = React.useMemo<Record<string, OptionBaseProps>>(
+  const categoryOptionsByValue = React.useMemo<Record<string, IOptionBase>>(
     () =>
-      categoryOptions.reduce<Record<string, OptionBaseProps>>((acc, opt) => {
+      categoryOptions.reduce<Record<string, IOptionBase>>((acc, opt) => {
         acc[String(opt.value)] = opt;
         return acc;
       }, {}),
@@ -135,10 +142,20 @@ export function TransactionUpsertSheet({
 
     if (!initial) {
       // create
+      const initialType: TransactionType =
+        type === "transfer"
+          ? "transfer"
+          : (defaultCategoryState?.type ?? TYPE_OPTIONS[0].value);
+      const defaultId =
+        initialType === "transfer" ? null : (defaultCategoryState?.id ?? null);
+
+      const isDefaultIdValid =
+        Boolean(defaultId) && categories.some((c) => c.id === defaultId);
+
       form.reset({
-        type: type === "transfer" ? "transfer" : TYPE_OPTIONS[0].value,
+        type: initialType,
         amount: "",
-        categoryId: null,
+        categoryId: isDefaultIdValid ? defaultId : null,
         dateKey: todayKey(),
       });
       return;
@@ -151,7 +168,7 @@ export function TransactionUpsertSheet({
       categoryId: type === "transfer" ? null : initial.categoryId,
       dateKey: initial.dateKey,
     });
-  }, [open, initial, currency, form, type]);
+  }, [open, initial, currency, form, type, defaultCategoryState, categories]);
 
   // transfer: category always null and picker must be closed
   React.useEffect(() => {
@@ -162,13 +179,14 @@ export function TransactionUpsertSheet({
   }, [type, form]);
 
   const categoryId = useWatch({ control: form.control, name: "categoryId" });
-  const chosenCategory = React.useMemo<OptionBaseProps[] | null>(() => {
+  const chosenCategory = React.useMemo<IOptionBase[] | null>(() => {
     if (!categoryId) return null;
     const opt = findCategoryOption(categoryOptions, categoryId);
     return opt ? [opt] : null;
   }, [categoryId, categoryOptions]);
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
+
     form.clearErrors("amount");
 
     const amountMinor = toMinorByCurrency(values.amount, currency);
@@ -177,6 +195,7 @@ export function TransactionUpsertSheet({
         type: "validate",
         message: "Введите сумму больше нуля",
       });
+      setSaving(false);
       return;
     }
 
@@ -224,6 +243,7 @@ export function TransactionUpsertSheet({
         e.meta?.field === "amount"
       ) {
         form.setError("amount", { type: "server", message: e.message });
+        setSaving(false);
         return;
       }
       throw e;

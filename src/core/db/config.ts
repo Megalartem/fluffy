@@ -14,7 +14,7 @@ export interface Transaction {
   id: string;
   workspaceId: string;
   type: "income" | "expense";
-  amount: number;
+  amountMinor: number;
   currency: string;
   categoryId?: string;
   note?: string;
@@ -79,7 +79,7 @@ export interface Setting {
   id: string;
   workspaceId: string;
   key: string;
-  value: any;
+  value: string | number | boolean | null;
   createdAt: number;
   updatedAt: number;
   version: number;
@@ -133,30 +133,38 @@ export class FluffyDatabase extends Dexie {
           "++id, [workspaceId+key], [workspaceId+updatedAt], [workspaceId+syncStatus], [workspaceId+lastSyncedAt]",
       })
       .upgrade(async (tx) => {
-        await tx.table("transactions").toCollection().modify((t: any) => {
+        // --- transactions: date -> dateKey, amount(minor) -> amountMinor, numeric timestamps -> ISO strings
+        await tx.table("transactions").toCollection().modify((t: Transaction) => {
           t.version = t.version || 1;
           t.syncStatus = t.syncStatus || "pending";
           if (!t.lastSyncedAt && t.syncedAt) t.lastSyncedAt = t.syncedAt;
+
+          // amountMinor
+          // legacy `amount` was stored in minor units already
+          if (typeof t.amountMinor !== "number" && typeof t.amountMinor === "string") {
+            const n = Number(t.amountMinor);
+            if (Number.isFinite(n)) t.amountMinor = Math.round(n);
+          }
         });
 
-        await tx.table("budgets").toCollection().modify((b: any) => {
+        await tx.table("budgets").toCollection().modify((b: Budget) => {
           b.version = b.version || 1;
           b.syncStatus = b.syncStatus || "pending";
           if (!b.lastSyncedAt && b.syncedAt) b.lastSyncedAt = b.syncedAt;
         });
 
-        await tx.table("categories").toCollection().modify((c: any) => {
+        await tx.table("categories").toCollection().modify((c: Category) => {
           c.version = c.version || 1;
           c.syncStatus = c.syncStatus || "pending";
         });
 
-        await tx.table("goals").toCollection().modify((g: any) => {
+        await tx.table("goals").toCollection().modify((g: Goal) => {
           g.version = g.version || 1;
           g.syncStatus = g.syncStatus || "pending";
           if (!g.lastSyncedAt && g.syncedAt) g.lastSyncedAt = g.syncedAt;
         });
 
-        await tx.table("settings").toCollection().modify((s: any) => {
+        await tx.table("settings").toCollection().modify((s: Setting) => {
           s.version = s.version || 1;
           s.syncStatus = s.syncStatus || "pending";
         });

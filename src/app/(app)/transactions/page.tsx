@@ -1,212 +1,180 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { fmt } from "@/shared/lib/formatter";
-import { TransactionSheet } from "@/features/transactions/ui/transaction-sheet";
-import { TransactionsFiltersModal } from "@/features/transactions/ui/filters-modal";
-import { useTransactions } from "@/features/transactions/hooks/use-transactions";
-import { Pagination, usePagination } from "@/shared/ui/pagination";
-import { Container } from "@/shared/ui/container";
-import { Input } from "@/shared/ui/input";
-import { Button } from "@/shared/ui/button";
-import { EmptyState } from "@/shared/ui/empty-state";
-import { Alert } from "@/shared/ui/alert";
-import { ListItem } from "@/shared/ui/list-item";
-// import { FilterToggle } from "@/shared/ui/filter-toggle";
-import { Spinner } from "@/shared/ui/spinner";
+import * as React from "react";
+import { EmptyState } from "@/shared/ui/molecules/EmptyState/EmptyState";
+import { TransactionsFilter } from "@/features/transactions/ui/components/TransactionsFilter/TransactionsFilter";
+import TransactionUpsertSheet from "@/features/transactions/ui/components/TransactionUpsertSheet/TransactionUpsertSheet";
+import { FAB } from "@/shared/ui/atoms/FAB/FAB";
+import { Plus } from "lucide-react";
+
+import { useTransactions } from "@/features/transactions/hooks/useTransactions";
+import type { CreateTransactionInput, Transaction, TransactionsFilterValues, UpdateTransactionInput } from "@/features/transactions/model/types";
+import { transactionsRepo } from "@/features/transactions/api/repo.dexie";
+import styles from "./transactions.module.css";
+import {
+  MOCK_CURRENCY,
+  MOCK_WORKSPACE_ID,
+  mockCategories,
+  mockCategoryOptions,
+  seedMockTransactionsIfEmpty,
+} from "@/features/transactions/dev/mocks";
+import { TransactionsList } from "@/features/transactions/ui/components";
+import { useTransactionMutations } from "@/features/transactions/hooks/utils/useTransactionMutation";
+
+const EMPTY_STATES = {
+  noTransactions: {
+    title: "No transactions yet",
+    description: "Add your first income or expense — it will appear here.",
+    primaryActionLabel: "Add transaction",
+  },
+  noFilterTransactions: {
+    title: "No results",
+    description: "Try changing filters or reset them.",
+    primaryActionLabel: "Reset filters",
+  },
+  error: {
+    title: "Something went wrong",
+    description: "Try again.",
+    primaryActionLabel: "Reload",
+  },
+};
+
+const INITIAL_FILTERS: TransactionsFilterValues = {
+  query: "",
+  type: "all",
+  categoryIds: [],
+  sort: { key: null, direction: null },
+};
 
 
 export default function TransactionsPage() {
-  const {
-    state,
-    load,
-    categories,
-    categoriesMap,
+  const isDev = process.env.NODE_ENV === "development";
+  const didSeed = React.useRef(false);
+
+  // Seed mock data in development
+  React.useEffect(() => {
+    if (!isDev || didSeed.current) return;
+    didSeed.current = true;
+    void seedMockTransactionsIfEmpty(MOCK_WORKSPACE_ID);
+  }, [isDev]);
+
+  const [filters, setFilters] = React.useState<TransactionsFilterValues>(INITIAL_FILTERS);
+  const [upsertOpen, setUpsertOpen] = React.useState(false);
+  const [editing, setEditing] = React.useState<Transaction | undefined>(undefined);
+
+  const { transactions, loading, error, refresh, loadMore, hasMore } = useTransactions({
+    workspaceId: MOCK_WORKSPACE_ID,
     filters,
-    setFilters,
-    setQuery,
-    filtersActive,
-    filtersActiveCount,
-    sort,
-    toggleSort,
-    resetSort,
-    filteredItems,
-  } = useTransactions();
+    repo: transactionsRepo,
+    categories: mockCategories,
+  });
 
-  const pagination = usePagination(filteredItems.length, 25);
-  const paginatedItems = pagination.paginate(filteredItems);
+  const { txCreate, txUpdate, txSaving } = useTransactionMutations({
+  workspaceId: MOCK_WORKSPACE_ID,
+  refresh,
+});
 
-  const [createOpen, setCreateOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [editingTx, setEditingTx] = useState<import("@/features/transactions/model/types").Transaction | null>(null);
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const handleRefresh = React.useCallback(async () => {
+    await refresh();
+  }, [refresh]);
 
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleRetry = React.useCallback(() => {
+    void handleRefresh();
+  }, [handleRefresh]);
+
+  const handleCreated = React.useCallback(async (input: CreateTransactionInput) => {
+    await txCreate(input);
+    await handleRefresh();
+  }, [txCreate, handleRefresh]);
+
+  const handleUpdated = React.useCallback(async (input: UpdateTransactionInput) => {
+    await txUpdate(input);
+    await handleRefresh();
+  }, [handleRefresh, txUpdate]);
+
+  const filtersActive =
+    Boolean(filters.query.trim()) ||
+    filters.type !== "all" ||
+    filters.categoryIds.length > 0 ||
+    Boolean(filters.sort.key || filters.sort.direction);
+
+  const isEmpty = !loading && transactions.length === 0;
+
+  const handleOpenCreate = React.useCallback(() => {
+
+    setEditing(undefined);
+    setUpsertOpen(true);
   }, []);
 
-  // Reset pagination when filters change
-  useEffect(() => {
-    pagination.reset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, sort]);
+  const handleOpenEdit = React.useCallback((tx: Transaction) => {
+    setEditing(tx);
+    setUpsertOpen(true);
+  }, []);
 
-  function openEdit(tx: import("@/features/transactions/model/types").Transaction) {
-    setEditingTx(tx);
-    setEditOpen(true);
-  }
+  const handleResetFilters = React.useCallback(() => {
+    setFilters(INITIAL_FILTERS);
+  }, []);
 
-  function onSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Escape") {
-      setFilters((prev) => ({ ...prev, query: "" }));
-    }
-  }
+  const handleFiltersChange = React.useCallback((newFilters: TransactionsFilterValues) => {
+    setFilters(newFilters as TransactionsFilterValues);
+  }, []);
 
   return (
-    <Container className="relative space-y-4 pb-6">
-      <div className="sticky top-0 z-30 -mx-4 md:-mx-6 px-4 md:px-6 pt-6 pb-3 border-b border-border bg-surface/90 backdrop-blur">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-text">Транзакции</h1>
-          <Button variant="secondary" onClick={load} type="button">
-            Обновить
-          </Button>
-        </div>
-
-        <div className="mt-3 flex items-center gap-2">
-          <div className="relative flex-1">
-            <Input
-              placeholder="Поиск (заметка, категория или сумма)"
-              value={filters.query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={onSearchKeyDown}
-            />
-
-            {filters.query.trim() ? (
-              <button
-                type="button"
-                aria-label="Очистить поиск"
-                title="Очистить"
-                onClick={() => setFilters((prev) => ({ ...prev, query: "" }))}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-text-subtle hover:text-text"
-              >
-                ×
-              </button>
-            ) : null}
-          </div>
-
-          <FilterToggle activeCount={filtersActiveCount} onClick={() => setFiltersOpen(true)} />
-        </div>
-      </div>
-
-      {state.status === "loading" ? (
-        <div className="flex items-center gap-2 text-text-subtle">
-          <Spinner />
-          <span>Загрузка…</span>
-        </div>
-      ) : null}
-
-      {state.status === "error" ? (
-        <Alert
-          variant="danger"
-          title="Ошибка"
-          description={state.message}
-          actions={<Button variant="secondary" onClick={load}>Повторить</Button>}
-        />
-      ) : null}
-
-      {state.status === "ready" && (state as any).items?.length === 0 ? (
-        <EmptyState
-          title="Пока нет записей"
-          description="Добавь первую трату — это займёт пару секунд."
-          action={<Button onClick={() => setCreateOpen(true)}>Добавить</Button>}
-        />
-      ) : null}
-
-      {state.status === "ready" && (state as any).items?.length > 0 && filteredItems.length === 0 ? (
-        <EmptyState
-          title="Ничего не найдено"
-          description="Попробуй изменить фильтры или очистить поиск."
-          action={
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setFilters({ type: "all", categoryId: "", query: "" });
-                setQuery("");
-              }}
-            >
-              Сбросить
-            </Button>
-          }
-        />
-      ) : null}
-
-      {state.status === "ready" && filteredItems.length > 0 ? (
-        <div className="space-y-2">
-          {paginatedItems.map((t) => {
-            const category = t.categoryId ? categoriesMap.get(t.categoryId) : null;
-            return (
-              <ListItem
-                key={t.id}
-                interactive
-                onClick={() => openEdit(t)}
-                title={category?.name ?? "Без категории"}
-                subtitle={t.note ? t.note : t.date}
-                end={
-                  <div className="font-semibold tabular-nums text-text">
-                    {t.type === "expense" ? "-" : "+"}
-                    {fmt(t.amount)} {t.currency}
-                  </div>
-                }
-              />
-            );
-          })}
-
-          {filteredItems.length > 10 && (
-            <Pagination
-              currentPage={pagination.currentPage}
-              totalPages={pagination.totalPages}
-              totalItems={filteredItems.length}
-              itemsPerPage={pagination.itemsPerPage}
-              onPageChange={pagination.goToPage}
-              onItemsPerPageChange={pagination.setItemsPerPage}
-            />
-          )}
-        </div>
-      ) : null}
-
-      {/* Create */}
-      <TransactionSheet
-        open={createOpen}
-        mode="create"
-        onClose={() => setCreateOpen(false)}
-        onChanged={load}
+    <div className={styles.body}>
+      <TransactionsFilter
+        value={filters}
+        onChange={handleFiltersChange}
+        categoryOptions={mockCategoryOptions}
+        sortOptions={[]}
       />
 
-      {/* Edit */}
-      <TransactionSheet
-        open={editOpen}
-        mode="edit"
-        transaction={editingTx}
-        onClose={() => {
-          setEditOpen(false);
-          setEditingTx(null);
-        }}
-        onChanged={load}
+      {error ? (
+        <EmptyState
+          title={EMPTY_STATES.error.title}
+          description={EMPTY_STATES.error.description}
+          tone="muted"
+          primaryAction={{ label: EMPTY_STATES.error.primaryActionLabel, onClick: handleRetry }}
+        />
+      ) : isEmpty ? (
+        <EmptyState
+          title={EMPTY_STATES.noTransactions.title}
+          description={EMPTY_STATES.noTransactions.description}
+          tone="muted"
+          primaryAction={{ label: EMPTY_STATES.noTransactions.primaryActionLabel, onClick: handleOpenCreate }}
+        />
+      ) : (
+        <TransactionsList
+          transactions={transactions}
+          categories={mockCategories}
+          currency={MOCK_CURRENCY}
+          loading={loading}
+          error={error}
+          onRetry={handleRetry}
+          filtersActive={filtersActive}
+          onResetFilters={handleResetFilters}
+          onAddTransaction={handleOpenCreate}
+          onTransactionClick={handleOpenEdit}
+        />
+      )}
+
+      <FAB
+        icon={Plus}
+        aria-label="Add transaction"
+        onClick={handleOpenCreate}
       />
 
-      {/* Filters modal */}
-      {/* <TransactionsFiltersModal
-        open={filtersOpen}
-        onClose={() => setFiltersOpen(false)}
-        categories={categories}
-        filters={filters}
-        onChange={(patch) => setFilters((prev) => ({ ...prev, ...patch }))}
-        onReset={() => setFilters({ type: "all", categoryId: "", query: "" })}
-        sort={sort}
-        onToggleSort={toggleSort}
-        onResetSort={resetSort}
-      /> */}
-    </Container>
+      <TransactionUpsertSheet
+        open={upsertOpen}
+        onClose={() => setUpsertOpen(false)}
+        workspaceId={MOCK_WORKSPACE_ID}
+        currency={MOCK_CURRENCY}
+        categories={mockCategories}
+        type="expense"
+        initial={editing}
+        onCreate={handleCreated}
+        onUpdate={handleUpdated}
+        defaultCategoryState={{ id: "cat_food", type: "expense" }}
+      />
+    </div>
   );
 }
