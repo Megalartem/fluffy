@@ -33,8 +33,8 @@ export interface DIContainer {
 }
 
 class SimpleDIContainer implements DIContainer {
-  private factories = new Map<string, { factory: () => any; singleton: boolean }>();
-  private singletons = new Map<string, any>();
+  private factories = new Map<string, { factory: () => unknown; singleton: boolean }>();
+  private singletons = new Map<string, unknown>();
 
   register<T>(
     key: string,
