@@ -34,7 +34,6 @@ import {
 import {
   LoadMoreBarState,
   NoticeItem,
-  FormNumberField,
   FormStringField,
   FormSelectField,
   ConfirmDialog
@@ -186,8 +185,9 @@ export default function TestUIAtomsPage() {
         primary={{ label: "Удалить", onClick: () => { console.log('Удалить') }, disabled: false }}
       />
 
-      <FormNumberField
+      <FormStringField
         label="Amount"
+        type='number'
         helperText="Add the amount in USD"
         error="Incorrect amount"
         required
