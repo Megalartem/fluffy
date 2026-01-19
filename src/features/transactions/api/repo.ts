@@ -22,4 +22,6 @@ export interface TransactionsRepo {
   softDelete(workspaceId: string, id: string): Promise<void>;
 
   getById(workspaceId: string, id: string): Promise<Transaction | null>;
+
+  unsetCategory(workspaceId: string, categoryId: string): Promise<void>;
 }

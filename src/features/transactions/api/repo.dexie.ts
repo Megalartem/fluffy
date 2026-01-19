@@ -113,6 +113,22 @@ class DexieTransactionsRepo implements ITransactionsRepository {
     });
   }
 
+    async unsetCategory(workspaceId: string, categoryId: string): Promise<void> {
+    try {
+      await ensureDbInitialized();
+      const now = nowIso();
+
+      await db.transactions
+        .where("[workspaceId+categoryId]")
+        .equals([workspaceId, categoryId])
+        .modify({ categoryId: null, updatedAt: now });
+    } catch (e) {
+      throw new AppError("STORAGE_ERROR", "Failed to unset category in transactions", {
+        cause: e instanceof Error ? e.message : String(e),
+      });
+    }
+  }
+
 }
 
 export const transactionsRepo = new DexieTransactionsRepo();
