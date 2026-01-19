@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
-import styles from "./SegmentedControl.module.css";
+import styles from "./SegmentControl.module.css";
 import { ButtonBase, Heading } from "@/shared/ui/atoms";
 
 export type SegmentedOption<T extends string> = {
