@@ -7,7 +7,7 @@ import {
   type RegisterOptions,
 } from "react-hook-form";
 
-import { Heading, Icon, type OptionBaseProps, SelectBase } from "@/shared/ui/atoms";
+import { Heading, Icon, type IOptionBase, SelectBase } from "@/shared/ui/atoms";
 import styles from "./FormField.module.css";
 import { FormFieldBase, type FormFieldBaseProps } from "./FormFieldBase";
 import { ChevronDown, X } from "lucide-react";
@@ -36,7 +36,7 @@ export interface IFormFieldSelect<T extends FieldValues>
   isOpen?: boolean;
 
   /** Map stored ids -> UI option (label/icon) */
-  optionsByValue: Record<string, OptionBaseProps>;
+  optionsByValue: Record<string, IOptionBase>;
 
   /** Allow removing selected values from chips (multi only) */
   removable?: boolean;
@@ -59,7 +59,7 @@ export function FormFieldSelect<T extends FieldValues>({
   const { field, fieldState } = useController({ control, name, rules });
   const error = fieldState.error?.message;
 
-  const values: OptionBaseProps[] | null = useMemo(() => {
+  const values: IOptionBase[] | null = useMemo(() => {
     const raw = field.value as FormSelectValue;
 
     if (mode === "single") {
@@ -72,7 +72,7 @@ export function FormFieldSelect<T extends FieldValues>({
     const ids = Array.isArray(raw) ? raw : [];
     const opts = ids
       .map((v) => optionsByValue[String(v)])
-      .filter(Boolean) as OptionBaseProps[];
+      .filter(Boolean) as IOptionBase[];
     return opts;
   }, [field.value, mode, optionsByValue]);
 
@@ -80,20 +80,24 @@ export function FormFieldSelect<T extends FieldValues>({
   const [leaving, setLeaving] = useState<Record<string, true>>({});
 
   useEffect(() => {
-    // Cleanup leaving flags for values that no longer exist (e.g., external reset)
     const existing = new Set((values ?? []).map((v) => String(v.value)));
-    setLeaving((prev) => {
-      let changed = false;
-      const next: Record<string, true> = {};
-      for (const key of Object.keys(prev)) {
-        if (existing.has(key)) next[key] = true;
-        else changed = true;
-      }
-      return changed ? next : prev;
+
+    queueMicrotask(() => {
+      setLeaving((prev) => {
+        let changed = false;
+        const next: Record<string, true> = {};
+
+        for (const k of Object.keys(prev)) {
+          if (existing.has(k)) next[k] = true;
+          else changed = true;
+        }
+
+        return changed ? next : prev;
+      });
     });
   }, [values]);
 
-  function commitRemove(value: OptionBaseProps) {
+  function commitRemove(value: IOptionBase) {
     const raw = field.value as FormSelectValue;
 
     if (mode === "multi") {
@@ -107,7 +111,7 @@ export function FormFieldSelect<T extends FieldValues>({
     field.onChange(null);
   }
 
-  function handleRemoveChip(e: React.MouseEvent, value: OptionBaseProps) {
+  function handleRemoveChip(e: React.MouseEvent, value: IOptionBase) {
     e.stopPropagation();
 
     // by design: only multi has removable chips (keeps single UI simple)
@@ -121,8 +125,9 @@ export function FormFieldSelect<T extends FieldValues>({
     window.setTimeout(() => {
       commitRemove(value);
       setLeaving((prev) => {
-        const { [key]: _removed, ...rest } = prev;
-        return rest;
+        const next = { ...prev };
+        delete next[key];
+        return next;
       });
     }, EXIT_MS);
   }

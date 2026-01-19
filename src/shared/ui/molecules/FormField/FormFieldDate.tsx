@@ -142,7 +142,7 @@ export function FormFieldDate<TFormValues extends FieldValues>({
                   <Icon
                     icon={CalendarIcon}
                     size="s"
-                    variant={visualState === "error" ? "accent" : "default"}
+                    variant={visualState === "error" ? "accent" : "muted"}
                   />
                 </AriaButton>
               </Group>
