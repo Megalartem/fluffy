@@ -71,6 +71,11 @@ function sortTransactions(
   const dir = sort.direction === "asc" ? 1 : -1;
   const sorted = [...transactions];
 
+  const tieBreakNewestFirst = (a: Transaction, b: Transaction) => {
+    if (a.dateKey !== b.dateKey) return b.dateKey.localeCompare(a.dateKey);
+    return (b.createdAt ?? "").localeCompare(a.createdAt ?? "");
+  };
+
   if (sort.key === "date") {
     sorted.sort((a, b) =>
       a.dateKey === b.dateKey
@@ -78,7 +83,20 @@ function sortTransactions(
         : a.dateKey.localeCompare(b.dateKey) * dir
     );
   } else if (sort.key === "amount") {
-    sorted.sort((a, b) => (a.amountMinor - b.amountMinor) * dir);
+    sorted.sort((a, b) => {
+      const cmp = (a.amountMinor - b.amountMinor) * dir;
+      return cmp !== 0 ? cmp : tieBreakNewestFirst(a, b);
+    });
+  } else if (sort.key === "type") {
+    const weight: Record<Transaction["type"], number> = {
+      expense: 0,
+      income: 1,
+      transfer: 2,
+    };
+    sorted.sort((a, b) => {
+      const cmp = (weight[a.type] - weight[b.type]) * dir;
+      return cmp !== 0 ? cmp : tieBreakNewestFirst(a, b);
+    });
   }
 
   return sorted;

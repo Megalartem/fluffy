@@ -1,9 +1,6 @@
 "use client";
 
 import React from "react";
-import clsx from "clsx";
-// import styles from "./TransactionsFilter.module.css";
-
 import {
   Controller,
   FormProvider,
@@ -21,10 +18,8 @@ import {
 } from "@/shared/ui/molecules";
 
 import { CategoriesSheet } from "../CategoryField/CategoriesSheet";
-
 import { FormFieldSelect } from "@/shared/ui/molecules/FormField/FormFieldSelect";
 import { FormFieldSegment } from "@/shared/ui/molecules/FormField/FormFieldSegment";
-
 import type { TransactionsSortOption } from "./sheets/SortOptionsSheet";
 import type {
   TransactionsFilterValues,

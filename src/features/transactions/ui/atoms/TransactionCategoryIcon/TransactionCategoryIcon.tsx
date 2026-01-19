@@ -54,6 +54,7 @@ export function TransactionCategoryIcon({
                     size={["s", "m"].includes(size) ? "xs" : "s"}
                     color={"tx-type"}
                     importance="secondary"
+                    className={txType === 'income' ? styles.badgeIconIncome : ""}
                 />
             </span>
         </div>

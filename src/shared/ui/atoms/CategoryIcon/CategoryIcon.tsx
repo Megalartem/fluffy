@@ -25,7 +25,7 @@ const mapBackgroundToColor = (v?: string): CategoryColor => {
     case "amber": case "orange": case "coral": case "red":
     case "green": case "lime": case "mint":
     case "pink": case "magenta": case "plum":
-    case "slate": case "steel": case "graphite": case "sand": case "brown":
+    case "slate": case "steel": case "graphite": case "sand": case "brown": case "olive":
       return v as CategoryColor;
     default:
       return "default";

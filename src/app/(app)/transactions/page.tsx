@@ -62,6 +62,14 @@ export default function TransactionsPage() {
   const [upsertOpen, setUpsertOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<Transaction | undefined>(undefined);
 
+  const sortOptions = React.useMemo(
+    () => [
+      { key: "date", label: "Date" },
+      { key: "amount", label: "Amount" },
+    ],
+    []
+  );
+
   const { transactions, loading, error, refresh } = useTransactions({
     workspaceId: MOCK_WORKSPACE_ID,
     filters,
@@ -125,7 +133,7 @@ export default function TransactionsPage() {
         value={filters}
         onChange={handleFiltersChange}
         categoryOptions={mockCategoryOptions}
-        sortOptions={[]}
+        sortOptions={sortOptions}
       />
 
       {error ? (
@@ -149,6 +157,7 @@ export default function TransactionsPage() {
           currency={MOCK_CURRENCY}
           loading={loading}
           error={error}
+          sort={filters.sort}
           onRetry={handleRetry}
           filtersActive={filtersActive}
           onResetFilters={handleResetFilters}

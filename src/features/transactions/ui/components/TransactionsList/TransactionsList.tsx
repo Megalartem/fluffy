@@ -6,19 +6,25 @@ import clsx from "clsx";
 import styles from "./TransactionsList.module.css";
 
 import { EmptyState } from "@/shared/ui/molecules/EmptyState/EmptyState";
-import type { Transaction } from "@/features/transactions/model/types";
+import type { Transaction, TransactionsFilterValues } from "@/features/transactions/model/types";
 import { TransactionsDayGroup } from "@/features/transactions/ui/molecules";
 import { Skeleton } from "@/shared/ui/molecules";
 import type { Category } from "@/features/categories/model/types";
+import { Card } from "@/shared/ui/molecules";
+import { Divider } from "@/shared/ui/atoms";
+import { TransactionRow } from "@/features/transactions/ui/molecules";
+import { dynamicIconImports, type IconName } from "lucide-react/dynamic";
+import { fromMinorByCurrency } from "@/shared/lib/money/helper";
 
 export type TransactionListEmptyStateStrings = {
     noTransactionsTitle: string;
     noTransactionsDescription?: string;
     noTransactionsPrimaryLabel?: string;
 
-    noResultsTitle: string;
-    noResultsDescription?: string;
-    noResultsPrimaryLabel?: string;
+    noFilterResultsTitle?: string;
+    noFilterResultsDescription?: string;
+    noFilterResultsPrimaryLabel?: string;
+    
 
     errorTitle: string;
     errorDescription?: string;
@@ -30,9 +36,9 @@ const DEFAULT_EMPTY: TransactionListEmptyStateStrings = {
     noTransactionsDescription: "Add your first income or expense — it will appear here.",
     noTransactionsPrimaryLabel: "Add transaction",
 
-    noResultsTitle: "No results",
-    noResultsDescription: "Try changing filters or reset them.",
-    noResultsPrimaryLabel: "Reset filters",
+    noFilterResultsTitle: "No results",
+    noFilterResultsDescription: "Try changing filters or reset them.",
+    noFilterResultsPrimaryLabel: "Reset filters",
 
     errorTitle: "Something went wrong",
     errorDescription: "Try again.",
@@ -77,17 +83,6 @@ function formatDayTitle(dateKey: string): string {
     }).format(d);
 }
 
-function formatMoneyFromMinor(amountMinor: number, currency: string): string {
-    const amount = amountMinor / 100;
-    return new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency,
-        currencyDisplay: "symbol",
-        signDisplay: "auto",
-        maximumFractionDigits: 2,
-    }).format(amount);
-}
-
 function calcDayTotalMinor(transactions: Transaction[]): number {
     return transactions.reduce((acc, t) => {
         if (t.type === "income") return acc + t.amountMinor;  // <-- добавь return
@@ -96,10 +91,13 @@ function calcDayTotalMinor(transactions: Transaction[]): number {
     }, 0);
 }
 
-export type TransactionListProps = {
+export type ITransactionList = {
     transactions: Transaction[];
     categories: Category[];
     currency: string;
+
+    /** Current sort selection; used to avoid overriding sorted data */
+    sort?: TransactionsFilterValues["sort"];
 
     loading?: boolean;
     error?: unknown;
@@ -114,6 +112,23 @@ export type TransactionListProps = {
     className?: string;
 };
 
+const lazyIconCache = new Map<IconName, React.LazyExoticComponent<React.ComponentType<{ className?: string; size?: string | number }>>>();
+
+function getLazyLucideIcon(name: IconName) {
+    const cached = lazyIconCache.get(name);
+    if (cached) return cached;
+
+    const importer = dynamicIconImports[name];
+    if (!importer) {
+        const Fallback = () => null;
+        return Fallback;
+    }
+
+    const LazyIcon = React.lazy(importer);
+    lazyIconCache.set(name, LazyIcon);
+    return LazyIcon;
+}
+
 /**
  * UI component for the Transactions page content area.
  * - Shows loading / error / empty states.
@@ -123,6 +138,7 @@ export function TransactionsList({
     transactions,
     categories,
     currency,
+    sort,
     loading = false,
     error,
     filtersActive = false,
@@ -132,20 +148,24 @@ export function TransactionsList({
     onRetry,
     empty,
     className,
-}: TransactionListProps) {
+}: ITransactionList) {
     const strings = React.useMemo(() => ({ ...DEFAULT_EMPTY, ...(empty ?? {}) }), [empty]);
+
+    const categoryById = React.useMemo(() => {
+        const m = new Map<string, Category>();
+        for (const c of categories) m.set(c.id, c);
+        return m;
+    }, [categories]);
+
+    const renderFlat = Boolean(sort?.key && sort?.direction && sort.key !== "date");
 
     const dayGroups = React.useMemo<DayGroup[]>(() => {
         if (!transactions?.length) return [];
 
-        // Ensure deterministic order inside each day (newest first)
-        const sorted = [...transactions].sort((a, b) => {
-            if (a.dateKey !== b.dateKey) return b.dateKey.localeCompare(a.dateKey);
-            return (b.createdAt ?? "").localeCompare(a.createdAt ?? "");
-        });
-
+        // IMPORTANT: do not override the order coming from the data layer;
+        // `useTransactions` already applies the selected sort.
         const byDay = new Map<string, Transaction[]>();
-        for (const t of sorted) {
+        for (const t of transactions) {
             const list = byDay.get(t.dateKey);
             if (list) list.push(t);
             else byDay.set(t.dateKey, [t]);
@@ -154,7 +174,7 @@ export function TransactionsList({
         const result: DayGroup[] = [];
         for (const [dateKey, list] of byDay.entries()) {
             const totalMinor = calcDayTotalMinor(list);
-            const totalText = formatMoneyFromMinor(totalMinor, currency);
+            const totalText = fromMinorByCurrency(totalMinor, currency);
 
             result.push({
                 dateKey,
@@ -163,9 +183,6 @@ export function TransactionsList({
                 transactions: list,
             });
         }
-
-        // Map preserves insertion order; we inserted days in sorted order, but be explicit
-        result.sort((a, b) => b.dateKey.localeCompare(a.dateKey));
         return result;
     }, [transactions, currency]);
 
@@ -196,18 +213,21 @@ export function TransactionsList({
             </div>
         );
     }
-
+    console.log('filtersActive', filtersActive);
+    console.log('transactions.length', transactions.length); 
     if (transactions.length === 0) {
+        console.log('no transactions');
         if (filtersActive) {
+            console.log('no transactions with active filters');
             return (
                 <EmptyState
-                    title={strings.noResultsTitle}
-                    description={strings.noResultsDescription}
+                    title={strings.noFilterResultsTitle}
+                    description={strings.noFilterResultsDescription}
                     tone="muted"
                     primaryAction={
                         onResetFilters
                             ? {
-                                label: strings.noResultsPrimaryLabel ?? DEFAULT_EMPTY.noResultsPrimaryLabel!,
+                                label: strings.noFilterResultsPrimaryLabel ?? DEFAULT_EMPTY.noFilterResultsPrimaryLabel!,
                                 onClick: onResetFilters,
                             }
                             : undefined
@@ -216,7 +236,7 @@ export function TransactionsList({
                 />
             );
         }
-
+        console.log('no transactions at all');
         return (
             <EmptyState
                 title={strings.noTransactionsTitle}
@@ -234,20 +254,46 @@ export function TransactionsList({
             />
         );
     }
-
+    console.log('rendering transactions list');
     return (
         <div className={clsx(styles.root, className)}>
-            {/* 123 */}
-            {dayGroups.map((g) => (
-                <TransactionsDayGroup
-                    key={g.dateKey}
-                    transactions={g.transactions}
-                    categories={categories}
-                    title={g.title}
-                    totalText={g.totalText}
-                    onTransactionClick={onTransactionClick}
-                />
-            ))}
+            {renderFlat ? (
+                <Card variant="default" padding="md" bgVariant="white">
+                    {transactions.map((t, idx) => {
+                        const category = categoryById.get(t.categoryId ?? "");
+                        if (!category) return null;
+
+                        return (
+                            <React.Fragment key={t.id}>
+                                <TransactionRow
+                                    title={category.name}
+                                    subtitle={undefined}
+                                    amount={t.amountMinor}
+                                    currency={t.currency}
+                                    txType={t.type}
+                                    icon={getLazyLucideIcon(category.iconKey)}
+                                    categoryColor={category.colorKey}
+                                    onClick={() => onTransactionClick?.(t)}
+                                    tone="ghost"
+                                    size="m"
+                                />
+                                {idx < transactions.length - 1 ? <Divider /> : null}
+                            </React.Fragment>
+                        );
+                    })}
+                </Card>
+            ) : (
+                dayGroups.map((g) => (
+                    <TransactionsDayGroup
+                        key={g.dateKey}
+                        transactions={g.transactions}
+                        categories={categories}
+                        title={g.title}
+                        totalText={g.totalText}
+                        onTransactionClick={onTransactionClick}
+                    />
+                ))
+            )}
         </div>
     );
 }

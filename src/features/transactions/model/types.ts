@@ -36,7 +36,8 @@ export type UpdateTransactionInput = {
 export type TransactionsSortValue =
   | { key: null; direction: null }
   | { key: "date"; direction: "asc" | "desc" }
-  | { key: "amount"; direction: "asc" | "desc" };
+  | { key: "amount"; direction: "asc" | "desc" }
+  | { key: "type"; direction: "asc" | "desc" };
 
 export type TransactionsFilterValues = {
   query: string;

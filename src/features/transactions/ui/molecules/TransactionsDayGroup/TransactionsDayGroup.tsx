@@ -9,6 +9,7 @@ import { TransactionRow } from "@/features/transactions/ui/molecules";
 import { Transaction } from "@/features/transactions/model/types";
 import { Category } from "@/features/categories/model/types";
 import { dynamicIconImports, IconName } from "lucide-react/dynamic";
+import { Circle } from "lucide-react";
 
 export type ITransactionsDayGroup = {
     title: string;      // "Saturday, 21 June"
@@ -77,21 +78,24 @@ export function TransactionsDayGroup({
             <div className={styles.list}>
                 {transactions.map((t, idx) => {
                     const category = categoryById.get(t.categoryId ?? "");
+                    const title = category?.name ?? "Unknown category";
+                    const icon = category ? getLazyLucideIcon(category.iconKey) : Circle;
+                    const categoryColor = category?.colorKey ?? "default";
+
                     if (!category) {
                         console.warn(`Category with id=${t.categoryId} not found for transaction id=${t.id}`);
-                        return null;
                     }
 
                     return (
                         <React.Fragment key={t.id}>
                             <TransactionRow
-                                title={category.name}
+                                title={title}
                                 subtitle={undefined}
                                 amount={t.amountMinor}
                                 currency={t.currency}
                                 txType={t.type}
-                                icon={getLazyLucideIcon(category.iconKey)}
-                                categoryColor={category.colorKey}
+                                icon={icon}
+                                categoryColor={categoryColor}
                                 onClick={() => onTransactionClick?.(t)}
                                 tone="ghost"
                                 size="m"
