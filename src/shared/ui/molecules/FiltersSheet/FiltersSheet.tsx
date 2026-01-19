@@ -32,10 +32,9 @@ export function FiltersSheet({
       dismissible={dismissible}
       height={height}
       className={clsx(styles.sheet, className)}
+      footer={footer}
     >
       <div className={styles.content}>{children}</div>
-
-      {footer ? <div className={styles.footer}>{footer}</div> : null}
     </BottomSheet>
   );
 }

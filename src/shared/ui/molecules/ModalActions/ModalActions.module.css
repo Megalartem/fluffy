@@ -1,5 +1,4 @@
 .root {
-  margin-top: var(--spacing-4);
   display: grid;
   gap: var(--spacing-2);
 }
