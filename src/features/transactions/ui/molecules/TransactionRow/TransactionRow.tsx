@@ -1,12 +1,11 @@
 import React, { Suspense } from "react";
-// import styles from "./TransactionRow.module.css";
 
 import { ListRowBase } from "@/shared/ui/molecules";
 import { TransactionCategoryIcon, type TxType } from "@/features/transactions/ui/atoms";
 import { Amount, Icon } from "@/shared/ui/atoms";
 import { CategoryColor } from "@/features/categories/model/types";
 import { Circle } from "lucide-react";
-import { fromMinorByCurrency, toMinor, toMinorByCurrency } from "@/shared/lib/money/helper";
+import { fromMinorByCurrency } from "@/shared/lib/money/helper";
 
 export type TransactionRowProps = {
   title: string;
@@ -25,10 +24,6 @@ export type TransactionRowProps = {
   selected?: boolean;
   onClick?: () => void;
 };
-
-function formatAmount(amount: number | string, currency: string) {
-  return toMinorByCurrency(amount.toString(), currency)
-}
 
 export function TransactionRow({
   title,
@@ -66,7 +61,7 @@ export function TransactionRow({
       size={size}
       tone={tone}
       onClick={onClick}
-      ariaLabel={`Открыть транзакцию: ${title}`}
+      ariaLabel={`Open transaction: ${title}`}
     />
   );
 }

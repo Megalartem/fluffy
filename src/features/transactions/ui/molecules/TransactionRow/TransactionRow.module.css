@@ -1,7 +1,0 @@
-.amount[data-tone="expense"] {
-  opacity: var(--opacity-transaction-type);
-}
-
-.amount[data-tone="income"] {
-  opacity: 1;
-}

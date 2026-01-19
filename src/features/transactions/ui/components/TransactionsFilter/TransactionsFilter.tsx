@@ -2,7 +2,7 @@
 
 import React from "react";
 import clsx from "clsx";
-import styles from "./TransactionsFilter.module.css";
+// import styles from "./TransactionsFilter.module.css";
 
 import {
   Controller,
@@ -25,10 +25,11 @@ import { CategoriesSheet } from "../CategoryField/CategoriesSheet";
 import { FormFieldSelect } from "@/shared/ui/molecules/FormField/FormFieldSelect";
 import { FormFieldSegment } from "@/shared/ui/molecules/FormField/FormFieldSegment";
 
+import type { TransactionsSortOption } from "./sheets/SortOptionsSheet";
 import type {
-  TransactionsSortOption,
+  TransactionsFilterValues,
   TransactionsSortValue,
-} from "./sheets/SortOptionsSheet";
+} from "@/features/transactions/model/types";
 
 export type TransactionsTypes = "all" | "expense" | "income" | "transfer";
 
@@ -62,8 +63,8 @@ export function TransactionsFilter({
   sortOptions,
   className,
 }: {
-  value: TransactionsFiltersValue;
-  onChange: (newFilters: TransactionsFiltersValue) => void;
+  value: TransactionsFilterValues;
+  onChange: (newFilters: TransactionsFilterValues) => void;
   categoryOptions: IOptionBase[];
   sortOptions: TransactionsSortOption[];
   className?: string;
@@ -154,7 +155,7 @@ export function TransactionsFilter({
   };
 
   return (
-    <div className={clsx(styles.root, className)}>
+    <div className={className}>
       <SearchBar
         value={value.query}
         onChange={(next) => setPartial({ query: next })}
@@ -203,7 +204,7 @@ export function TransactionsFilter({
             removable
           />
 
-          <div className={styles.section}>
+          <div>
             <Text variant="label">Sorting</Text>
             <Controller
               control={form.control}
