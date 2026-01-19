@@ -26,5 +26,6 @@ export interface Category {
   deletedAt?: string | null;
 }
 
-export type CreateCategoryInput = Omit<Category, "id" | "createdAt" | "updatedAt" | "isArchived">;
-export type UpdateCategoryPatch = Partial<Pick<Category, "name" | "iconKey" | "colorKey" | "order" | "isArchived">>;
+export type CreateCategoryInput = Omit<Category, "id" | "workspaceId" | "createdAt" | "updatedAt" | "deletedAt" | "isArchived">;
+export type UpdateCategoryPatch = Partial<Pick<Category, "name" | "iconKey" | "colorKey" | "order" | "isArchived" | "type" | "deletedAt">>;
+export type UpdateCategoryInput = { id: string; patch: UpdateCategoryPatch; };

@@ -63,3 +63,5 @@ export class DexieCategoriesRepo implements ICategoriesRepository {
     });
   }
 }
+
+export const categoriesRepo = new DexieCategoriesRepo();
