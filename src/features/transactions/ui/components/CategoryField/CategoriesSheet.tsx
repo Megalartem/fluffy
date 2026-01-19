@@ -1,6 +1,5 @@
-import { ButtonBase, OptionBaseProps } from "@/shared/ui/atoms";
-import { BottomSheet, Modal, ModalActions, ModalHeader, OptionControl } from "@/shared/ui/molecules";
-import { useCallback } from "react";
+import { IOptionBase } from "@/shared/ui/atoms";
+import { BottomSheet, ModalActions, ModalHeader, OptionControl } from "@/shared/ui/molecules";
 
 type OptionMode = "single" | "multi";
 
@@ -8,10 +7,10 @@ interface CategoriesSheetProps {
   open: boolean;
   title: string;
   onClose: () => void;
-  options: OptionBaseProps[];
-  chosenOptions: OptionBaseProps[] | null;
-  onChange: (val: OptionBaseProps[] | null) => void;
-  onApply: (chosen: OptionBaseProps[] | null) => void;
+  options: IOptionBase[];
+  chosenOptions: IOptionBase[] | null;
+  onChange: (val: IOptionBase[] | null) => void;
+  onApply: (chosen: IOptionBase[] | null) => void;
   mode?: OptionMode;
 }
 

@@ -20,8 +20,8 @@ export type {
   ModalAction,
 } from "./ModalActions/ModalActions";
 
-export { SegmentedControl } from "./SegmentedControl/SegmentedControl";
-export type { SegmentedControlProps, SegmentedOption } from "./SegmentedControl/SegmentedControl";
+export { SegmentedControl } from "./SegmentControl/SegmentControl";
+export type { SegmentedControlProps, SegmentedOption } from "./SegmentControl/SegmentControl";
 
 export { ListRowBase } from "./ListRowBase/ListRowBase";
 export type { ListRowBaseTone, ListRowBaseSize } from "./ListRowBase/ListRowBase";

@@ -62,14 +62,14 @@ export default function TransactionsPage() {
   const [upsertOpen, setUpsertOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<Transaction | undefined>(undefined);
 
-  const { transactions, loading, error, refresh, loadMore, hasMore } = useTransactions({
+  const { transactions, loading, error, refresh } = useTransactions({
     workspaceId: MOCK_WORKSPACE_ID,
     filters,
     repo: transactionsRepo,
     categories: mockCategories,
   });
 
-  const { txCreate, txUpdate, txSaving } = useTransactionMutations({
+  const { txCreate, txUpdate } = useTransactionMutations({
   workspaceId: MOCK_WORKSPACE_ID,
   refresh,
 });
@@ -116,7 +116,7 @@ export default function TransactionsPage() {
   }, []);
 
   const handleFiltersChange = React.useCallback((newFilters: TransactionsFilterValues) => {
-    setFilters(newFilters as TransactionsFilterValues);
+    setFilters(newFilters);
   }, []);
 
   return (
