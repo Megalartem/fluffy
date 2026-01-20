@@ -1,11 +1,7 @@
 "use client";
 
-// import { useState } from "react";
 import { usePathname } from "next/navigation";
-// import { FAB } from "@/shared/ui/atoms";
-import { WorkspaceProvider } from "@/shared/config/workspace-context";
-// import { SyncStatusBadge, ConflictResolverModal } from "@/features/sync/ui";
-// import { useSyncStatus } from "@/features/sync/hooks/use-sync-status";
+import { WorkspaceProvider } from "@/shared/config/WorkspaceProvider";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -23,8 +19,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // };
 
   return (
-    <WorkspaceProvider>
+    // <WorkspaceProvider>
         {children}
-    </WorkspaceProvider>
+    // </WorkspaceProvider>
   );
 }
