@@ -1,15 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { useWorkspace } from "@/shared/config/workspace-context";
+// import { useWorkspace } from "@/shared/config/workspace-context";
 import type { CreateCategoryInput, UpdateCategoryPatch } from "@/features/categories/model/types";
 import { categoryService } from "../model/service"
+import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 
-type UseCategoryMutationOptions = {
+
+export function useCategoryMutation(params: {
   refresh?: () => Promise<void> | void;
-};
-
-export function useCategoryMutation(options: UseCategoryMutationOptions = {}) {
+}) {
   const { workspaceId } = useWorkspace();
 
   const [loading, setLoading] = React.useState(false);
@@ -21,7 +21,7 @@ export function useCategoryMutation(options: UseCategoryMutationOptions = {}) {
       setError(null);
       try {
         await fn();
-        await options.refresh?.();
+        await params.refresh?.();
       } catch (e) {
         setError(e);
         throw e; // чтобы UI мог показать toast/inline
@@ -29,10 +29,10 @@ export function useCategoryMutation(options: UseCategoryMutationOptions = {}) {
         setLoading(false);
       }
     },
-    [options]
+    [params]
   );
 
-  const create = React.useCallback(
+  const catCreate = React.useCallback(
     async (input: CreateCategoryInput) => {
       await withState(async () => {
         await categoryService.addCategory(workspaceId, input);
@@ -41,7 +41,7 @@ export function useCategoryMutation(options: UseCategoryMutationOptions = {}) {
     [withState, workspaceId]
   );
 
-  const update = React.useCallback(
+  const catUpdate = React.useCallback(
     async (id: string, patch: UpdateCategoryPatch) => {
       await withState(async () => {
         await categoryService.updateCategory(workspaceId, { id, patch });
@@ -50,7 +50,7 @@ export function useCategoryMutation(options: UseCategoryMutationOptions = {}) {
     [withState, workspaceId]
   );
 
-  const archive = React.useCallback(
+  const catArchive = React.useCallback(
     async (id: string, isArchived: boolean) => {
       await withState(async () => {
         await categoryService.archiveCategory(workspaceId, id, isArchived);
@@ -59,7 +59,7 @@ export function useCategoryMutation(options: UseCategoryMutationOptions = {}) {
     [withState, workspaceId]
   );
 
-  const remove = React.useCallback(
+  const catRemove = React.useCallback(
     async (id: string) => {
       await withState(async () => {
         await categoryService.deleteCategory(workspaceId, id);
@@ -68,5 +68,5 @@ export function useCategoryMutation(options: UseCategoryMutationOptions = {}) {
     [withState, workspaceId]
   );
 
-  return { create, update, archive, remove, loading, error } as const;
+  return { catCreate, catUpdate, catArchive, catRemove, loading, error } as const;
 }

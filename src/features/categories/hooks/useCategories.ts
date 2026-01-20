@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useWorkspace } from "@/shared/config/workspace-context";
+import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import type { Category } from "@/features/categories/model/types";
 import { ensureDefaultCategoriesSeeded } from "@/features/categories/model/seed";
 import { categoriesRepo } from "../api/repo.dexie";
