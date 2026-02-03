@@ -5,7 +5,6 @@ import { FormProvider, useForm, type SubmitHandler } from "react-hook-form";
 
 import styles from "./CategoryUpsertSheet.module.css";
 
-import { CATEGORY_COLOR_KEYS } from "@/features/categories/model/types";
 import type {
   Category,
   CategoryType,
@@ -14,15 +13,14 @@ import type {
   UpdateCategoryPatch,
 } from "@/features/categories/model/types";
 
-import { BottomSheet, FormFieldIconPicker, ModalHeader } from "@/shared/ui/molecules";
+import { BottomSheet, ModalHeader } from "@/shared/ui/molecules";
 import { ButtonBase } from "@/shared/ui/atoms";
 
 import { FormFieldString } from "@/shared/ui/molecules/FormField/FormFieldString";
 import { FormFieldSegment } from "@/shared/ui/molecules/FormField/FormFieldSegment";
-import { FormFieldSelect } from "@/shared/ui/molecules/FormField/FormFieldSelect";
-import type { IOptionBase } from "@/shared/ui/atoms";
-import { iconNames, type IconName } from "lucide-react/dynamic";
-import clsx from "clsx";
+import { type IconName } from "lucide-react/dynamic";
+import { FormFieldCategoryAppearance } from "../CategoryAppearance/FormFieldCategoryAppearance";
+import { CategoryChooseIconSheet } from "../CategoryChooseIconSheet/CategoryChooseIconSheet";
 
 export type UpdateCategoryInput = {
   id: string;
@@ -56,14 +54,6 @@ const TYPE_OPTIONS: Array<{ value: CategoryType; label: string }> = [
   { value: "income", label: "Income" },
 ];
 
-interface IOptionIcon extends IOptionBase {
-  value: IconName;
-}
-
-const ICON_OPTIONS = iconNames.map((value) => ({ value, label: value })) satisfies IOptionIcon[];
-
-const COLOR_OPTIONS = CATEGORY_COLOR_KEYS.map((value) => ({ value, label: value })) satisfies IOptionBase[];
-
 export function CategoryUpsertSheet({
   open,
   onClose,
@@ -73,6 +63,7 @@ export function CategoryUpsertSheet({
 }: CategoryUpsertSheetProps) {
   const isEdit = Boolean(initial);
   const [saving, setSaving] = React.useState(false);
+  const [isChooseIconSheetOpen, setIsChooseIconSheetOpen] = React.useState(false);
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -83,25 +74,6 @@ export function CategoryUpsertSheet({
     },
     mode: "onSubmit",
   });
-
-  // Map options for FormFieldIconPicker
-  const iconOptionsByValue = React.useMemo(
-    () =>
-      ICON_OPTIONS.reduce<Record<string, IOptionIcon>>((acc, o) => {
-        acc[String(o.value)] = o;
-        return acc;
-      }, {}),
-    []
-  );
-
-  const colorOptionsByValue = React.useMemo(
-    () =>
-      COLOR_OPTIONS.reduce<Record<string, IOptionBase>>((acc, o) => {
-        acc[String(o.value)] = o;
-        return acc;
-      }, {}),
-    []
-  );
 
   // Prefill/reset on open
   React.useEffect(() => {
@@ -126,8 +98,6 @@ export function CategoryUpsertSheet({
       colorKey: initial.colorKey,
     });
   }, [open, initial, form]);
-
-  console.log("form values", form.getValues());
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     form.clearErrors("name");
@@ -211,35 +181,28 @@ export function CategoryUpsertSheet({
             options={TYPE_OPTIONS}
             size="m"
           />
-          <div className={styles.rowSpacer} >
 
-            {/* Category icon */}
-            <FormFieldIconPicker<FormValues>
-              name="iconKey"
-              label="Icon"
-              dataColor={form.getValues().colorKey}
-              optionsByValue={iconOptionsByValue}
-              defaultValue={iconOptionsByValue["piggy-bank"]}
-              onOpen={() => {
-                console.log("open icon picker");
-              }}
-              className={styles.iconPicker}
-            /> 
+          {/* Category appearance (icon & color) */}
+          <FormFieldCategoryAppearance<FormValues>
+            iconFieldName="iconKey"
+            colorFieldName="colorKey"
+            onIconClick={React.useCallback(() => setIsChooseIconSheetOpen(true), [])}
+          />
 
-            {/* Category color */}
-            <FormFieldSelect<FormValues>
-              name="colorKey"
-              label="Color"
-              mode="single"
-              placeholder="Choose color"
-              optionsByValue={colorOptionsByValue}
-              showChevron
-              onOpen={() => {
-                console.log("open color picker");
-              }}
-              className={styles.fieldFullWidth}
-            />
-          </div>
+          {/* Icon picker sheet */}
+          <CategoryChooseIconSheet
+            isOpen={isChooseIconSheetOpen}
+            iconKey={form.watch("iconKey") as IconName}
+            onSubmit={(nextIconKey) => {
+              if (nextIconKey) {
+                form.setValue("iconKey", nextIconKey, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+              }
+            }}
+            onClose={() => setIsChooseIconSheetOpen(false)}
+          />
         </div>
       </FormProvider>
     </BottomSheet >
