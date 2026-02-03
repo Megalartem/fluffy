@@ -9,6 +9,7 @@ export { FormFieldString } from "./FormField/FormFieldString";
 export { FormFieldSelect } from "./FormField/FormFieldSelect";
 export { FormFieldDate } from "./FormField/FormFieldDate";
 export { FormFieldSegment } from "./FormField/FormFieldSegment";
+export { FormFieldIconPicker } from "./FormField/FormFieldIconPicker";
 
 export { ModalHeader } from "./ModalHeader/ModalHeader";
 export type { ModalHeaderProps } from "./ModalHeader/ModalHeader";
@@ -70,3 +71,9 @@ export type {
   OptionControlProps,
   OptionMode,
 } from "./OptionControl/OptionControl";
+
+export { Carousel } from "./Carousel/Carousel";
+export type { CarouselProps } from "./Carousel/Carousel";
+
+export { BezelCarousel } from "./BezelCarousel/BezelCarousel";
+export type { BezelCarouselProps } from "./BezelCarousel/BezelCarousel";
