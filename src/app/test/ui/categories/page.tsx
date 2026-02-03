@@ -1,25 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Coffee, ShoppingBag } from "lucide-react";
 
 import { CategoryRow, CategoryActionsMenu, CategoryUpsertSheet } from "@/features/categories/ui/molecules";
 import { useCategoryMutation } from "@/features/categories/hooks/useCategoryMutation";
 import { useCategories } from "@/features/categories/hooks/useCategories";
-import { CategoryAppearance } from "@/features/categories/ui/components";
+import { CategoryAppearance, CategoryChooseIconSheet } from "@/features/categories/ui/components";
 import { CategoryColor } from "@/features/categories/model/types";
+import { IconName, iconNames } from "lucide-react/dynamic";
 
 export default function TestUICategoriesPage() {
 
-    const [isArchived, setIsArchived] = React.useState(false);
-    const [isEditOpen, setIsEditOpen] = React.useState(false);
+    const [isArchived, setIsArchived] = useState(false);
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isChooseIconSheetOpen, setIsChooseIconSheetOpen] = useState(false);
     const [colorId, setColorId] = useState<CategoryColor>("red");
-    const [icon, setIcon] = useState<React.ReactNode>(<ShoppingBag />);
-
-    const openAllColors = () => {
-        // открыть BottomSheet/Modal с полной палитрой
-        console.log("open all colors sheet");
-    };
+    const [iconKey, setIconKey] = useState<IconName>("piggy-bank");
 
     const { refresh } = useCategories();
     const { catUpdate, catArchive } = useCategoryMutation({
@@ -70,11 +67,21 @@ export default function TestUICategoriesPage() {
                 />
             )}
             <CategoryAppearance
-                icon={icon}
+                iconKey={iconKey}
                 colorId={colorId}
                 onChangeColor={setColorId}
-                // onOpenIconsSheet={() => console.log("open icons sheet")}
+                onIconClick={() => setIsChooseIconSheetOpen(true)}
             />
+
+            <CategoryChooseIconSheet
+                isOpen={isChooseIconSheetOpen}
+                iconKey={iconKey}
+                onSubmit={(nextIconKey) => {
+                    if (nextIconKey) setIconKey(nextIconKey);
+                }}
+                onClose={() => setIsChooseIconSheetOpen(false)}
+            />
+            
 
         </div>
     );
