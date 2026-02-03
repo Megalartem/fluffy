@@ -1,7 +1,8 @@
 import React from "react";
 import styles from "./TransactionCategoryIcon.module.css";
-import { CategoryIcon, type CategoryColor } from "@/shared/ui/atoms";
+import { CategoryIcon } from "@/shared/ui/atoms";
 import { ArrowDown, ArrowUp, ArrowRight } from "lucide-react";
+import { CategoryColor } from "@/features/categories/model/types";
 
 type TxCategoryIconSize = "s" | "m" | "l";
 export type TxType = "expense" | "income" | "transfer";
