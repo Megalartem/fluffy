@@ -3,7 +3,7 @@
 import React from "react";
 import clsx from "clsx";
 import styles from "./OptionControl.module.css";
-import { OptionBase, type OptionBaseProps } from "@/shared/ui/atoms";
+import { OptionBase, type IOptionBase } from "@/shared/ui/atoms";
 
 export type OptionMode = "single" | "multi";
 export type BgColorVariant = "default" | "ghost";
@@ -16,24 +16,23 @@ export type BgColorVariant = "default" | "ghost";
  * Для multi — любое количество.
  */
 export interface OptionControlProps {
-  options: OptionBaseProps[];
+  options: IOptionBase[];
   mode?: OptionMode; // default: single
 
   /** Controlled selected options from parent */
-  chosenOptions: OptionBaseProps[] | null;
-
+  chosenOptions: IOptionBase[] | null;
   /**
    * Immediate change handler:
    * - single: вызывается сразу при выборе
    * - multi: вызывается сразу при каждом изменении
    */
-  onChange?: (next: OptionBaseProps[] | null) => void;
+  onChange?: (next: IOptionBase[] | null) => void;
 
   className?: string;
   btnBgColorVariant?: BgColorVariant;
 }
 
-function mapValuesToOptions(values: string[], options: OptionBaseProps[]): OptionBaseProps[] {
+function mapValuesToOptions(values: string[], options: IOptionBase[]): IOptionBase[] {
   const valueSet = new Set(values);
   return options.filter((o) => valueSet.has(o.value));
 }

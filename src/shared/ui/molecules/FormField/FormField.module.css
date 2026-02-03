@@ -270,3 +270,36 @@
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
+
+
+.selectBodyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2);
+  border-radius: var(--radius-full);
+}
+
+.selectBodyIcon[data-color="default"] { background: transparent; }
+.selectBodyIcon[data-color="violet"] { background-color: var(--category-violet-bg); }
+.selectBodyIcon[data-color="indigo"] { background-color: var(--category-indigo-bg); }
+.selectBodyIcon[data-color="blue"] { background-color: var(--category-blue-bg); }
+.selectBodyIcon[data-color="cyan"] { background-color: var(--category-cyan-bg); }
+.selectBodyIcon[data-color="teal"] { background-color: var(--category-teal-bg); }
+.selectBodyIcon[data-color="amber"] { background-color: var(--category-amber-bg); }
+.selectBodyIcon[data-color="orange"] { background-color: var(--category-orange-bg); }
+.selectBodyIcon[data-color="coral"] { background-color: var(--category-coral-bg); }
+.selectBodyIcon[data-color="red"] { background-color: var(--category-red-bg); }
+
+.selectBodyIcon[data-color="green"] { background-color: var(--category-green-bg); }
+.selectBodyIcon[data-color="lime"] { background-color: var(--category-lime-bg); }
+.selectBodyIcon[data-color="mint"] { background-color: var(--category-mint-bg); }
+.selectBodyIcon[data-color="pink"] { background-color: var(--category-pink-bg); }
+.selectBodyIcon[data-color="magenta"] { background-color: var(--category-magenta-bg); }
+.selectBodyIcon[data-color="plum"] { background-color: var(--category-plum-bg); }
+.selectBodyIcon[data-color="slate"] { background-color: var(--category-slate-bg); }
+.selectBodyIcon[data-color="steel"] { background-color: var(--category-steel-bg); }
+.selectBodyIcon[data-color="graphite"] { background-color: var(--category-graphite-bg); }
+.selectBodyIcon[data-color="sand"] { background-color: var(--category-sand-bg); }
+.selectBodyIcon[data-color="brown"] { background-color: var(--category-brown-bg); }
+.selectBodyIcon[data-color="tx-type"] { background-color: var(--color-category-tx-type); }

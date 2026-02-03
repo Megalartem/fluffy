@@ -40,6 +40,7 @@ export interface IFormFieldSelect<T extends FieldValues>
 
   /** Allow removing selected values from chips (multi only) */
   removable?: boolean;
+  className?: string;
 }
 
 export function FormFieldSelect<T extends FieldValues>({
@@ -53,6 +54,7 @@ export function FormFieldSelect<T extends FieldValues>({
   isOpen = false,
   optionsByValue,
   removable = false,
+  className,
   ...base
 }: IFormFieldSelect<T>) {
   const { control } = useFormContext<T>();
@@ -135,7 +137,8 @@ export function FormFieldSelect<T extends FieldValues>({
   const hasValue = Boolean(values && values.length > 0);
 
   return (
-    <FormFieldBase error={error} {...base} fieldType="select">
+    <FormFieldBase
+     error={error} {...base} fieldType="select" className={className}>
       <SelectBase
         onClick={onOpen}
         hasValue={hasValue}
