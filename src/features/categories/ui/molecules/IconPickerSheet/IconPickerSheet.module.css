@@ -1,0 +1,50 @@
+.body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search {
+  position: sticky;
+  top: 0;
+  background: var(--bg-main);
+  padding-bottom: 8px;
+  z-index: 1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cell {
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(0,0,0,0.02);
+  display: grid;
+  place-items: center;
+}
+
+.cell:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+.cell[data-selected="true"] {
+  border-color: rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.08);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.fallback {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.08);
+}
