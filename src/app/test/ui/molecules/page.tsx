@@ -7,12 +7,13 @@ import {
   CategoryIcon,
   Icon,
   IconButton,
-  OptionBaseProps,
+  IOptionBase,
   Text,
 } from '@/shared/ui/atoms';
 import {
   BottomSheet,
   Card,
+  Carousel,
   EmptyState,
   FiltersSheet,
   InlineNotice,
@@ -34,18 +35,38 @@ import {
 import {
   LoadMoreBarState,
   NoticeItem,
-  FormStringField,
-  FormSelectField,
+  FormFieldString,
+  FormFieldSelect,
   ConfirmDialog
 } from '@/shared/ui/molecules';
 import { Bell, ArrowUpDown, ShoppingCart, Beef, Car, House, LucideIcon, PlugZap, Banana } from 'lucide-react';
+
+
+type ColorItem = {
+  id: string;
+  hex: string;
+  name: string;
+};
+
+const DEFAULT_COLORS: ColorItem[] = [
+  { id: "coral",  hex: "#FF6B6B", name: "Coral" },
+  { id: "orange", hex: "#FF9F43", name: "Orange" },
+  { id: "yellow", hex: "#FECB2F", name: "Yellow" },
+  { id: "mint",   hex: "#2ECC71", name: "Mint" },
+  { id: "teal",   hex: "#1ABC9C", name: "Teal" },
+  { id: "blue",   hex: "#4D96FF", name: "Blue" },
+  { id: "indigo", hex: "#6C5CE7", name: "Indigo" },
+  { id: "purple", hex: "#A66CFF", name: "Purple" },
+  { id: "pink",   hex: "#FF4D8D", name: "Pink" },
+  { id: "gray",   hex: "#E5E7EB", name: "Gray" },
+];
 
 
 const renderIcon = (icon: LucideIcon) => (
   <Icon icon={icon} size="l" />
 );
 
-const categoryOptions: OptionBaseProps[] = [
+const categoryOptions: IOptionBase[] = [
   { label: "Food", value: "food", icon: renderIcon(Beef) },
   { label: "Taxi", value: "taxi", icon: renderIcon(Car) },
   { label: "Rent", value: "rent", icon: renderIcon(House) },
@@ -56,7 +77,8 @@ const categoryOptions: OptionBaseProps[] = [
 
 interface FilterValues {
   amountMin: string;
-  categories: OptionBaseProps[];
+  category: IOptionBase | null;
+  categories: IOptionBase[];
 }
 
 
@@ -69,6 +91,7 @@ export default function TestUIAtomsPage() {
 
   const [filterValues, setFilterValues] = useState<FilterValues>({
     amountMin: "",
+    category: null,
     categories: [],
   });
   const [activeFilterSelect, setActiveFilterSelect] = useState<string | null>(null);
@@ -82,7 +105,7 @@ export default function TestUIAtomsPage() {
     direction: null,
   });
   const [isCategoryOptionsOpen, setIsCategoryOptionsOpen] = useState(false);
-  const [chosenOptions, setChosenOptions] = useState<OptionBaseProps[] | null>(null);
+  const [chosenOptions, setChosenOptions] = useState<IOptionBase[] | null>(null);
 
 
   const [notices, setNotices] = useState<NoticeItem[]>([
@@ -141,7 +164,7 @@ export default function TestUIAtomsPage() {
   );
 
 
-  const handleSingleSelectOption = (option: OptionBaseProps | null) => {
+  const handleSingleSelectOption = (option: IOptionBase | null) => {
     setFilterValues((prev) => ({
       ...prev,
       category: option,
@@ -149,7 +172,7 @@ export default function TestUIAtomsPage() {
     setIsCategoryOptionsOpen(false);
   }
 
-  const handleMultiSelectOption = (options: OptionBaseProps[]) => {
+  const handleMultiSelectOption = (options: IOptionBase[]) => {
     console.log('Selected options:', options);
     setChosenOptions(options);
     setFilterValues((prev) => ({
@@ -185,33 +208,32 @@ export default function TestUIAtomsPage() {
         primary={{ label: "Удалить", onClick: () => { console.log('Удалить') }, disabled: false }}
       />
 
-      <FormStringField
+      {/* <FormFieldString
         label="Amount"
         type='number'
         helperText="Add the amount in USD"
-        error="Incorrect amount"
         required
         value={demoAmount}
-        onChange={(e) => setDemoAmount((e.target.value))}
-      />
+        onChange={(e) => setDemoAmount((e.target.value))} name={''}      />
 
-      <FormStringField
+      <FormFieldString
         label="String label"
         placeholder="Enter text"
         value={demoText}
-        onChange={(e) => setDemoText(e.target.value)}
-      />
+        onChange={(e) => setDemoText(e.target.value)} name={''}      />
 
-      <FormSelectField
+      <FormFieldSelect
         label="Select label"
         mode="single"
-        values={filterValues.categories}
         placeholder="Choose an option"
-        onClick={() => {
-          // demo only
-          setDemoSelectLabel((p) => (p ? null : "ood"));
+        name={'Choose an option'}
+        onOpen={() => console.log("open select")}
+        optionsByValue={{
+          option1: { label: "Option 1", value: "option1" },
+          option2: { label: "Option 2", value: "option2" },
+          option3: { label: "Option 3", value: "option3" },
         }}
-      />
+        /> */}
 
       <SegmentedControl
         value={val}
@@ -314,26 +336,20 @@ export default function TestUIAtomsPage() {
           </div>
         }
       >
-
-        <FormSelectField
+{/* 
+        <FormFieldSelect
           label="Category"
           mode="multi"
-          values={filterValues.categories}
-          isOpen={isCategoryOptionsOpen}
+          name="categories"
+          // value={filterValues.categories[0] || null}
           placeholder="Choose an option"
-          onClick={() => setIsCategoryOptionsOpen(true)}
-          onRemoveValue={(value: OptionBaseProps) => {
-            setFilterValues((prev) => ({
-              ...prev,
-              categories: prev.categories.filter((cat) => cat.value !== value.value),
-            }));
-            setChosenOptions((prev) => {
-              if (!prev) return null;
-              return prev.filter((cat) => cat.value !== value.value);
-            });
-
+          onOpen={() => setIsCategoryOptionsOpen(true)}
+          optionsByValue={{
+            food: { label: "Food", value: "food" },
+            taxi: { label: "Taxi", value: "taxi" },
+            rent: { label: "Rent", value: "rent" },
           }}
-        />
+          /> */}
 
         <Card variant="ghost">
           <Text>activeSelect: {String(activeFilterSelect)}</Text>
@@ -359,9 +375,6 @@ export default function TestUIAtomsPage() {
           onChange={(val) => {
             setChosenOptions(val);
             // handleSingleSelectOption(val[0]);
-          }}
-          onApply={(chosen) => {
-            handleMultiSelectOption(chosen || []);
           }}          
         />
       </BottomSheet>
@@ -468,9 +481,6 @@ export default function TestUIAtomsPage() {
         chosenOptions={chosenOptions}
         onChange={(val) => {
           setChosenOptions(val);
-        }}
-        onApply={() => {
-          console.log("Options applied")
         }}
       />
 

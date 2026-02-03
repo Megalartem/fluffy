@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useWorkspace } from "@/shared/config/workspace-context";
+import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import { Modal } from "@/shared/ui/modal";
 import { GoalsService } from "@/features/goals/model/service";
 import type { Goal } from "@/features/goals/model/types";

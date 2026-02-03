@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { Category } from "@/features/categories/model/types";
-import { Modal } from "@/shared/ui/modal";
-import { useCategories } from "@/features/categories/hooks/use-categories";
+import { Modal } from "@/shared/ui/molecules";
+import { useCategories } from "@/features/categories/hooks/useCategories";
 
 export default function CategoriesPage() {
   const { items, loading, load, create, rename, remove } = useCategories();

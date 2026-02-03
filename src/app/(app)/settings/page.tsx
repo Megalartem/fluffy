@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useWorkspace } from "@/shared/config/workspace-context";
+import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import { BackupService } from "@/features/backup/model/service";
 
 function downloadJson(filename: string, data: unknown) {

@@ -1,11 +1,11 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+// import { usePathname } from "next/navigation";
 import { WorkspaceProvider } from "@/shared/config/WorkspaceProvider";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const hideFab = pathname?.startsWith("/settings");
+  // const pathname = usePathname();
+  // const hideFab = pathname?.startsWith("/settings");
 
   // const { syncState, conflicts, resolveConflicts } = useSyncStatus();
 
@@ -19,8 +19,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // };
 
   return (
-    // <WorkspaceProvider>
+    <WorkspaceProvider>
         {children}
-    // </WorkspaceProvider>
+     </WorkspaceProvider>
   );
 }

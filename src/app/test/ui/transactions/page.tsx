@@ -7,7 +7,7 @@ import type { Transaction } from "@/features/transactions/model/types";
 import TransactionUpsertSheet from "@/features/transactions/ui/components/TransactionUpsertSheet/TransactionUpsertSheet";
 
 import { TransactionCategoryIcon } from "@/features/transactions/ui/atoms/TransactionCategoryIcon/TransactionCategoryIcon";
-import { TransactionRow, TransactionsDayGroupModel, TransactionsList } from "@/features/transactions/ui/molecules";
+import { ITransactionsDayGroup, TransactionRow } from "@/features/transactions/ui/molecules";
 
 import { Bus, Coffee, FerrisWheel, HomeIcon, ShoppingCart } from "lucide-react";
 import { Heading, Text, IOptionBase, Icon } from "@/shared/ui/atoms";
@@ -15,121 +15,75 @@ import {
   TransactionsFilter,
   TransactionsFiltersValue,
 } from "@/features/transactions/ui/components/TransactionsFilter/TransactionsFilter";
+import { TransactionsList } from "@/features/transactions/ui/components";
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 
 // Mock "server" pages (stable reference)
-const PAGES: TransactionsDayGroupModel[][] = [
+const PAGES: ITransactionsDayGroup[][] = [
   [
     {
-      id: "2025-06-21",
       title: "Saturday, 21 June",
-      totalText: "$272.5",
-      items: [
+      totalText: "$272.50",
+      transactions: [
         {
-          id: "t1",
-          title: "Grocery",
-          subtitle: "10:20",
-          amount: 160,
-          currency: "$",
-          txType: "expense" as const,
-          icon: ShoppingCart,
-          categoryColor: "violet" as const,
+          id: "tx_1",
+          workspaceId: "ws_test",
+          type: "expense",
+          amountMinor: 15000,
+          currency: "USD",
+          categoryId: "cat_grocery",
+          note: "Bought groceries",
+          dateKey: "2025-06-21",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          deletedAt: null,
         },
         {
-          id: "t2",
-          title: "Transport",
-          subtitle: "12:10",
-          amount: 35,
-          currency: "$",
-          txType: "expense" as const,
-          icon: Bus,
-          categoryColor: "steel" as const,
-        },
-        {
-          id: "t3",
-          title: "Cafe",
-          subtitle: "18:40",
-          amount: 27.5,
-          currency: "$",
-          txType: "expense" as const,
-          icon: Coffee,
-          categoryColor: "amber" as const,
+          id: "tx_2",
+          workspaceId: "ws_test",
+          type: "expense",
+          amountMinor: 12250,
+          currency: "USD",
+          categoryId: "cat_transport",
+          note: "Bus ticket",
+          dateKey: "2025-06-21",
+          createdAt: new Date().toISOString(),
+          updatedAt: new  Date().toISOString(),
+          deletedAt: null,
         },
       ],
+      categories: [],
     },
+  ],
+  [
     {
-      id: "2025-06-20",
       title: "Friday, 20 June",
-      totalText: "$120",
-      items: [
+      totalText: "$80.00",
+      transactions: [
         {
-          id: "t4",
-          title: "Home",
-          subtitle: "21:00",
-          amount: 120,
-          currency: "$",
-          txType: "expense" as const,
-          icon: HomeIcon,
-          categoryColor: "sand" as const,
+          id: "tx_3",
+          workspaceId: "ws_test",
+          type: "income",
+          amountMinor: 8000,
+          currency: "USD",
+          categoryId: "cat_salary",
+          note: "Part of salary",
+          dateKey: "2025-06-20",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          deletedAt: null,
         },
       ],
-    },
-  ],
-  [
-    {
-      id: "2025-06-19",
-      title: "Thursday, 19 June",
-      totalText: "$58",
-      items: [
-        {
-          id: "t5",
-          title: "Transport",
-          subtitle: "09:10",
-          amount: 18,
-          currency: "$",
-          txType: "expense" as const,
-          icon: Bus,
-          categoryColor: "steel" as const,
-        },
-        {
-          id: "t6",
-          title: "Cafe",
-          subtitle: "14:30",
-          amount: 40,
-          currency: "$",
-          txType: "expense" as const,
-          icon: Coffee,
-          categoryColor: "amber" as const,
-        },
-      ],
-    },
-  ],
-  [
-    {
-      id: "2025-06-18",
-      title: "Wednesday, 18 June",
-      totalText: "$500",
-      items: [
-        {
-          id: "t7",
-          title: "Salary",
-          subtitle: "11:00",
-          amount: 500,
-          currency: "$",
-          txType: "income" as const,
-          icon: HomeIcon,
-          categoryColor: "green" as const,
-        },
-      ],
+      categories: [],
     },
   ],
 ];
 
 export default function TestUITransactionsPage() {
   const [listState, setListState] = useState<"loading" | "ready">("ready");
-  const [groups, setGroups] = useState<TransactionsDayGroupModel[]>(() => PAGES[0] ?? []);
+  const [groups, setGroups] = useState<ITransactionsDayGroup[]>(() => PAGES[0] ?? []);
   const [pageIndex, setPageIndex] = useState(0);
   const [loadMoreState, setLoadMoreState] = useState<"idle" | "loading" | "disabled">(
     PAGES.length > 1 ? "idle" : "disabled"
@@ -396,8 +350,8 @@ export default function TestUITransactionsPage() {
         </div>
 
         <TransactionsList
-          groups={groups}
-          state={listState}
+          transactions={transactions}
+          categories={categories}
           loadMoreState={loadMoreState}
           onLoadMore={loadMore}
           skeletonCount={3}
