@@ -4,6 +4,9 @@
   padding: var(--spacing-4);
   background: var(--color-bg);
   box-shadow: var(--shadow-card);
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .title {

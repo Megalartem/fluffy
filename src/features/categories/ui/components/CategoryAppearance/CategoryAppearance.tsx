@@ -4,18 +4,22 @@ import React, { useMemo } from "react";
 import { BezelCarousel } from "@/shared/ui/molecules/BezelCarousel/BezelCarousel";
 import styles from "./CategoryAppearance.module.css";
 import { CATEGORY_COLOR_KEYS, COLOR_LABELS, type CategoryColor } from "../../../model/types";
+import { IconName } from "lucide-react/dynamic";
+import { CategoryIcon } from "@/shared/ui/atoms/CategoryIcon/CategoryIcon";
+import { getLazyLucideIcon } from "@/shared/lib/iconLoader";
 
 type ColorItem = { id: CategoryColor; name: string };
 
 const EXCLUDE_FROM_CAROUSEL: CategoryColor[] = ["tx-type"];
 
+
 export function CategoryAppearance({
-  icon,
+  iconKey,
   colorId,
   onChangeColor,
   onIconClick,
 }: {
-  icon: React.ReactNode;
+  iconKey: IconName;
   colorId: CategoryColor;
   onChangeColor: (id: CategoryColor) => void;
   onIconClick: () => void;
@@ -32,7 +36,7 @@ export function CategoryAppearance({
 
   return (
     <div className={styles.card}>
-      <div className={styles.title}>Внешний вид</div>
+      <div className={styles.title}>Icon & Color</div>
 
       <BezelCarousel<ColorItem>
         items={items}
@@ -60,14 +64,17 @@ export function CategoryAppearance({
             onClick={onIconClick}
             aria-label="Change icon"
           >
-            <span className={styles.icon}>{icon}</span>
+            <span className={styles.icon}>
+              <React.Suspense fallback={null}>
+                <CategoryIcon
+                  icon={getLazyLucideIcon(iconKey)}
+                  size={"l"}
+                />
+              </React.Suspense>
+            </span>
           </button>
         )}
       />
-
-      <div className={styles.caption}>
-        Цвет: <span className={styles.captionStrong}>{selected.name}</span>
-      </div>
     </div>
   );
 }
