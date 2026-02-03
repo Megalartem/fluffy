@@ -1,0 +1,35 @@
+
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.iconGrid {
+    display: grid;
+    padding: var(--spacing-4);
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+    gap: var(--spacing-4);
+}
+
+.iconButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.iconButton[data-selected="true"] {
+    border-color: var(--color-primary);
+}
+
+.loadMoreTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 1 / -1;
+    height: 20px;   
+}
