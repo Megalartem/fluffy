@@ -27,6 +27,11 @@
   height: 48px;
 }
 
+.root[data-size="xl"] {
+  width: var(--input-height);
+  height: var(--input-height);
+}
+
 .icon {
   width: 20px;
   height: 20px;
@@ -46,6 +51,11 @@
 .root[data-size="l"] .icon {
   width: 24px;
   height: 24px;
+}
+
+.root[data-size="xl"] .icon {
+  width: 48px;
+  height: 48px;
 }
 
 /* category colors (bg only, 30% opacity via tokens) */

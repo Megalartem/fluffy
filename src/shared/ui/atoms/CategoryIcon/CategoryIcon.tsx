@@ -3,7 +3,7 @@ import styles from "./CategoryIcon.module.css";
 import { CategoryColor } from "@/features/categories/model/types";
 
 
-type CategorySize = "xs" | "s" | "m" | "l";
+type CategorySize = "xs" | "s" | "m" | "l" | "xl";
 type Importance = "primary" | "secondary";
 
 interface CategoryIconProps extends React.HTMLAttributes<HTMLDivElement> {
