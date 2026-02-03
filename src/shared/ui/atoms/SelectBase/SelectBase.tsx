@@ -14,11 +14,12 @@ export interface SelectBaseProps
   "data-variant"?: string;
   ariaLabel?: string
   disabled?: boolean;
+  className?: string;
 }
 
 export function SelectBase({
   state = "default",
-  className = "",
+  className,
   ariaHaspopup,
   children,
   hasValue = false,
