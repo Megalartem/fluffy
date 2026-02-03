@@ -8,6 +8,7 @@ export function useTransaction(params: {
   repo: ITransactionsRepository;
 }) {
   const { workspaceId, id, repo } = params;
+  // TODO: useWorkspace hook for workspaceId
 
   const [data, setData] = React.useState<Transaction | null>(null);
   const [loading, setLoading] = React.useState(false);

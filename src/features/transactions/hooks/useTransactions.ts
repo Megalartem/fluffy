@@ -6,7 +6,6 @@ import {
   applyClientFilters,
 } from "./utils/transactions";
 
-// ...existing code...
 
 export function useTransactions(params: {
   workspaceId: string;
@@ -19,6 +18,8 @@ export function useTransactions(params: {
   step?: number;
 }) {
   const { workspaceId, filters, repo, categories, initialLimit = 50, step = 50 } = params;
+  // TODO: useWorkspace hook for workspaceId
+  // TODO: useCategories hook for categories
 
   const categoryNameById = React.useMemo(
     () => buildCategoryMap(categories),
