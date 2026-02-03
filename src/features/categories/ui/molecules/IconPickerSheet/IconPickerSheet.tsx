@@ -5,9 +5,8 @@ import dynamic from "next/dynamic";
 import dynamicIconImports from "lucide-react/dynamicIconImports";
 import type { IconName } from "lucide-react/dynamic";
 
-import { BottomSheet, ModalHeader } from "@/shared/ui/molecules";
-import { ButtonBase } from "@/shared/ui/atoms";
-import { FormFieldString } from "@/shared/ui/molecules/FormField/FormFieldString";
+import { BottomSheet, ModalHeader, FormFieldBase } from "@/shared/ui/molecules";
+import { ButtonBase, InputBase } from "@/shared/ui/atoms";
 
 import styles from "./IconPickerSheet.module.css";
 
@@ -61,14 +60,13 @@ export function IconPickerSheet({
     >
       <div className={styles.body}>
         <div className={styles.search}>
-          {/* можно заменить на ваш TextField, я использую готовый FormFieldString */}
-          <FormFieldString<any>
-            name={"__icon_search" as any}
-            label="Search"
-            placeholder="Type icon name..."
-            value={query}
-            onChange={(v: any) => setQuery(String(v ?? ""))}
-          />
+          <FormFieldBase label="Search">
+            <InputBase
+              placeholder="Type icon name..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </FormFieldBase>
         </div>
 
         <div className={styles.grid} role="list">
