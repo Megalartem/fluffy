@@ -13,10 +13,12 @@ export function CategoryAppearance({
   icon,
   colorId,
   onChangeColor,
+  onIconClick,
 }: {
   icon: React.ReactNode;
   colorId: CategoryColor;
   onChangeColor: (id: CategoryColor) => void;
+  onIconClick: () => void;
 }) {
   const items: ColorItem[] = useMemo(() => {
     return CATEGORY_COLOR_KEYS
@@ -55,7 +57,7 @@ export function CategoryAppearance({
         renderOverlay={() => (
           <button
             className={styles.preview}
-            onClick={() => console.log("Icon picker clicked")}
+            onClick={onIconClick}
             aria-label="Change icon"
           >
             <span className={styles.icon}>{icon}</span>
