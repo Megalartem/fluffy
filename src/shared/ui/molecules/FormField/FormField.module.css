@@ -326,6 +326,25 @@
   padding-left: calc(var(--spacing-5) + var(--spacing-2));
 }
 
-.helperText {
-  color: var(--color-text-secondary);
+/* Toggle field */
+.toggleRoot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  cursor: pointer;
+}
+
+.toggleLabelText {
+  user-select: none;
+}
+
+.toggleHint {
+  padding-left: calc(var(--spacing-11) + var(--spacing-2));
 }
