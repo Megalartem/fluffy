@@ -34,18 +34,6 @@ export default function TestUICategoriesPage() {
         <div className="flex flex-col min-h-screen bg-bg-main p-4 gap-4">
             <div className="flex items-center justify-between">
                 <div className="text-lg font-semibold">Categories</div>
-                {/* <IconButton
-                    variant="muted"
-                    size="m"
-                    icon={Plus}
-                    onClick={() => setIsCreateOpen(true)}
-                    aria-label="Create Category"
-                /> */}
-                {/* <ButtonBase
-                variant="muted"
-                 onClick={() => setIsCreateOpen(true)}>
-                    <Plus size={20} />
-                </ButtonBase> */}
             </div>
 
             <CategoriesFilter
