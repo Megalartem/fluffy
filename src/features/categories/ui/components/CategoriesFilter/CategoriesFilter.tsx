@@ -12,7 +12,7 @@ import {
   SearchBar,
   ModalActions,
   FormFieldSegment,
-  FormFieldCheckmark,
+  FormFieldToggle,
 } from "@/shared/ui/molecules";
 
 import type {
@@ -88,8 +88,8 @@ export function CategoriesFilter({
 
   const filtersActive = Boolean(
     value.query.trim() ||
-      value.type !== "all" ||
-      value.showArchived
+    value.type !== "all" ||
+    value.showArchived
   );
 
   const onApply: SubmitHandler<FormValues> = React.useCallback(
@@ -141,9 +141,10 @@ export function CategoriesFilter({
             size="m"
           />
 
-          <FormFieldCheckmark<FormValues>
+          <FormFieldToggle
             name="showArchived"
             label="Show archived"
+            helperText="Include archived categories in the list"
           />
         </FormProvider>
       </FiltersSheet>
