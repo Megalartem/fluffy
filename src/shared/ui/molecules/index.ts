@@ -9,6 +9,7 @@ export { FormFieldString } from "./FormField/FormFieldString";
 export { FormFieldSelect } from "./FormField/FormFieldSelect";
 export { FormFieldDate } from "./FormField/FormFieldDate";
 export { FormFieldSegment } from "./FormField/FormFieldSegment";
+export { FormFieldCheckmark } from "./FormField/FormFieldCheckmark";
 export { FormFieldIconPicker } from "./FormField/FormFieldIconPicker";
 
 export { ModalHeader } from "./ModalHeader/ModalHeader";
