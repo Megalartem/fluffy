@@ -163,9 +163,9 @@ export function TransactionUpsertSheet({
 
     // edit
     form.reset({
-      type: type === "transfer" ? "transfer" : type,
+      type: initial.type,
       amount: fromMinorByCurrency(initial.amountMinor, currency),
-      categoryId: type === "transfer" ? null : initial.categoryId,
+      categoryId: initial.categoryId ?? null,
       dateKey: initial.dateKey,
     });
   }, [open, initial, currency, form, type, defaultCategoryState, categories]);
@@ -220,11 +220,11 @@ export function TransactionUpsertSheet({
         await onCreate(input);
       } else {
         const patch = {
+          type: values.type,
           amountMinor,
           dateKey,
           categoryId: categoryIdValue,
-          // type/currency/note — не трогаем, так как в форме их нет (кроме type в MVP)
-          // NOTE: if you want to allow editing type here, move it into patch on backend.
+          // currency/note — не трогаем, так как в форме их нет
         };
 
         const input: UpdateTransactionInput = {
