@@ -1,7 +1,8 @@
 .root {
   position: fixed;
   inset: 0;
-  z-index: var(--z-overlay);
+  /* Динамический z-index: базовое значение + смещение уровня */
+  z-index: calc(var(--z-overlay) + var(--level-offset, 0));
 
 }
 
@@ -10,7 +11,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: var(--z-bottom-sheet);
+  /* Динамический z-index: базовое значение + смещение уровня */
+  z-index: calc(var(--z-bottom-sheet) + var(--level-offset, 0));
 
   background: var(--color-bg);
   border-top-left-radius: var(--radius-lg);

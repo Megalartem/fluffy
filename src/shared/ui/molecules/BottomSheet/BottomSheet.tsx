@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useId } from "react";
+import React, { useEffect, useId, createContext, useContext } from "react";
 import {
   AnimatePresence,
   motion,
@@ -11,6 +11,9 @@ import {
 import clsx from "clsx";
 import styles from "./BottomSheet.module.css";
 import { Overlay } from "@/shared/ui/atoms";
+
+// Context для отслеживания уровня вложенности BottomSheet
+const BottomSheetLevelContext = createContext<number>(0);
 
 export type BottomSheetHeight = "auto" | "half" | "full";
 
@@ -36,6 +39,8 @@ export function BottomSheet({
   className,
 }: IBottomSheet) {
   const titleId = useId();
+  const currentLevel = useContext(BottomSheetLevelContext);
+  const nextLevel = currentLevel + 1;
 
   const [snapHeight, setSnapHeight] = React.useState<BottomSheetHeight>(height);
   const dragControls = useDragControls();
@@ -76,7 +81,16 @@ export function BottomSheet({
   return (
     <AnimatePresence>
       {open && (
-        <div className={styles.root} key={height}>
+        <div 
+          className={styles.root} 
+          key={height}
+          style={{
+            // Увеличиваем z-index для каждого уровня вложенности
+            // overlay: 1100 + level * 100
+            // sheet: 1200 + level * 100
+            ['--level-offset' as string]: currentLevel * 100,
+          } as React.CSSProperties}
+        >
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -166,7 +180,12 @@ export function BottomSheet({
               </div>
             ) : null}
 
-            <div className={styles.body}>{children}</div>
+            <div className={styles.body}>
+              {/* Оборачиваем children в Context для следующего уровня */}
+              <BottomSheetLevelContext.Provider value={nextLevel}>
+                {children}
+              </BottomSheetLevelContext.Provider>
+            </div>
 
             {footer ? <div className={styles.footer}>{footer}</div> : null}
           </motion.div>
