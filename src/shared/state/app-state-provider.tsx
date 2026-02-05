@@ -8,7 +8,7 @@ import {
   type AppStateActions,
   type AppStateContextValue,
 } from "./app-state";
-import { useWorkspace } from "@/shared/config/workspace-context";
+import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 
 /**
  * AppStateProvider - manages global application state
