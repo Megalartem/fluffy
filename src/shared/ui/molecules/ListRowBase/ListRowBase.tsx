@@ -34,11 +34,9 @@ export function ListRowBase({
 }) {
     const isInteractive = Boolean(onClick);
 
-    const Comp: React.ElementType = isInteractive ? "button" : "div";
 
     return (
-        <Comp
-            type={isInteractive ? "button" : undefined}
+        <div
             className={clsx(
                 styles.root,
                 tone === "muted" && styles.muted,
@@ -51,7 +49,7 @@ export function ListRowBase({
             role={role}
             aria-label={ariaLabel}
             aria-selected={ariaSelected}
-            disabled={disabled}
+            aria-disabled={disabled}
         >
             {leading ? <div className={styles.leading}>{leading}</div> : null}
 
@@ -61,6 +59,6 @@ export function ListRowBase({
             </div>
 
             {trailing ? <div className={styles.trailing}>{trailing}</div> : null}
-        </Comp>
+        </div>
     );
 }
