@@ -32,9 +32,13 @@ export class CategoryService {
       throw new AppError("VALIDATION_ERROR", "Name is required", { field: "name" });
     }
 
-    // (опционально) валидация order
-    if (!Number.isFinite(input.order) || input.order < 0) {
-      throw new AppError("VALIDATION_ERROR", "Order must be a non-negative number", { field: "order" });
+    // Auto-calculate order if not provided or invalid
+    let order = input.order;
+    if (!Number.isFinite(order) || order < 0) {
+      // Get max order from existing categories and add 10
+      const existingCategories = await this.categoriesRepo.list(workspaceId);
+      const maxOrder = existingCategories.reduce((max, cat) => Math.max(max, cat.order), 0);
+      order = maxOrder + 10;
     }
 
     const now = nowIso();
@@ -46,7 +50,7 @@ export class CategoryService {
       type: input.type,
       iconKey: input.iconKey,
       colorKey: input.colorKey,
-      order: input.order,
+      order,
       isArchived: false,
       createdAt: now,
       updatedAt: now,

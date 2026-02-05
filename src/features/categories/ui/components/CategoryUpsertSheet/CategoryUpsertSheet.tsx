@@ -112,13 +112,11 @@ export function CategoryUpsertSheet({
     try {
       if (!isEdit) {
         const input: CreateCategoryInput = {
-          // если твой CreateCategoryInput включает workspaceId — убери эту строку
-          // но по хорошему он должен быть без workspaceId, как мы обсуждали
           name,
           type: values.type,
           iconKey: values.iconKey as IconName,
           colorKey: values.colorKey,
-          order: 0, // сервис выставит корректно (max+10). если нет — сделай тут.
+          order: 0, // will be auto-calculated by service if 0
         } as unknown as CreateCategoryInput;
 
         await onCreate(input);
