@@ -113,7 +113,22 @@ class DexieTransactionsRepo implements ITransactionsRepository {
     });
   }
 
-    async unsetCategory(workspaceId: string, categoryId: string): Promise<void> {
+  async countByCategory(workspaceId: string, categoryId: string): Promise<number> {
+    try {
+      await ensureDbInitialized();
+      return await db.transactions
+        .where("[workspaceId+categoryId]")
+        .equals([workspaceId, categoryId])
+        .filter((t) => !t.deletedAt)
+        .count();
+    } catch (e) {
+      throw new AppError("STORAGE_ERROR", "Failed to count transactions by category", {
+        cause: e instanceof Error ? e.message : String(e),
+      });
+    }
+  }
+
+  async unsetCategory(workspaceId: string, categoryId: string): Promise<void> {
     try {
       await ensureDbInitialized();
       const now = nowIso();

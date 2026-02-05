@@ -52,6 +52,16 @@ export interface ITransactionsRepository {
    * Мягко удаляет транзакцию (устанавливает deletedAt)
    */
   softDelete(workspaceId: string, id: string): Promise<void>;
+
+  /**
+   * Подсчитывает количество транзакций для категории
+   */
+  countByCategory(workspaceId: string, categoryId: string): Promise<number>;
+
+  /**
+   * Убирает категорию у всех транзакций (устанавливает categoryId = null)
+   */
+  unsetCategory(workspaceId: string, categoryId: string): Promise<void>;
 }
 
 /**

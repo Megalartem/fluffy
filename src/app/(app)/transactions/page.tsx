@@ -79,13 +79,11 @@ export default function TransactionsPage() {
   }, [handleRefresh]);
 
   const handleCreated = React.useCallback(async (input: CreateTransactionInput) => {
-    console.log("Creating transaction", input);
     await txCreate(input);
     await handleRefresh();
   }, [txCreate, handleRefresh]);
 
   const handleUpdated = React.useCallback(async (input: UpdateTransactionInput) => {
-    console.log("Updating transaction", input);
     await txUpdate(input);
     await handleRefresh();
   }, [handleRefresh, txUpdate]);

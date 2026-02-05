@@ -213,12 +213,8 @@ export function TransactionsList({
             </div>
         );
     }
-    console.log('filtersActive', filtersActive);
-    console.log('transactions.length', transactions.length); 
     if (transactions.length === 0) {
-        console.log('no transactions');
         if (filtersActive) {
-            console.log('no transactions with active filters');
             return (
                 <EmptyState
                     title={strings.noFilterResultsTitle}
@@ -236,7 +232,6 @@ export function TransactionsList({
                 />
             );
         }
-        console.log('no transactions at all');
         return (
             <EmptyState
                 title={strings.noTransactionsTitle}
@@ -254,7 +249,6 @@ export function TransactionsList({
             />
         );
     }
-    console.log('rendering transactions list');
     return (
         <div className={clsx(styles.root, className)}>
             {renderFlat ? (

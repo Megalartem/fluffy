@@ -23,5 +23,6 @@ export interface TransactionsRepo {
 
   getById(workspaceId: string, id: string): Promise<Transaction | null>;
 
+  countByCategory(workspaceId: string, categoryId: string): Promise<number>;
   unsetCategory(workspaceId: string, categoryId: string): Promise<void>;
 }
