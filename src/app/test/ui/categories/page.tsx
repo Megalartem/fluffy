@@ -5,9 +5,10 @@ import { useState } from "react";
 import { CategoryUpsertSheet, CategoryList, CategoriesFilter } from "@/features/categories/ui/components";
 import { useCategoryMutation } from "@/features/categories/hooks/useCategoryMutation";
 import { useCategories } from "@/features/categories/hooks/useCategories";
-import { ButtonBase } from "@/shared/ui/atoms";
+import { FAB } from "@/shared/ui/atoms";
 import type { Category } from "@/features/categories/model/types";
 import type { CategoriesFilterValues } from "@/features/categories/model/filter-types";
+import { Plus } from "lucide-react";
 
 export default function TestUICategoriesPage() {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -32,10 +33,19 @@ export default function TestUICategoriesPage() {
     return (
         <div className="flex flex-col min-h-screen bg-bg-main p-4 gap-4">
             <div className="flex items-center justify-between">
-                <div className="text-lg font-semibold">Test UI: Categories</div>
-                <ButtonBase onClick={() => setIsCreateOpen(true)}>
-                    Add Category
-                </ButtonBase>
+                <div className="text-lg font-semibold">Categories</div>
+                {/* <IconButton
+                    variant="muted"
+                    size="m"
+                    icon={Plus}
+                    onClick={() => setIsCreateOpen(true)}
+                    aria-label="Create Category"
+                /> */}
+                {/* <ButtonBase
+                variant="muted"
+                 onClick={() => setIsCreateOpen(true)}>
+                    <Plus size={20} />
+                </ButtonBase> */}
             </div>
 
             <CategoriesFilter
@@ -50,6 +60,9 @@ export default function TestUICategoriesPage() {
                 onEdit={handleEdit}
                 onArchive={handleArchive}
             />
+
+            {/* Spacer для FAB */}
+            <div style={{ height: "var(--spacer-height)" }} />
 
             {/* Create Category Sheet */}
             <CategoryUpsertSheet
@@ -77,6 +90,12 @@ export default function TestUICategoriesPage() {
                     }}
                 />
             )}
+
+            <FAB
+                aria-label="Create Category"
+                icon={Plus}
+                onClick={() => setIsCreateOpen(true)}
+            />
         </div>
     );
 }
