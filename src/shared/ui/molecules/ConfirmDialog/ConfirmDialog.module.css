@@ -15,6 +15,7 @@
 .description {
   color: var(--color-text-secondary);
   line-height: var(--line-height-base);
+  white-space: pre-line;
 }
 
 .actions {

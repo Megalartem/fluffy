@@ -5,7 +5,6 @@ import { CategoryActionsMenu } from "../CategoryActionsMenu/CategoryActionsMenu"
 import type { Category } from "@/features/categories/model/types";
 import { getLazyLucideIcon } from "@/shared/lib/iconLoader";
 
-// Анимационные параметры
 const ANIMATION_DURATION = 0.25;
 const ANIMATION_EASE = [0.4, 0, 0.2, 1] as const;
 
@@ -13,6 +12,7 @@ export interface AnimatedCategoryItemProps {
   category: Category;
   onEdit?: (category: Category) => void;
   onArchive?: (category: Category, isArchived: boolean) => void;
+  onDelete?: (category: Category) => void;
   onClick?: (category: Category) => void;
 }
 
@@ -20,6 +20,7 @@ export function AnimatedCategoryItem({
   category,
   onEdit,
   onArchive,
+  onDelete,
   onClick,
 }: AnimatedCategoryItemProps) {
   const shouldReduceMotion = useReducedMotion();
@@ -73,7 +74,7 @@ export function AnimatedCategoryItem({
             isArchived={category.isArchived}
             onArchiveToggle={(isArchived) => onArchive?.(category, isArchived)}
             onEdit={() => onEdit?.(category)}
-            onDelete={() => {}}
+            onDelete={() => onDelete?.(category)}
           />
         }
       />

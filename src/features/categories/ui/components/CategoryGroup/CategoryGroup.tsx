@@ -1,4 +1,5 @@
 import { AnimatePresence } from "framer-motion";
+import { memo } from "react";
 import { AnimatedCategoryItem } from "../../molecules";
 import type { Category } from "@/features/categories/model/types";
 import styles from "./CategoryGroup.module.css";
@@ -9,15 +10,17 @@ export interface CategoryGroupProps {
   visibleIds: Set<string>;
   onEdit?: (category: Category) => void;
   onArchive?: (category: Category, isArchived: boolean) => void;
+  onDelete?: (category: Category) => void;
   onClick?: (category: Category) => void;
 }
 
-export function CategoryGroup({
+export const CategoryGroup = memo(function CategoryGroup({
   title,
   categories,
   visibleIds,
   onEdit,
   onArchive,
+  onDelete,
   onClick,
 }: CategoryGroupProps) {
   const visibleCategories = categories.filter(c => visibleIds.has(c.id));
@@ -35,6 +38,7 @@ export function CategoryGroup({
               category={category}
               onEdit={onEdit}
               onArchive={onArchive}
+              onDelete={onDelete}
               onClick={onClick}
             />
           ))}
@@ -42,4 +46,4 @@ export function CategoryGroup({
       </div>
     </div>
   );
-}
+});

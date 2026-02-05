@@ -39,7 +39,7 @@ export interface CategoriesFilterProps {
   className?: string;
 }
 
-export function CategoriesFilter({
+export const CategoriesFilter = React.memo(function CategoriesFilter({
   value,
   onChange,
   className,
@@ -150,4 +150,4 @@ export function CategoriesFilter({
       </FiltersSheet>
     </div>
   );
-}
+});

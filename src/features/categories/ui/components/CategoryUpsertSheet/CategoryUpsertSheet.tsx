@@ -61,7 +61,7 @@ export function CategoryUpsertSheet({
   onCreate,
   onUpdate,
 }: CategoryUpsertSheetProps) {
-  const isEdit = Boolean(initial);
+  const isEdit = Boolean(initial?.id);
   const [saving, setSaving] = React.useState(false);
   const [isChooseIconSheetOpen, setIsChooseIconSheetOpen] = React.useState(false);
 
@@ -81,7 +81,7 @@ export function CategoryUpsertSheet({
 
     setSaving(false);
 
-    if (!initial) {
+    if (!initial?.id) {
       form.reset({
         name: "",
         type: "expense",

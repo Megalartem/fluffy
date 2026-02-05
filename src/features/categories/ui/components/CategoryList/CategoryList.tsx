@@ -23,18 +23,20 @@ export interface CategoryListProps {
   /** Коллбеки для действий */
   onEdit?: (category: Category) => void;
   onArchive?: (category: Category, isArchived: boolean) => void;
+  onDelete?: (category: Category) => void;
   onClick?: (category: Category) => void;
   
   /** Кастомный empty state */
   emptyState?: React.ReactNode;
 }
 
-export function CategoryList({
+export const CategoryList = React.memo(function CategoryList({
   categories,
   filters,
   groupByType = false,
   onEdit,
   onArchive,
+  onDelete,
   onClick,
   emptyState,
 }: CategoryListProps) {
@@ -111,6 +113,7 @@ export function CategoryList({
             visibleIds={visibleIds}
             onEdit={onEdit}
             onArchive={onArchive}
+            onDelete={onDelete}
             onClick={onClick}
           />
           <CategoryGroup
@@ -119,6 +122,7 @@ export function CategoryList({
             visibleIds={visibleIds}
             onEdit={onEdit}
             onArchive={onArchive}
+            onDelete={onDelete}
             onClick={onClick}
           />
         </>
@@ -133,6 +137,7 @@ export function CategoryList({
                   category={category}
                   onEdit={onEdit}
                   onArchive={onArchive}
+                  onDelete={onDelete}
                   onClick={onClick}
                 />
               ))}
@@ -141,4 +146,4 @@ export function CategoryList({
       )}
     </div>
   );
-}
+});

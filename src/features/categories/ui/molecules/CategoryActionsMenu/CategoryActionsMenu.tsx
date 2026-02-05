@@ -29,7 +29,6 @@ export function CategoryActionsMenu({
     const handleAction = React.useCallback(
         (key: React.Key) => {
             const k = String(key) as ActionKey;
-
             if (k === "edit") onEdit();
             if (k === "archiveToggle") onArchiveToggle(!isArchived);
             if (k === "delete") onDelete();
