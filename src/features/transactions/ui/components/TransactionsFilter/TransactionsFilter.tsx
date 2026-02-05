@@ -25,6 +25,8 @@ import type {
   TransactionsFilterValues,
   TransactionsSortValue,
 } from "@/features/transactions/model/types";
+import type { Category } from "@/features/categories/model/types";
+import { buildCategoryOptions } from "@/features/transactions/lib/categoryOptions";
 
 export type TransactionsTypes = "all" | "expense" | "income" | "transfer";
 
@@ -54,18 +56,28 @@ type FormValues = {
 export function TransactionsFilter({
   value,
   onChange,
-  categoryOptions,
+  categories,
   sortOptions,
   className,
 }: {
   value: TransactionsFilterValues;
   onChange: (newFilters: TransactionsFilterValues) => void;
-  categoryOptions: IOptionBase[];
+  categories: Category[];
   sortOptions: TransactionsSortOption[];
   className?: string;
 }) {
   const [openFilters, setOpenFilters] = React.useState(false);
   const [openCategories, setOpenCategories] = React.useState(false);
+
+  // Build category options based on current filter type
+  const categoryOptions = React.useMemo(() => {
+    const txType = value.type === "all" ? "expense" : value.type;
+    return buildCategoryOptions({
+      categories,
+      txType,
+      includeArchived: false,
+    });
+  }, [categories, value.type]);
 
   // RHF draft state for the filters sheet
   const form = useForm<FormValues>({

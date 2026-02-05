@@ -11,15 +11,10 @@ import { useTransactions } from "@/features/transactions/hooks/useTransactions";
 import type { CreateTransactionInput, Transaction, TransactionsFilterValues, UpdateTransactionInput } from "@/features/transactions/model/types";
 import { transactionsRepo } from "@/features/transactions/api/repo.dexie";
 import styles from "./transactions.module.css";
-import {
-  MOCK_CURRENCY,
-  MOCK_WORKSPACE_ID,
-  mockCategories,
-  mockCategoryOptions,
-  seedMockTransactionsIfEmpty,
-} from "@/features/transactions/dev/mocks";
 import { TransactionsList } from "@/features/transactions/ui/components";
 import { useTransactionMutations } from "@/features/transactions/hooks/utils/useTransactionMutation";
+import { useWorkspace } from "@/shared/config/WorkspaceProvider";
+import { useCategories } from "@/features/categories/hooks/useCategories";
 
 const EMPTY_STATES = {
   noTransactions: {
@@ -48,15 +43,8 @@ const INITIAL_FILTERS: TransactionsFilterValues = {
 
 
 export default function TransactionsPage() {
-  const isDev = process.env.NODE_ENV === "development";
-  const didSeed = React.useRef(false);
-
-  // Seed mock data in development
-  React.useEffect(() => {
-    if (!isDev || didSeed.current) return;
-    didSeed.current = true;
-    void seedMockTransactionsIfEmpty(MOCK_WORKSPACE_ID);
-  }, [isDev]);
+  const { workspaceId } = useWorkspace();
+  const { items: categories } = useCategories({ includeArchived: false });
 
   const [filters, setFilters] = React.useState<TransactionsFilterValues>(INITIAL_FILTERS);
   const [upsertOpen, setUpsertOpen] = React.useState(false);
@@ -71,16 +59,16 @@ export default function TransactionsPage() {
   );
 
   const { transactions, loading, error, refresh } = useTransactions({
-    workspaceId: MOCK_WORKSPACE_ID,
+    workspaceId,
     filters,
     repo: transactionsRepo,
-    categories: mockCategories,
+    categories,
   });
 
   const { txCreate, txUpdate } = useTransactionMutations({
-  workspaceId: MOCK_WORKSPACE_ID,
-  refresh,
-});
+    workspaceId,
+    refresh,
+  });
 
   const handleRefresh = React.useCallback(async () => {
     await refresh();
@@ -91,11 +79,13 @@ export default function TransactionsPage() {
   }, [handleRefresh]);
 
   const handleCreated = React.useCallback(async (input: CreateTransactionInput) => {
+    console.log("Creating transaction", input);
     await txCreate(input);
     await handleRefresh();
   }, [txCreate, handleRefresh]);
 
   const handleUpdated = React.useCallback(async (input: UpdateTransactionInput) => {
+    console.log("Updating transaction", input);
     await txUpdate(input);
     await handleRefresh();
   }, [handleRefresh, txUpdate]);
@@ -127,12 +117,14 @@ export default function TransactionsPage() {
     setFilters(newFilters);
   }, []);
 
+  const defaultCategoryId = categories.find(c => c.type === "expense" && !c.isArchived)?.id;
+
   return (
     <div className={styles.body}>
       <TransactionsFilter
         value={filters}
         onChange={handleFiltersChange}
-        categoryOptions={mockCategoryOptions}
+        categories={categories}
         sortOptions={sortOptions}
       />
 
@@ -153,8 +145,8 @@ export default function TransactionsPage() {
       ) : (
         <TransactionsList
           transactions={transactions}
-          categories={mockCategories}
-          currency={MOCK_CURRENCY}
+          categories={categories}
+          currency="USD"
           loading={loading}
           error={error}
           sort={filters.sort}
@@ -175,14 +167,14 @@ export default function TransactionsPage() {
       <TransactionUpsertSheet
         open={upsertOpen}
         onClose={() => setUpsertOpen(false)}
-        workspaceId={MOCK_WORKSPACE_ID}
-        currency={MOCK_CURRENCY}
-        categories={mockCategories}
+        workspaceId={workspaceId}
+        currency="USD"
+        categories={categories}
         type="expense"
         initial={editing}
         onCreate={handleCreated}
         onUpdate={handleUpdated}
-        defaultCategoryState={{ id: "cat_food", type: "expense" }}
+        defaultCategoryState={defaultCategoryId ? { id: defaultCategoryId, type: "expense" } : undefined}
       />
     </div>
   );

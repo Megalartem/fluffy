@@ -24,15 +24,16 @@ export async function ensureDefaultCategoriesSeeded(workspaceId: string): Promis
   const already = await db.meta.get(seedKey(workspaceId));
   if (already) return;
 
-  const base: Array<Pick<Category, "name" | "order" | "iconKey">> = [
-    { name: "Еда", order: 10, iconKey: "coffee" },
-    { name: "Транспорт", order: 20, iconKey: "truck" },
-    { name: "Кофе", order: 30, iconKey: "coffee" },
-    { name: "Дом", order: 40, iconKey: "home" },
-    { name: "Подписки", order: 50, iconKey: "credit-card" },
-    { name: "Здоровье", order: 60, iconKey: "heart" },
-    { name: "Развлечения", order: 70, iconKey: "film" },
-    { name: "Другое", order: 80, iconKey: "box" },
+  const base: Array<Pick<Category, "name" | "order" | "iconKey" | "type">> = [
+    { name: "Еда", order: 10, iconKey: "coffee", type: "expense" },
+    { name: "Транспорт", order: 20, iconKey: "truck", type: "expense" },
+    { name: "Кофе", order: 30, iconKey: "coffee", type: "expense" },
+    { name: "Дом", order: 40, iconKey: "home", type: "expense" },
+    { name: "Подписки", order: 50, iconKey: "credit-card", type: "expense" },
+    { name: "Здоровье", order: 60, iconKey: "heart", type: "expense" },
+    { name: "Развлечения", order: 70, iconKey: "film", type: "expense" },
+    { name: "Другое", order: 80, iconKey: "box", type: "expense" },
+    { name: "Зарплата", order: 90, iconKey: "wallet", type: "income" },
   ];
 
   const now = nowIso();
@@ -40,7 +41,7 @@ export async function ensureDefaultCategoriesSeeded(workspaceId: string): Promis
     id: makeId("cat"),
     workspaceId,
     name: c.name,
-    type: "expense",
+    type: c.type,
     iconKey: c.iconKey,
     colorKey: randomColors(),
     isArchived: false,

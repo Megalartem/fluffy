@@ -5,6 +5,8 @@ import {
   buildCategoryMap,
   applyClientFilters,
 } from "./utils/transactions";
+import { ensureSampleTransactionsSeeded } from "../model/seed";
+import { cleanupOldMockData } from "../model/cleanup";
 
 
 export function useTransactions(params: {
@@ -18,8 +20,6 @@ export function useTransactions(params: {
   step?: number;
 }) {
   const { workspaceId, filters, repo, categories, initialLimit = 50, step = 50 } = params;
-  // TODO: useWorkspace hook for workspaceId
-  // TODO: useCategories hook for categories
 
   const categoryNameById = React.useMemo(
     () => buildCategoryMap(categories),
@@ -31,12 +31,15 @@ export function useTransactions(params: {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<unknown>(null);
 
+  const didSeedRef = React.useRef(false);
+
   const categoryIdsKey = filters.categoryIds.join("|");
   const sortKey = JSON.stringify(filters.sort);
   const filtersRef = React.useRef(filters);
 
   React.useEffect(() => {
     filtersRef.current = filters;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     filters.type,
     filters.query,
@@ -48,6 +51,17 @@ export function useTransactions(params: {
     setLoading(true);
     setError(null);
     try {
+      // Seed sample transactions only once per workspace session
+      if (!didSeedRef.current && categories && categories.length > 0) {
+        didSeedRef.current = true;
+        
+        // Clean up old mock data first (one-time cleanup)
+        await cleanupOldMockData();
+        
+        // Then seed new sample transactions
+        await ensureSampleTransactionsSeeded(workspaceId);
+      }
+
       const f = filtersRef.current;
       const baseType =
         f.type !== "all" ? (f.type as TransactionType) : undefined;
@@ -61,7 +75,12 @@ export function useTransactions(params: {
     } finally {
       setLoading(false);
     }
-  }, [limit, repo, workspaceId, categoryNameById]);
+  }, [limit, repo, workspaceId, categoryNameById, categories]);
+
+  // Reset seed flag when workspace changes
+  React.useEffect(() => {
+    didSeedRef.current = false;
+  }, [workspaceId]);
 
   
   React.useEffect(() => {
