@@ -47,10 +47,12 @@ export function CategoryActionsMenu({
 
             <Popover className={styles.popover} placement="bottom end" offset={8}>
                 <Menu className={styles.menu} onAction={handleAction}>
-                    <MenuItem id="edit" className={styles.item}>
-                        <Pencil className={styles.itemIcon} />
-                        <span>Edit</span>
-                    </MenuItem>
+                    {isArchived ? null : (
+                        <MenuItem id="edit" className={styles.item}>
+                            <Pencil className={styles.itemIcon} />
+                            <span>Edit</span>
+                        </MenuItem>
+                    )}
 
                     <MenuItem id="archiveToggle" className={styles.item}>
                         {isArchived ? (
