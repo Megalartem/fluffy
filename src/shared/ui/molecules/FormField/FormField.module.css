@@ -303,3 +303,29 @@
 .selectBodyIcon[data-color="sand"] { background-color: var(--category-sand-bg); }
 .selectBodyIcon[data-color="brown"] { background-color: var(--category-brown-bg); }
 .selectBodyIcon[data-color="tx-type"] { background-color: var(--color-category-tx-type); }
+
+/* Checkmark field */
+.checkmarkRoot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.checkmarkLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+}
+
+.checkmarkLabelText {
+  user-select: none;
+}
+
+.checkmarkHint {
+  padding-left: calc(var(--spacing-5) + var(--spacing-2));
+}
+
+.helperText {
+  color: var(--color-text-secondary);
+}
