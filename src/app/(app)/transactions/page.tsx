@@ -44,7 +44,7 @@ const INITIAL_FILTERS: TransactionsFilterValues = {
 
 export default function TransactionsPage() {
   const { workspaceId } = useWorkspace();
-  const { items: categories } = useCategories({ includeArchived: false });
+  const { items: categories } = useCategories({ includeArchived: true });
 
   const [filters, setFilters] = React.useState<TransactionsFilterValues>(INITIAL_FILTERS);
   const [upsertOpen, setUpsertOpen] = React.useState(false);
