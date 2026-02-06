@@ -33,7 +33,7 @@ import {
   buildCategoryOptions,
   findCategoryOption,
 } from "@/features/transactions/lib/categoryOptions";
-import { renderCategoryIcon } from "@/features/transactions/lib/renderCategoryIcon";
+import { renderCategoryIcon } from "@/shared/lib/renderCategoryIcon";
 
 import { toMinorByCurrency, fromMinorByCurrency } from "@/shared/lib/money/helper";
 import { AppError } from "@/shared/errors/app-error";

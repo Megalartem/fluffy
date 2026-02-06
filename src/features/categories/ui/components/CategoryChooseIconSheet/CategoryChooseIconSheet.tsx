@@ -8,7 +8,7 @@ import { BottomSheet, ModalHeader, Skeleton, SearchBar } from "@/shared/ui/molec
 import dynamicIconImports from "lucide-react/dynamicIconImports";
 import type { IconName } from "lucide-react/dynamic";
 import styles from "./CategoryChooseIconSheet.module.css";
-import { getLazyLucideIcon } from "@/shared/lib/iconLoader";
+import { getLazyLucideIcon } from "@/shared/lib/renderCategoryIcon";
 
 const ICONS_PER_BATCH = 50;
 const ALL_ICONS = Object.keys(dynamicIconImports) as IconName[];

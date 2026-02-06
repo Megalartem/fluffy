@@ -6,7 +6,7 @@ import styles from "./CategoryAppearance.module.css";
 import { CATEGORY_COLOR_KEYS, COLOR_LABELS, type CategoryColor } from "../../../model/types";
 import { IconName } from "lucide-react/dynamic";
 import { CategoryIcon } from "@/shared/ui/atoms/CategoryIcon/CategoryIcon";
-import { getLazyLucideIcon } from "@/shared/lib/iconLoader";
+import { getLazyLucideIcon } from "@/shared/lib/renderCategoryIcon";
 
 type ColorItem = { id: CategoryColor; name: string };
 

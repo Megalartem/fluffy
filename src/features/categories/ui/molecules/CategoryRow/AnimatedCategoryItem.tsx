@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { CategoryRow } from "./CategoryRow";
 import { CategoryActionsMenu } from "../CategoryActionsMenu/CategoryActionsMenu";
 import type { Category } from "@/features/categories/model/types";
-import { getLazyLucideIcon } from "@/shared/lib/iconLoader";
+import { getLazyLucideIcon } from "@/shared/lib/renderCategoryIcon";
 
 const ANIMATION_DURATION = 0.25;
 const ANIMATION_EASE = [0.4, 0, 0.2, 1] as const;

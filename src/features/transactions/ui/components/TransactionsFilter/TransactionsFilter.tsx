@@ -27,7 +27,7 @@ import type {
 } from "@/features/transactions/model/types";
 import type { Category } from "@/features/categories/model/types";
 import { buildCategoryOptions } from "@/features/transactions/lib/categoryOptions";
-import { renderCategoryIcon } from "@/features/transactions/lib/renderCategoryIcon";
+import { renderCategoryIcon } from "@/shared/lib/renderCategoryIcon";
 
 export type TransactionsTypes = "all" | "expense" | "income" | "transfer";
 
