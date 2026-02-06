@@ -117,7 +117,8 @@ export class GoalsService {
 
     // 2) Create transfer transaction ONLY via transactions domain (outside Dexie transaction)
     // Note: transaction service may add workspaceId internally; keep input minimal.
-    const txInput = {
+    const txInput: CreateTransactionInput = {
+      workspaceId,
       type: "transfer" as const,
       amountMinor,
       currency: goal.currency,
@@ -128,7 +129,7 @@ export class GoalsService {
 
     const tx = await this.transactionService.addTransaction(
       workspaceId,
-      txInput as unknown as CreateTransactionInput
+      txInput
     );
 
     // 3) Write goalContribution + update goal cache atomically (goals domain tables only)
