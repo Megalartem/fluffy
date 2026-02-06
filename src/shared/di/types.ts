@@ -38,3 +38,5 @@ export enum DI_KEYS {
   BACKUP_SERVICE = "BackupService",
   SETTINGS_SERVICE = "SettingsService",
 }
+
+export type CurrencyCode = "USD" | "EUR" | "RUB" | "VND" | string;

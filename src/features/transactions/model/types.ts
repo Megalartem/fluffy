@@ -1,6 +1,7 @@
+import { CurrencyCode } from "@/shared/di/types";
+
 export type TransactionType = "expense" | "income" | "transfer";
 
-export type CurrencyCode = "USD" | "EUR" | "RUB" | "VND" | string;
 
 export type Transaction = {
   id: string;
