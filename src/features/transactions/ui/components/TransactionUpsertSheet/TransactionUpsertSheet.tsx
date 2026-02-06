@@ -33,6 +33,7 @@ import {
   buildCategoryOptions,
   findCategoryOption,
 } from "@/features/transactions/lib/categoryOptions";
+import { renderCategoryIcon } from "@/features/transactions/lib/renderCategoryIcon";
 
 import { toMinorByCurrency, fromMinorByCurrency } from "@/shared/lib/money/helper";
 import { AppError } from "@/shared/errors/app-error";
@@ -120,6 +121,7 @@ export function TransactionUpsertSheet({
       buildCategoryOptions({
         categories,
         txType: txTypeForOptions,
+        renderIcon: renderCategoryIcon,
       }),
     [categories, txTypeForOptions]
   );
@@ -306,25 +308,23 @@ export function TransactionUpsertSheet({
             />
 
             {/* Category */}
-            {type !== "transfer" && (
-              <FormFieldSelect<FormValues>
-                name="categoryId"
-                label="Category"
-                mode="single"
-                placeholder="Choose category"
-                onOpen={() => setCatOpen(true)}
-                optionsByValue={categoryOptionsByValue}
-                rules={{
-                  validate: (v) => {
-                    const currentType = form.getValues("type");
-                    if (currentType === "transfer") return true;
-                    return v ? true : "Choose category";
-                  },
-                }}
-                showChevron
-                isOpen={catOpen}
-              />
-            )}
+            <FormFieldSelect<FormValues>
+              name="categoryId"
+              label="Category"
+              mode="single"
+              placeholder="Choose category"
+              onOpen={() => setCatOpen(true)}
+              optionsByValue={categoryOptionsByValue}
+              rules={{
+                validate: (v) => {
+                  const currentType = form.getValues("type");
+                  if (currentType === "transfer") return true;
+                  return v ? true : "Choose category";
+                },
+              }}
+              showChevron
+              isOpen={catOpen}
+            />
 
             {/* Date */}
             <FormFieldDate<FormValues>

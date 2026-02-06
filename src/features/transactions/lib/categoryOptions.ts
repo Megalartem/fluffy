@@ -1,6 +1,6 @@
 import type { Category } from "@/features/categories/model/types";
 import type { TransactionType } from "@/features/transactions/model/types";
-import type { OptionBaseProps } from "@/shared/ui/atoms";
+import type { OptionItem } from "@/shared/ui/atoms";
 
 export type CategoryIconRenderer = (category: Category) => React.ReactNode;
 
@@ -24,7 +24,7 @@ export function buildCategoryOptions({
   txType,
   includeArchived = false,
   renderIcon,
-}: BuildCategoryOptionsParams): OptionBaseProps[] {
+}: BuildCategoryOptionsParams): OptionItem[] {
   return categories
     .filter((c) => (includeArchived ? true : !c.isArchived))
     .filter((c) => isCategoryAllowedForTxType(c.type, txType))
@@ -33,7 +33,7 @@ export function buildCategoryOptions({
     .map((c) => ({
       value: c.id,
       label: c.name,
-      ...(renderIcon ? { icon: renderIcon(c) } : null),
+      ...(renderIcon ? { icon: renderIcon(c) } : {}),
     }));
 }
 
@@ -41,9 +41,9 @@ export function buildCategoryOptions({
  * Convenience: найти выбранную категорию-опцию по categoryId (для edit-prefill)
  */
 export function findCategoryOption(
-  options: OptionBaseProps[],
+  options: OptionItem[],
   categoryId?: string | null
-): OptionBaseProps | null {
+): OptionItem | null {
   if (!categoryId) return null;
   return options.find((o) => o.value === categoryId) ?? null;
 }
