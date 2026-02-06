@@ -119,6 +119,9 @@ export default function TransactionsPage() {
 
   return (
     <div className={styles.body}>
+      <div className="flex items-center justify-between">
+            <div className="text-lg font-semibold">Transactions</div>
+        </div>
       <TransactionsFilter
         value={filters}
         onChange={handleFiltersChange}
