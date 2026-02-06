@@ -59,7 +59,7 @@ export type CreateGoalContributionInput =
   Pick<GoalContribution, "goalId" | "amountMinor" | "currency" | "dateKey" | "note" | "linkedTransactionId">;
 
 export type UpdateGoalPatch = Partial<
-  Pick<Goal, "name" | "targetAmountMinor" | "deadline" | "status" | "colorKey" | "deletedAt">
+  Pick<Goal, "name" | "targetAmountMinor" | "currentAmountMinor" | "deadline" | "status" | "colorKey" | "deletedAt">
 >;
 
 export type UpdateGoalContributionPatch = Partial<

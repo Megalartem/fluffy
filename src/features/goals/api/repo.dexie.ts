@@ -74,6 +74,8 @@ export class DexieGoalsRepo implements GoalsRepo {
   }
 }
 
+export const goalsRepo = new DexieGoalsRepo();
+
 
 export class DexieGoalContributionsRepo implements GoalContributionsRepo {
   async listByGoalId(workspaceId: string, goalId: string): Promise<GoalContribution[]> {
@@ -147,3 +149,5 @@ export class DexieGoalContributionsRepo implements GoalContributionsRepo {
     await db.goalContributions.put({ ...existing, deletedAt: nowIso(), updatedAt: nowIso() });
   }
 }
+
+export const contributionsRepo = new DexieGoalContributionsRepo();
