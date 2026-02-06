@@ -3,7 +3,7 @@ import type { AppSettings } from "@/features/settings/model/types";
 import type { Transaction } from "@/features/transactions/model/types";
 import type { Category, CategoryColor } from "@/features/categories/model/types";
 import type { MonthlyBudget } from "@/features/budgets/model/types";
-import type { Goal } from "@/features/goals/model/types";
+import type { Goal, GoalContribution } from "@/features/goals/model/types";
 import { IconName } from "lucide-react/dynamic";
 
 
@@ -22,6 +22,8 @@ export class BudgetDB extends Dexie {
   categories!: Table<Category, string>;
   budgets!: Table<MonthlyBudget, string>;
   goals!: Table<Goal, string>;
+
+  goalContributions!: Table<GoalContribution, string>;
 
 
 
@@ -123,6 +125,90 @@ export class BudgetDB extends Dexie {
           if (typeof c.deletedAt === "number") c.deletedAt = new Date(c.deletedAt).toISOString();
         });
       });
+    // v7: goals -> align with amountMinor fields + add goalContributions table
+    this.version(7)
+      .stores({
+        meta: "&key",
+        settings: "&id, workspaceId",
+
+        transactions:
+          "&id, workspaceId, dateKey, type, categoryId, updatedAt, deletedAt, [workspaceId+dateKey], [workspaceId+type], [workspaceId+categoryId], [workspaceId+updatedAt]",
+
+        categories:
+          "&id, workspaceId, type, order, isArchived, updatedAt, deletedAt, [workspaceId+type], [workspaceId+isArchived], [workspaceId+updatedAt]",
+
+        budgets: "&id, workspaceId, month, deletedAt",
+
+        // goals now use *Minor fields + status
+        goals:
+          "&id, workspaceId, status, deadline, updatedAt, deletedAt, [workspaceId+status], [workspaceId+updatedAt]",
+
+        // goalContributions is the source of truth for reserved
+        goalContributions:
+          "&id, workspaceId, goalId, dateKey, linkedTransactionId, updatedAt, deletedAt, [workspaceId+goalId], [workspaceId+dateKey], [workspaceId+updatedAt]",
+      })
+      .upgrade(async (tx) => {
+        // Build workspaceId -> defaultCurrency map from settings (best-effort)
+        const currencyByWs = new Map<string, string>();
+        try {
+          const settingsArr = await tx.table("settings").toArray();
+          for (const s of settingsArr as Array<Partial<AppSettings> & Record<string, unknown>>) {
+            if (typeof s.workspaceId === "string") {
+              const cur = s.defaultCurrency;
+              if (typeof cur === "string" && cur.trim()) currencyByWs.set(s.workspaceId, cur);
+            }
+          }
+        } catch {
+          // ignore
+        }
+
+        // --- goals: targetAmount/currentAmount -> *Minor, title -> name, add currency/status
+        await tx.table("goals").toCollection().modify((g: Partial<Goal> & Record<string, unknown>) => {
+          // name
+          if (!g.name && typeof g.title === "string") g.name = g.title as string;
+
+          // targetAmountMinor
+          if (typeof g.targetAmountMinor !== "number") {
+            const legacy = g.targetAmount;
+            if (typeof legacy === "number") g.targetAmountMinor = Math.round(legacy);
+            else if (typeof legacy === "string") {
+              const n = Number(legacy);
+              if (Number.isFinite(n)) g.targetAmountMinor = Math.round(n);
+            }
+          }
+
+          // currentAmountMinor
+          if (typeof g.currentAmountMinor !== "number") {
+            const legacy = g.currentAmount;
+            if (typeof legacy === "number") g.currentAmountMinor = Math.round(legacy);
+            else if (typeof legacy === "string") {
+              const n = Number(legacy);
+              if (Number.isFinite(n)) g.currentAmountMinor = Math.round(n);
+            } else {
+              g.currentAmountMinor = 0;
+            }
+          }
+
+          // currency
+          if (typeof g.currency !== "string" || !g.currency) {
+            const ws = typeof g.workspaceId === "string" ? g.workspaceId : "";
+            g.currency = currencyByWs.get(ws) ?? "RUB";
+          }
+
+          // status
+          if (g.status !== "active" && g.status !== "completed" && g.status !== "archived") {
+            g.status = "active";
+          }
+
+          // timestamps normalization
+          if (typeof g.createdAt === "number") g.createdAt = new Date(g.createdAt as number).toISOString();
+          if (typeof g.updatedAt === "number") g.updatedAt = new Date(g.updatedAt as number).toISOString();
+          if (typeof g.deletedAt === "number") g.deletedAt = new Date(g.deletedAt as number).toISOString();
+
+          // normalize empty strings
+          if (g.deadline === "") g.deadline = null;
+        });
+      });
   }
 }
 
@@ -144,10 +230,10 @@ export async function ensureDbInitialized(): Promise<void> {
   const key = "schemaVersion";
   const existing = await db.meta.get(key);
   if (!existing) {
-    await db.meta.put({ key, value: "6", updatedAt: nowIso() });
+    await db.meta.put({ key, value: "7", updatedAt: nowIso() });
     return;
   }
-  if (existing.value !== "6") {
-    await db.meta.put({ key, value: "6", updatedAt: nowIso() });
+  if (existing.value !== "7") {
+    await db.meta.put({ key, value: "7", updatedAt: nowIso() });
   }
 }
