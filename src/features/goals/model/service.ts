@@ -4,9 +4,9 @@ import { AppError } from "@/shared/errors/app-error";
 import type { GoalsRepo, GoalContributionsRepo } from "@/features/goals/api/repo";
 import type {
   CreateGoalInput,
-  CreateGoalContributionInput,
   Goal,
   UpdateGoalPatch,
+  ContributeToGoalInput,
 } from "./types";
 
 import type { CreateTransactionInput } from "@/features/transactions/model/types";
@@ -94,9 +94,7 @@ export class GoalsService {
    */
   async contribute(
     workspaceId: string,
-    input: Omit<CreateGoalContributionInput, "currency" | "linkedTransactionId"> & {
-      dateKey?: string;
-    }
+    input: ContributeToGoalInput
   ): Promise<Goal> {
     const amountMinor = Math.round(input.amountMinor);
     if (!Number.isFinite(amountMinor) || amountMinor <= 0) {
