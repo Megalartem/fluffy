@@ -32,3 +32,5 @@ export { Overlay } from './Overlay/Overlay';
 
 
 export { OptionBase, type IOptionBase, type OptionItem } from './OptionBase/OptionBase';
+
+export { GoalProgressRing } from './GoalProgressRing/GoalProgressRing';
