@@ -5,7 +5,6 @@ import { GoalProgressRing, Text } from "@/shared/ui/atoms";
 import { fromMinorByCurrency } from "@/shared/lib/money/helper";
 import styles from "./GoalItem.module.css";
 import { GoalStatusBadge } from "../GoalStatusBadge";
-import clsx from "clsx";
 
 export type GoalItemSize = "m" | "l" | "xl";
 export type GoalItemTone = "default" | "muted" | "ghost";
