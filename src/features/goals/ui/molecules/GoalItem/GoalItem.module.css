@@ -1,0 +1,40 @@
+.root{
+  width: 100%;
+  position: relative;
+}
+
+.root.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.leading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Лёгкая “приглушённость” архива */
+.leading[data-goal-status="archived"] {
+  opacity: 0.7;
+}
+
+/* Едва заметное усиление для completed */
+.leading[data-goal-status="completed"] {
+  filter: saturate(1.05);
+}
+
+.subtitle {
+  display: flex;
+  flex-direction: column;
+}
+
+.title.root.column {
+  align-items: center;
+}
+
+.statusBadge {
+  position: absolute;
+  top: var(--spacing-2);
+  right: var(--spacing-2);
+}
