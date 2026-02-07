@@ -55,40 +55,33 @@ export function GoalItem({
 
 
   return (
-    <ListRowBase
-      leading={
-        <>
-          <GoalStatusBadge
-            goal={goal}
-            className={styles.statusBadge}
-          />
+    <div className={styles.wrapper}>
+      <GoalStatusBadge goal={goal} className={styles.statusBadge} />
+      <ListRowBase
+        leading={
           <GoalProgressRing size={RING_SIZE_MAP[size]} value={progress} label={label} />
-        </>
-      }
-      title={goal.name}
-      subtitle={
-        <div className={styles.subtitle}>
-          <Text variant="body">
-            {fromMinorByCurrency(goal.currentAmountMinor, goal.currency)}
-            <span className={styles.amountSeparator}> / </span>
-            {fromMinorByCurrency(goal.targetAmountMinor, goal.currency)}
-          </Text>
-          {subtitle && size !== "m" && (
-            <Text variant="caption">
-              {subtitle}
+        }
+        title={goal.name}
+        subtitle={
+          <div className={styles.subtitle}>
+            <Text variant="body">
+              {fromMinorByCurrency(goal.currentAmountMinor, goal.currency)}
+              {" / "}
+              {fromMinorByCurrency(goal.targetAmountMinor, goal.currency)}
             </Text>
-          )}
-        </div>
-      }
-      trailing={trailing}
-      size={size === "m" ? "m" : "l"}
-      tone={STATUS_TONE_MAP[goal.status]}
-      onClick={onClick}
-      className={clsx(styles.root, {
-        [styles.column]: direction === "column",
-      })}
-      ariaLabel={`Open goal: ${goal.name}`}
-    />
+            {subtitle && size !== "m" && (
+              <Text variant="caption">{subtitle}</Text>
+            )}
+          </div>
+        }
+        trailing={trailing}
+        size={size === "m" ? "m" : "l"}
+        tone={STATUS_TONE_MAP[goal.status]}
+        onClick={onClick}
+        className={direction === "column" ? styles.column : undefined}
+        ariaLabel={`Open goal: ${goal.name}`}
+      />
+    </div>
   );
 }
 
