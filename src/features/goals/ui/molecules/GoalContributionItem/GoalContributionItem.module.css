@@ -1,0 +1,22 @@
+.root {
+  width: 100%;
+  display: flex;
+}
+
+.titleRow {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+}
+
+.date {
+  color: var(--color-muted-foreground);
+  white-space: nowrap;
+}
+
+.note {
+  margin-top: var(--spacing-1);
+  color: var(--color-muted-foreground);
+}
