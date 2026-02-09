@@ -60,7 +60,7 @@ export function TransactionsDayGroup({
     return (
         <Card
             variant="default"
-            padding="md"
+            padding="m"
             bgVariant="white"
             className={className}
             onClick={onHeaderClick}

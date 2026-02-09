@@ -4,7 +4,7 @@ import styles from "./Card.module.css";
 import clsx from "clsx";
 
 export type CardVariant = "default" | "ghost";
-export type CardPadding = "md" | "lg";
+export type CardPadding = "m" | "l";
 
 export interface CardProps {
   variant?: CardVariant;
@@ -17,7 +17,7 @@ export interface CardProps {
 
 export const Card: React.FC<CardProps> = ({
   variant = "default",
-  padding = "md",
+  padding = "m",
   bgVariant = "default",
   className,
   children,
