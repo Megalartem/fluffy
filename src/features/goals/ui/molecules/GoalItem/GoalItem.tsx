@@ -63,11 +63,16 @@ export function GoalItem({
         title={goal.name}
         subtitle={
           <div className={styles.subtitle}>
+            <div className={styles.amounts}>
             <Text variant="body">
               {fromMinorByCurrency(goal.currentAmountMinor, goal.currency)}
+              </Text>
+              <Text variant="caption">
               {" / "}
               {fromMinorByCurrency(goal.targetAmountMinor, goal.currency)}
             </Text>
+            </div>
+
             {subtitle && size !== "m" && (
               <Text variant="caption">{subtitle}</Text>
             )}
