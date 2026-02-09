@@ -5,7 +5,7 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: var(--spacing-3, 12px);
+  gap: var(--spacing-4, 12px);
 
   padding: var(--spacing-2);
   border-radius: var(--radius-md);
@@ -42,6 +42,7 @@
 
 .center {
   min-width: 0;
+  width: 100%;
   display: grid;
   gap: var(--spacing-1);
 }

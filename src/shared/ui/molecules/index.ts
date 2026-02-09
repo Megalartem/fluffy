@@ -79,3 +79,9 @@ export type { CarouselProps } from "./Carousel/Carousel";
 
 export { BezelCarousel } from "./BezelCarousel/BezelCarousel";
 export type { BezelCarouselProps } from "./BezelCarousel/BezelCarousel";
+
+export { PageHeader } from "./PageHeader/PageHeader";
+export type { PageHeaderProps } from "./PageHeader/PageHeader";
+
+export { ActionMenu } from "./ActionsMenu/ActionsMenu";
+export type { ActionMenuProps, ActionMenuItem } from "./ActionsMenu/ActionsMenu";
