@@ -1,6 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import styles from "./ListRowBase.module.css";
+import useLongPress from "@/shared/hooks/useLongPress";
 
 export type ListRowBaseTone = "default" | "muted" | "ghost";
 export type ListRowBaseSize = "m" | "l";
@@ -11,6 +12,7 @@ export function ListRowBase({
     subtitle,
     trailing,
     onClick,
+    onLongPress,
     tone = "default",
     size = "m",
     className,
@@ -31,9 +33,13 @@ export function ListRowBase({
     ariaLabel?: string;
     ariaSelected?: boolean;
     disabled?: boolean;
+    onLongPress?: () => void;
 }) {
-    const isInteractive = Boolean(onClick);
-
+    const isInteractive = Boolean(onClick || onLongPress);
+    const longPressHandlers = useLongPress(
+        onLongPress || (() => {}),
+        onClick || (() => {})
+    );
 
     return (
         <div
@@ -45,7 +51,7 @@ export function ListRowBase({
                 isInteractive && styles.interactive,
                 className
             )}
-            onClick={onClick}
+            {...longPressHandlers}
             role={role}
             aria-label={ariaLabel}
             aria-selected={ariaSelected}
