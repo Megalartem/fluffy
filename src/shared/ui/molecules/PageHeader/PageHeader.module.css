@@ -1,0 +1,45 @@
+.root {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* ключ: центр всегда по центру */
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+}
+
+/* Left & right columns take equal available width */
+.side {
+  min-width: 0;
+  display: flex;
+}
+
+.side[data-slot="left"] {
+  justify-content: flex-start;
+}
+
+.side[data-slot="right"] {
+  justify-content: flex-end;
+}
+
+/* Side content stays tight */
+.sideInner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  min-width: 0;
+}
+
+.center {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.title {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
