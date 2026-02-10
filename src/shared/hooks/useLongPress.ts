@@ -1,5 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 
+const LONG_PRESS_THRESHOLD = 350;
+
 type LongPressOptions = {
     shouldPreventDefault?: boolean;
     delay?: number;
@@ -8,7 +10,7 @@ type LongPressOptions = {
 const useLongPress = (
     onLongPress: (event: React.MouseEvent | React.TouchEvent) => void,
     onClick: () => void,
-    { shouldPreventDefault = true, delay = 300 }: LongPressOptions = {}
+    { shouldPreventDefault = true, delay = LONG_PRESS_THRESHOLD }: LongPressOptions = {}
     ) => {
     const [longPressTriggered, setLongPressTriggered] = useState(false);
     const timeout = useRef<ReturnType<typeof setTimeout> | null>(null);
