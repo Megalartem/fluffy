@@ -13,10 +13,11 @@ import type { Category } from "@/features/categories/model/types";
 import type {
   Transaction,
   TransactionType,
-  CurrencyCode,
   CreateTransactionInput,
   UpdateTransactionInput,
 } from "@/features/transactions/model/types";
+
+import { CurrencyCode } from "@/shared/lib/money/helper";
 
 import type { IOptionBase } from "@/shared/ui/atoms";
 import { ButtonBase } from "@/shared/ui/atoms";
