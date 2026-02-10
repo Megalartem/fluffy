@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import clsx from "clsx";
 
-import { ListRowBase } from "@/shared/ui/molecules";
+import { ActionMenu, ActionMenuItem, ListRowBase } from "@/shared/ui/molecules";
 import { Text } from "@/shared/ui/atoms";
 import { fromMinorByCurrency } from "@/shared/lib/money/helper";
 
@@ -27,11 +27,12 @@ export type GoalContributionItemProps = {
 
 export function GoalContributionItem({
   contribution,
-  trailing,
   size = "m",
   tone = "default",
   onClick,
 }: GoalContributionItemProps) {
+  const [isActionsMenuOpen, setIsActionsMenuOpen] = React.useState(false);
+
   const amountText = useMemo(() => {
     const val = fromMinorByCurrency(contribution.amountMinor, contribution.currency);
     return `+ ${val}`;
@@ -40,6 +41,20 @@ export function GoalContributionItem({
   const dateText = useMemo(() => {
     return formatDate(contribution.dateKey);
   }, [contribution.dateKey]);
+
+   const actions: ActionMenuItem[] = [
+    {
+      id: "edit",
+      label: "Edit",
+      onAction: () => {},
+    },
+    {
+      id: "delete",
+      label: "Delete",
+      onAction: () => {},
+      variant: "danger",
+    },
+   ]
 
   const hasNote = Boolean(contribution.note && contribution.note.trim());
 
@@ -63,10 +78,20 @@ export function GoalContributionItem({
           </Text>
         ) : undefined
       }
-      trailing={trailing}
+      trailing={
+        <ActionMenu
+          ariaLabel="Contribution actions"
+          items={actions}
+          onAction={() => {}}
+          triggerButtonBody={<></>}
+          isOpen={isActionsMenuOpen}
+          onOpenChange={setIsActionsMenuOpen}
+        />
+      }
       size={size}
       tone={tone}
       onClick={onClick}
+      onLongPress={() => {setIsActionsMenuOpen(true)}}
       className={clsx(styles.root)}
       ariaLabel={`Open contribution: ${amountText} on ${dateText}`}
     />
