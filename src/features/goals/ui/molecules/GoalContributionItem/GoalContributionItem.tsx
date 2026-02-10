@@ -8,6 +8,7 @@ import { fromMinorByCurrency } from "@/shared/lib/money/helper";
 import type { GoalContribution } from "@/features/goals/model/types";
 import styles from "./GoalContributionItem.module.css";
 import { formatDate } from "@/shared/lib/formatter";
+import { Pencil, Trash2 } from "lucide-react";
 
 export type GoalContributionItemSize = "m" | "l";
 export type GoalContributionItemTone = "default" | "muted" | "ghost";
@@ -45,12 +46,14 @@ export function GoalContributionItem({
    const actions: ActionMenuItem[] = [
     {
       id: "edit",
+      icon: Pencil,
       label: "Edit",
       onAction: () => {},
     },
     {
       id: "delete",
       label: "Delete",
+      icon: Trash2,
       onAction: () => {},
       variant: "danger",
     },
