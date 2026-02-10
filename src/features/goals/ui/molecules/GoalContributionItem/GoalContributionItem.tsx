@@ -23,6 +23,8 @@ export type GoalContributionItemProps = {
   tone?: GoalContributionItemTone;
 
   onClick?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 };
 
 
@@ -31,6 +33,8 @@ export function GoalContributionItem({
   size = "m",
   tone = "default",
   onClick,
+  onDelete,
+  onEdit,
 }: GoalContributionItemProps) {
   const [isActionsMenuOpen, setIsActionsMenuOpen] = React.useState(false);
 
@@ -48,13 +52,13 @@ export function GoalContributionItem({
       id: "edit",
       icon: Pencil,
       label: "Edit",
-      onAction: () => {},
+      onAction: onEdit,
     },
     {
       id: "delete",
       label: "Delete",
       icon: Trash2,
-      onAction: () => {},
+      onAction: onDelete,
       variant: "danger",
     },
    ]
@@ -63,7 +67,6 @@ export function GoalContributionItem({
 
   return (
     <ListRowBase
-      leading={undefined}
       title={
         <div className={styles.titleRow}>
           <Text variant={"body"} className={styles.amount}>
