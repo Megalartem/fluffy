@@ -5,6 +5,7 @@ import { GoalProgressRing, Text } from "@/shared/ui/atoms";
 import { fromMinorByCurrency } from "@/shared/lib/money/helper";
 import styles from "./GoalItem.module.css";
 import { GoalStatusBadge } from "../GoalStatusBadge";
+import clsx from "clsx";
 
 export type GoalItemSize = "m" | "l" | "xl";
 export type GoalItemTone = "default" | "muted" | "ghost";
@@ -63,7 +64,7 @@ export function GoalItem({
         title={goal.name}
         subtitle={
           <div className={styles.subtitle}>
-            <div className={styles.amounts}>
+            <div className={clsx(styles.amounts, direction === "column" && styles.amountsColumn)}>
             <Text variant="body">
               {fromMinorByCurrency(goal.currentAmountMinor, goal.currency)}
               </Text>
