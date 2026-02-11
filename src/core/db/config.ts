@@ -62,6 +62,7 @@ export interface Goal {
   id: string;
   workspaceId: string;
   name: string;
+  note?: string;
   targetAmount: number;
   currentAmount: number;
   currency: string;
@@ -169,6 +170,24 @@ export class FluffyDatabase extends Dexie {
           s.syncStatus = s.syncStatus || "pending";
         });
       });
+
+    this.version(7).stores({
+      transactions:
+        "++id, workspaceId, [workspaceId+date], [workspaceId+type], [workspaceId+categoryId], [workspaceId+updatedAt], [workspaceId+syncStatus], [workspaceId+lastSyncedAt]",
+      budgets:
+        "++id, workspaceId, [workspaceId+categoryId], [workspaceId+updatedAt], [workspaceId+syncStatus], [workspaceId+lastSyncedAt]",
+      categories:
+        "++id, workspaceId, [workspaceId+name], [workspaceId+updatedAt], [workspaceId+syncStatus], [workspaceId+lastSyncedAt]",
+      goals:
+        "++id, workspaceId, [workspaceId+deadline], [workspaceId+updatedAt], [workspaceId+syncStatus], [workspaceId+lastSyncedAt]",
+      settings:
+        "++id, [workspaceId+key], [workspaceId+updatedAt], [workspaceId+syncStatus], [workspaceId+lastSyncedAt]",
+    })
+    .upgrade(async (tx) => {
+      await tx.table("goals").toCollection().modify((g: Goal) => {
+        if (!g.note) g.note = "";
+      });
+    });
   }
 
   /**

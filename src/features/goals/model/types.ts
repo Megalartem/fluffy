@@ -29,6 +29,7 @@ export interface Goal {
 
   // UI-поле (опционально): позволяет иметь разные акценты на карточках целей
   colorKey?: GoalColor | null;
+  note?: string | null;
 
   createdAt: string;
   updatedAt: string;
@@ -54,12 +55,12 @@ export interface GoalContribution {
 }
 
 // Inputs
-export type CreateGoalInput = Pick<Goal, "name" | "targetAmountMinor" | "deadline" | "currentAmountMinor" | "currency" | "status">;
+export type CreateGoalInput = Pick<Goal, "name" | "targetAmountMinor" | "deadline" | "currentAmountMinor" | "currency" | "status" | "note">;
 export type CreateGoalContributionInput =
   Pick<GoalContribution, "goalId" | "amountMinor" | "currency" | "dateKey" | "note" | "linkedTransactionId">;
 
 export type UpdateGoalPatch = Partial<
-  Pick<Goal, "name" | "targetAmountMinor" | "currentAmountMinor" | "deadline" | "status" | "colorKey" | "deletedAt">
+  Pick<Goal, "name" | "targetAmountMinor" | "currentAmountMinor" | "deadline" | "status" | "colorKey" | "deletedAt" | "note">
 >;
 
 export type UpdateGoalContributionPatch = Partial<
