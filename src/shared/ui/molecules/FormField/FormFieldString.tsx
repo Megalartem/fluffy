@@ -19,6 +19,8 @@ type IFormFieldString<T extends FieldValues> = Omit<
   required?: boolean;
   rules?: RegisterOptions<T>;
   fieldType?: "string" | "number" | "select";
+
+  multiline?: boolean;
 };
 
 export function FormFieldString<T extends FieldValues>({
@@ -29,6 +31,7 @@ export function FormFieldString<T extends FieldValues>({
   rules,
   fieldType = "string",
   state,
+  multiline = false,
   ...inputProps
 }: IFormFieldString<T>) {
   const { control } = useFormContext<T>();
@@ -52,6 +55,7 @@ export function FormFieldString<T extends FieldValues>({
         onBlur={field.onBlur}
         onChange={(e) => field.onChange(e.target.value)}
         state={error ? "error" : state ?? "default"}
+        multiline={multiline}
       />
     </FormFieldBase>
   );
