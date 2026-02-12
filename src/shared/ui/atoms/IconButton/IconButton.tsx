@@ -3,6 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import { ButtonBase, type ButtonBaseProps, type ButtonSize, type ButtonVariant } from "../ButtonBase/ButtonBase";
 import { Icon, type IconSize, type IconVariant } from "../Icon/Icon";
 import styles from "./IconButton.module.css";
+import clsx from "clsx";
 
 export type IconButtonVariant = "default" | "muted" | "ghost";
 
@@ -43,7 +44,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
       size={size}
       variant={mapped.button}
       data-size={size}
-      className={[styles.root, className].filter(Boolean).join(" ")}
+      className={clsx(styles.button, className)}
     >
       <Icon icon={icon} size={resolvedIconSize} variant={mapped.icon} />
     </ButtonBase>
