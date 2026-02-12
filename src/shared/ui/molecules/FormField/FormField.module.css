@@ -5,6 +5,7 @@
 }
 
 .label {
+  padding-left: var(--spacing-2);
   display: inline-flex;
   align-items: baseline;
   color: var(--color-text-secondary);
