@@ -13,6 +13,7 @@ import { ButtonBase } from "@/shared/ui/atoms";
 import { BottomSheet, ModalHeader } from "@/shared/ui/molecules";
 import { FormFieldString } from "@/shared/ui/molecules/FormField/FormFieldString";
 import { FormFieldDate } from "@/shared/ui/molecules/FormField/FormFieldDate";
+import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 
 type FormValues = {
   name: string;
@@ -39,6 +40,7 @@ export function GoalUpsertSheet({
   onCreate,
   onUpdate,
 }: GoalUpsertSheetProps) {
+  const { currency } = useWorkspace();
   const isEdit = Boolean(goal);
 
   const form = useForm<FormValues>({
@@ -71,11 +73,11 @@ export function GoalUpsertSheet({
 
     form.reset({
       name: goal.name,
-      targetAmount: fromMinorByCurrency(goal.targetAmountMinor, goal.currency),
+      targetAmount: fromMinorByCurrency(goal.targetAmountMinor, currency),
       deadline: goal.deadline ?? null,
       note: goal.note ?? "", // no note field in goal model yet
     });
-  }, [open, goal, form]);
+  }, [open, goal, form, currency]);
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     form.clearErrors("name");
@@ -88,7 +90,7 @@ export function GoalUpsertSheet({
       return;
     }
 
-    const targetAmountMinor = toMinorByCurrency(values.targetAmount, goal ? goal.currency : "USD");
+    const targetAmountMinor = toMinorByCurrency(values.targetAmount, currency);
     if (targetAmountMinor == null || targetAmountMinor <= 0) {
       form.setError("targetAmount", {
         type: "validate",
@@ -107,7 +109,7 @@ export function GoalUpsertSheet({
           name,
           targetAmountMinor: targetAmountMinor,
           currentAmountMinor: 0,
-          currency: goal!.currency,
+          currency: currency,
           deadline,
           note,
           status: "active",
@@ -164,12 +166,12 @@ export function GoalUpsertSheet({
             name="targetAmount"
             label="Target amount"
             placeholder="0"
-            rightSlot={goal ? goal.currency : "USD"}
+            rightSlot={currency}
             rules={{
               required: "Введите сумму",
               validate: (v) => {
                 if (!v) return "Введите сумму";
-                const minor = toMinorByCurrency(v, goal ? goal.currency : "USD");
+                const minor = toMinorByCurrency(v, currency);
                 if (minor == null || minor <= 0) return "Введите сумму больше нуля";
                 return true;
               },
