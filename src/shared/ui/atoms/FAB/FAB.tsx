@@ -1,14 +1,16 @@
 import React from "react";
-import type { LucideIcon } from "lucide-react";
+import { Plus, type LucideIcon } from "lucide-react";
 import styles from "./FAB.module.css";
 
 interface FABProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  icon: LucideIcon;
+  icon?: LucideIcon;
+  label?: string;
 }
 
 export const FAB: React.FC<FABProps> = ({
-  icon: IconComponent,
+  icon: IconComponent = Plus,
   className = "",
+  label = "FAB",
   type = "button",
   ...props
 }) => {
@@ -16,6 +18,7 @@ export const FAB: React.FC<FABProps> = ({
     <button
       {...props}
       type={type}
+      aria-label={label}
       className={[styles.fab, className].filter(Boolean).join(" ")}
     >
       <IconComponent className={styles.icon} aria-hidden="true" />
