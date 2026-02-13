@@ -17,6 +17,7 @@ interface WorkspaceContextType {
    * Сейчас всегда "ws_local", но в будущем может быть разным
    */
   workspaceId: string;
+  currency: string;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
@@ -30,16 +31,21 @@ const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefin
 export function WorkspaceProvider({
   children,
   workspaceId = DEFAULTS.LOCAL_WORKSPACE_ID,
+  currency = DEFAULTS.CURRENCY,
+
 }: {
   children: ReactNode;
   /** Опциональное переопределение workspaceId (для тестирования) */
   workspaceId?: string;
+  /** Опциональное переопределение валюты (для тестирования) */
+  currency?: string;
 }) {
   const contextValue = useMemo(
     () => ({
       workspaceId,
+      currency,
     }),
-    [workspaceId]
+    [workspaceId, currency]
   );
 
   return (
