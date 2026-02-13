@@ -1,12 +1,45 @@
 "use client";
 
+import { ContributeGoalSheet, GoalUpsertSheet } from "@/features/goals/ui/components";
 import { GoalContributionItem, GoalItem } from "@/features/goals/ui/molecules";
-import { GoalProgressRing } from "@/shared/ui/atoms";
-import { Card } from "@/shared/ui/molecules";
+import { ButtonBase, GoalProgressRing, IconButton } from "@/shared/ui/atoms";
+import { ActionMenu, ActionMenuItem, Card } from "@/shared/ui/molecules";
 import { PageHeader } from "@/shared/ui/molecules/PageHeader/PageHeader";
+import { Archive, ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 
 export default function TestUIGoalsPage() {
+    const [isOpenGoalSheet, setIsOpenGoalSheet] = useState(false);
+    const [isOpenContributionSheet, setIsOpenContributionSheet] = useState(false);
+
+    const goalActions: ActionMenuItem[] = [
+        {
+            id: "edit",
+            icon: Pencil,
+            label: "Edit",
+            onAction: () => {
+                setIsOpenGoalSheet(true);
+            },
+        },
+        {
+            id: "archive",
+            icon: Archive,
+            label: "Archive",
+            onAction: () => {
+                console.log("Archive goal");
+            },
+        },
+        {
+            id: "delete",
+            label: "Delete",
+            icon: Trash2,
+            variant: "danger",
+            onAction: () => {
+                console.log("Delete goal");
+            },
+        },
+    ];
 
     const goal1 = {
         id: "1",
@@ -29,19 +62,6 @@ export default function TestUIGoalsPage() {
         currency: "USD",
         deadline: "2024-06-30",
         status: "completed" as const,
-        workspaceId: "1",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    }
-
-    const goal3 = {
-        id: "3",
-        name: "Emergency Fund",
-        currentAmountMinor: 20000,
-        targetAmountMinor: 100000,
-        currency: "USD",
-        deadline: "2025-01-31",
-        status: "archived" as const,
         workspaceId: "1",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -127,21 +147,43 @@ export default function TestUIGoalsPage() {
                 subtitle="For work and gaming"
                 size="l"
             />
+
+            <PageHeader
+                title="Goals Test Page"
+                left={<IconButton
+                    icon={ArrowLeft}
+                    variant="ghost"
+                    onClick={() => { }}
+                />
+                }
+                right={<ActionMenu items={goalActions} />}
+            />
+
+
             <GoalItem
                 goal={goal2}
                 subtitle="For work and gaming"
                 direction="column"
                 size="xl"
             />
-            <GoalItem
-                goal={goal3}
-                subtitle="For work and gaming"
-                size="m"
-            />
+            <ButtonBase
+                variant="muted"
+                onClick={() => {
+                    setIsOpenGoalSheet(true);
+                }}>
+                Contribute
+            </ButtonBase>
+            <ButtonBase
+                variant="default"
+                onClick={() => {
+                    setIsOpenGoalSheet(true);
+                }}>
+                Contribute
+            </ButtonBase>
 
             <Card
-            padding="m"
-            bgVariant="white"
+                padding="m"
+                bgVariant="white"
             >
                 <div className="flex flex-col gap-2">
                     {contributionArray.map((contribution) => (
@@ -150,12 +192,47 @@ export default function TestUIGoalsPage() {
                             tone="ghost"
                             contribution={contribution}
                             size="m"
-                            onClick={() => {}}
+                            onClick={() => {
+                                setIsOpenContributionSheet(true);
+                            }}
+                            onEdit={() => {
+                                setIsOpenContributionSheet(true);
+                            }}
+                            onDelete={() => {
+                                console.log("Delete contribution", contribution.id);
+                            }}
                         />
                     ))}
                 </div>
             </Card>
 
+            <GoalUpsertSheet
+                open={isOpenGoalSheet}
+                onClose={() => setIsOpenGoalSheet(false)}
+                goal={goal2}
+                onCreate={(input) => {
+                    console.log("Create goal", input);
+                }}
+                onUpdate={(input) => {
+                    console.log("Update goal", input);
+                }}
+            />
+
+            <ContributeGoalSheet
+                goal={goal1}
+                contribution={contributionArray[0]}
+                open={isOpenContributionSheet}
+                onClose={() => setIsOpenContributionSheet(false)}
+                onCreate={(input) => {
+                    console.log("Create contribution", input);
+                } }
+                onUpdate={(input) => {
+                    console.log("Update contribution", input);
+                } }
+                onDelete={(input) => {
+                    console.log("Delete contribution", input);
+                } }
+                />
         </div>
     );
 }
