@@ -77,6 +77,10 @@
   gap: var(--spacing-1);
 }
 
+.clickableArea {
+  display: contents;
+}
+
 .interactive {
   cursor: pointer;
   user-select: none;

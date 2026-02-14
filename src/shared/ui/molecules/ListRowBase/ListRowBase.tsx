@@ -51,17 +51,18 @@ export function ListRowBase({
                 isInteractive && styles.interactive,
                 className
             )}
-            {...longPressHandlers}
             role={role}
             aria-label={ariaLabel}
             aria-selected={ariaSelected}
             aria-disabled={disabled}
         >
-            {leading ? <div className={styles.leading}>{leading}</div> : null}
+            <div className={styles.clickableArea} {...longPressHandlers}>
+                {leading ? <div className={styles.leading}>{leading}</div> : null}
 
-            <div className={styles.center}>
-                <div className={styles.title}>{title}</div>
-                {subtitle ? <div className={styles.subtitle}>{subtitle}</div> : null}
+                <div className={styles.center}>
+                    <div className={styles.title}>{title}</div>
+                    {subtitle ? <div className={styles.subtitle}>{subtitle}</div> : null}
+                </div>
             </div>
 
             {trailing ? <div className={styles.trailing}>{trailing}</div> : null}
