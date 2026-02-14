@@ -83,7 +83,6 @@ export function GoalItem({
       variant: "danger",
     },
    ]
-   console.log("GoalItem render", { goal, progress, label, isArchived });
 
 
   return (
