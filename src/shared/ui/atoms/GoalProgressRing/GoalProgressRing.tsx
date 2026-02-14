@@ -47,6 +47,13 @@ export function GoalProgressRing({
   const [isMounted, setIsMounted] = React.useState(false);
   const isMountedRef = React.useRef(false);
 
+  // Reset mounted state on unmount
+  React.useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   // Animate on mount and value changes
   React.useEffect(() => {
     const targetOffset = geometry.c * (1 - v);
