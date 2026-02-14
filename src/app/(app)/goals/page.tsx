@@ -211,6 +211,7 @@ export default function GoalsPage() {
         goal={editingGoal}
         onCreate={goalCreate}
         onUpdate={handleUpdateGoal}
+        onDelete={handleDeleteGoal}
       />
       <ConfirmDialog
         title="Delete Goal?"
