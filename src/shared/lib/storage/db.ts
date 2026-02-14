@@ -7,6 +7,9 @@ import type { Goal, GoalContribution } from "@/features/goals/model/types";
 import { IconName } from "lucide-react/dynamic";
 
 
+const DB_SCHEMA_VERSION = 8;
+
+
 
 
 export type DbMeta = {
@@ -209,10 +212,71 @@ export class BudgetDB extends Dexie {
           if (g.deadline === "") g.deadline = null;
         });
       });
+
+    // v8: force upgrade to heal schema drift (older v7 builds may have created BudgetDB without some stores)
+    // Keeps the v7 schema as-is, but bumps verno so IndexedDB runs onupgradeneeded and creates any missing object stores.
+    this.version(8)
+      .stores({
+        meta: "&key",
+        settings: "&id, workspaceId",
+
+        transactions:
+          "&id, workspaceId, dateKey, type, categoryId, updatedAt, deletedAt, [workspaceId+dateKey], [workspaceId+type], [workspaceId+categoryId], [workspaceId+updatedAt]",
+
+        categories:
+          "&id, workspaceId, type, order, isArchived, updatedAt, deletedAt, [workspaceId+type], [workspaceId+isArchived], [workspaceId+updatedAt]",
+
+        budgets: "&id, workspaceId, month, deletedAt",
+
+        goals:
+          "&id, workspaceId, status, deadline, updatedAt, deletedAt, [workspaceId+status], [workspaceId+updatedAt]",
+
+        goalContributions:
+          "&id, workspaceId, goalId, dateKey, linkedTransactionId, updatedAt, deletedAt, [workspaceId+goalId], [workspaceId+dateKey], [workspaceId+updatedAt]",
+      })
+      .upgrade(async (tx) => {
+        // Repeat the v7 goal normalization as a best-effort safety net.
+        await tx.table("goals").toCollection().modify((g: Partial<Goal> & Record<string, unknown>) => {
+          if (!g.name && typeof g.title === "string") g.name = g.title as string;
+
+          if (typeof g.targetAmountMinor !== "number") {
+            const legacy = g.targetAmount;
+            if (typeof legacy === "number") g.targetAmountMinor = Math.round(legacy);
+            else if (typeof legacy === "string") {
+              const n = Number(legacy);
+              if (Number.isFinite(n)) g.targetAmountMinor = Math.round(n);
+            }
+          }
+
+          if (typeof g.currentAmountMinor !== "number") {
+            const legacy = g.currentAmount;
+            if (typeof legacy === "number") g.currentAmountMinor = Math.round(legacy);
+            else if (typeof legacy === "string") {
+              const n = Number(legacy);
+              if (Number.isFinite(n)) g.currentAmountMinor = Math.round(n);
+            } else {
+              g.currentAmountMinor = 0;
+            }
+          }
+
+          if (g.status !== "active" && g.status !== "completed" && g.status !== "archived") {
+            g.status = "active";
+          }
+
+          if (typeof g.createdAt === "number") g.createdAt = new Date(g.createdAt as number).toISOString();
+          if (typeof g.updatedAt === "number") g.updatedAt = new Date(g.updatedAt as number).toISOString();
+          if (typeof g.deletedAt === "number") g.deletedAt = new Date(g.deletedAt as number).toISOString();
+
+          if (g.deadline === "") g.deadline = null;
+        });
+      });
   }
 }
 
 export const db = new BudgetDB();
+
+let ensuredSchemaVersion: string | null = null;
+let ensureInFlight: Promise<void> | null = null;
 
 export function nowIso(): string {
   return new Date().toISOString();
@@ -227,13 +291,30 @@ export function todayIsoDate(): string {
 }
 
 export async function ensureDbInitialized(): Promise<void> {
-  const key = "schemaVersion";
-  const existing = await db.meta.get(key);
-  if (!existing) {
-    await db.meta.put({ key, value: "7", updatedAt: nowIso() });
-    return;
-  }
-  if (existing.value !== "7") {
-    await db.meta.put({ key, value: "7", updatedAt: nowIso() });
+  const target = String(DB_SCHEMA_VERSION);
+  if (ensuredSchemaVersion === target) return;
+  if (ensureInFlight) return ensureInFlight;
+
+  // Important: this may be called from inside a Dexie transaction that doesn't include `meta`.
+  // If we don't ignore the ambient transaction, IndexedDB will throw NotFoundError
+  // when trying to access an objectStore that wasn't included in the transaction scope.
+  ensureInFlight = Dexie.ignoreTransaction(async () => {
+    const key = "schemaVersion";
+    const existing = await db.meta.get(key);
+    if (!existing) {
+      await db.meta.put({ key, value: target, updatedAt: nowIso() });
+      ensuredSchemaVersion = target;
+      return;
+    }
+    if (existing.value !== target) {
+      await db.meta.put({ key, value: target, updatedAt: nowIso() });
+    }
+    ensuredSchemaVersion = target;
+  });
+
+  try {
+    await ensureInFlight;
+  } finally {
+    ensureInFlight = null;
   }
 }

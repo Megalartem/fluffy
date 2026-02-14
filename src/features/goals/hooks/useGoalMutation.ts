@@ -4,6 +4,7 @@ import * as React from "react";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import type { CreateGoalInput, UpdateGoalPatch, ContributeToGoalInput } from "@/features/goals/model/types";
 import { goalsService } from "../model/service";
+import { goalContributionsService } from "@/features/goals/model/contributions.service";
 
 export function useGoalMutation(params: {
   refresh?: () => Promise<void> | void;
@@ -66,5 +67,21 @@ export function useGoalMutation(params: {
     [withState, workspaceId]
   );
 
-  return { goalCreate, goalUpdate, goalDelete, goalContribute, loading, error } as const;
+  const goalRefresh = React.useCallback(async (id: string) => {
+    await withState(async () => {
+      const contributions = await goalContributionsService.listByGoalId(workspaceId, id);
+      const goal = await goalsService.getById(workspaceId, id);
+      if (!goal) return; // goal could be deleted
+
+      const currentAmount = contributions.reduce((sum, c) => sum + c.amountMinor, 0);
+
+
+      await goalsService.update(workspaceId, id, { 
+        currentAmountMinor: currentAmount,
+        status: goal.status === "archived" ? "archived" : (currentAmount >= goal.targetAmountMinor ? "completed" : "active"),
+       });
+    });
+  }, [withState, workspaceId]);
+
+  return { goalCreate, goalUpdate, goalDelete, goalContribute, goalRefresh, loading, error } as const;
 }
