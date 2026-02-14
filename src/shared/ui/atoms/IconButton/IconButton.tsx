@@ -44,7 +44,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
       size={size}
       variant={mapped.button}
       data-size={size}
-      className={clsx(styles.button, className)}
+      className={clsx(styles.root, className)}
     >
       <Icon icon={icon} size={resolvedIconSize} variant={mapped.icon} />
     </ButtonBase>

@@ -9,11 +9,12 @@ import { toMinorByCurrency, fromMinorByCurrency } from "@/shared/lib/money/helpe
 
 import type { Goal, CreateGoalInput, UpdateGoalInput } from "@/features/goals/model/types";
 
-import { ButtonBase } from "@/shared/ui/atoms";
+import { ButtonBase, IconButton } from "@/shared/ui/atoms";
 import { BottomSheet, ModalHeader } from "@/shared/ui/molecules";
 import { FormFieldString } from "@/shared/ui/molecules/FormField/FormFieldString";
 import { FormFieldDate } from "@/shared/ui/molecules/FormField/FormFieldDate";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
+import { Trash2 } from "lucide-react";
 
 type FormValues = {
   name: string;
@@ -31,6 +32,7 @@ export type GoalUpsertSheetProps = {
 
   onCreate: (input: CreateGoalInput) => Promise<void> | void;
   onUpdate: (input: UpdateGoalInput) => Promise<void> | void;
+  onDelete?: (input: Goal) => Promise<void> | void;
 };
 
 export function GoalUpsertSheet({
@@ -39,6 +41,7 @@ export function GoalUpsertSheet({
   goal,
   onCreate,
   onUpdate,
+  onDelete,
 }: GoalUpsertSheetProps) {
   // TODO: move currency to form context or pass as prop, so that form can do validation and conversion without needing to know about workspace
   const { currency } = useWorkspace();
@@ -55,12 +58,14 @@ export function GoalUpsertSheet({
   });
 
   const [saving, setSaving] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
 
   // Prefill / reset on open
   React.useEffect(() => {
     if (!open) return;
 
     setSaving(false);
+    setDeleting(false);
 
     if (!goal) {
       form.reset({
@@ -137,6 +142,18 @@ export function GoalUpsertSheet({
     }
   };
 
+  const handleDelete = async () => {
+    if (!isEdit || !onDelete) return;
+
+    setDeleting(true);
+    try {
+      await onDelete(goal!);
+      onClose();
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <BottomSheet
       open={open}
@@ -146,12 +163,23 @@ export function GoalUpsertSheet({
       height="half"
       onClose={onClose}
       footer={
+        <div className={styles.footer}>
         <ButtonBase
           fullWidth
           onClick={form.handleSubmit(onSubmit)}
-          disabled={saving}>
+          disabled={saving || deleting}>
           {saving ? "Saving…" : "Save"}
         </ButtonBase>
+        {isEdit && onDelete && (
+            <IconButton
+              icon={Trash2}
+              variant="default"
+              onClick={handleDelete}
+              disabled={saving || deleting}
+              className={styles.deleteButton}
+            />
+          )}
+      </div>
       }
     >
       <FormProvider {...form}>
