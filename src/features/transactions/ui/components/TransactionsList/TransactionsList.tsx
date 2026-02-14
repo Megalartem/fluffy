@@ -13,7 +13,7 @@ import type { Category } from "@/features/categories/model/types";
 import { Card } from "@/shared/ui/molecules";
 import { Divider } from "@/shared/ui/atoms";
 import { TransactionRow } from "@/features/transactions/ui/molecules";
-import { fromMinorByCurrency } from "@/shared/lib/money/helper";
+import { shownAmount } from "@/shared/lib/money/helper";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 
 export type TransactionListEmptyStateStrings = {
@@ -158,7 +158,7 @@ export function TransactionsList({
         const result: DayGroup[] = [];
         for (const [dateKey, list] of byDay.entries()) {
             const totalMinor = calcDayTotalMinor(list);
-            const totalText = fromMinorByCurrency(totalMinor, currency);
+            const totalText = shownAmount(totalMinor, currency);
 
             result.push({
                 dateKey,
