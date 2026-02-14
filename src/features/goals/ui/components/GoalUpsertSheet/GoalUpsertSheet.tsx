@@ -40,6 +40,7 @@ export function GoalUpsertSheet({
   onCreate,
   onUpdate,
 }: GoalUpsertSheetProps) {
+  // TODO: move currency to form context or pass as prop, so that form can do validation and conversion without needing to know about workspace
   const { currency } = useWorkspace();
   const isEdit = Boolean(goal);
 
