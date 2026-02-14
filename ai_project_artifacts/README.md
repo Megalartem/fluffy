@@ -6,20 +6,29 @@ This directory contains all planning documents, phase reports, and development a
 
 ---
 
-## 📋 Current Status
+## 📋 Current Status (Feb 14, 2026)
 
-| Phase | Name | Status | Duration |
-|-------|------|--------|----------|
-| 1 | Foundation | ✅ Complete | 4-5h |
-| 2 | State & Validation | ✅ Complete | 5-6h |
-| 3 | Components & UX | ✅ Complete | 6-7h |
-| 4 | Cloud-Sync Prep | 🟡 In Progress | 6-8h |
-| 5 | Design System | 🔵 Planned | 8-10h |
-| 6 | Internationalization | 🔵 Planned | 6-8h |
-| 7-10 | Firebase, Auth, PWA, Testing | 🔵 Planned | ~25h |
+**Phase:** Feature Polish & Sprint Planning  
+**Focus:** Completing identified gaps in Goals, Categories, Transactions
 
-**Current Phase:** 4 (Cloud-Sync Preparation & Infrastructure)  
-**Next Focus:** Phase 5-6 (Design System + Internationalization)
+| Feature | Completeness | Status | Priority Tasks |
+|---------|--------------|--------|----------------|
+| Categories | 95% | ✅ Production Ready | ActionMenu (long press), Drag & drop |
+| Transactions | 92% | ✅ Production Ready | ActionMenu + Delete, Note field, Pagination |
+| Goals | 93% | ✅ Production Ready | Color picker |
+
+**Sprint 1 (High Priority):** 7 hours
+- ActionMenu для Categories (long press pattern)
+- ActionMenu + Delete для Transactions
+- Note field для Transactions
+
+**Sprint 2 (Medium Priority):** 9 hours  
+- Color picker для Goals
+- Drag & drop reordering для Categories
+- Load More pagination для Transactions
+
+**Current Phase:** Feature Polish & Sprint Planning (Feb 14, 2026)  
+**Next Focus:** UX Consistency & Missing Features (Sprint 1-2)
 
 ---
 
@@ -27,13 +36,20 @@ This directory contains all planning documents, phase reports, and development a
 
 ### 🎯 Start Here
 
-1. **[NEXT_ITERATIONS_PLAN.md](./NEXT_ITERATIONS_PLAN.md)** ⭐
+**[NEXT_SPRINT_TASKS.md](./NEXT_SPRINT_TASKS.md)** ⭐⭐⭐ NEW
+   - Prioritized task list for Sprint 1-2
+   - Based on feature reviews
+   - High priority: ActionMenu, Delete UI, Note fields
+   - Medium priority: Color picker, Drag & drop, Pagination
+   - Timeline: ~16 hours total
+
+**[NEXT_ITERATIONS_PLAN.md](./NEXT_ITERATIONS_PLAN.md)** ⭐
    - Executive summary of next phases
    - Why Phase 5 before Phase 6
    - Timeline estimate
    - Action items
 
-2. **[DEVELOPMENT_ROADMAP.md](./DEVELOPMENT_ROADMAP.md)**
+**[DEVELOPMENT_ROADMAP.md](./DEVELOPMENT_ROADMAP.md)**
    - All 10 phases at a glance
    - Architecture evolution
    - Milestones and timeline
@@ -41,23 +57,48 @@ This directory contains all planning documents, phase reports, and development a
 
 ---
 
+### 🔬 Feature Reviews (Feb 14, 2026)
+
+**[GOALS_FEATURE_REVIEW.md](./GOALS_FEATURE_REVIEW.md)** — 93% Complete ✅
+- Full architecture & structure
+- Implementation details (CRUD, hooks, UI)
+- Integration points (transactions, settings)
+- Gaps: colorKey not used (future)
+- Production ready
+
+**[CATEGORIES_FEATURE_REVIEW.md](./CATEGORIES_FEATURE_REVIEW.md)** — 95% Complete ✅
+- 22 colors + 1000+ icons system
+- BezelCarousel UI with 3D effect
+- Auto-seeding with smart categories
+- Gaps: drag & drop reordering, type "both"
+- Production ready
+
+**[TRANSACTIONS_FEATURE_REVIEW.md](./TRANSACTIONS_FEATURE_REVIEW.md)** — 92% Complete ✅
+- Day grouping with totals
+- Advanced filtering & sorting
+- Minor units for precision
+- Gaps: note field UI, delete button, pagination
+- Production ready
+
+---
+
 ### 📊 Phase Plans (Detailed)
 
-3. **[PHASE_4_PLAN.md](./PHASE_4_PLAN.md)** — Current
+**[PHASE_4_PLAN.md](./PHASE_4_PLAN.md)** — Current
    - Cloud-sync infrastructure
    - Sync engine with delta-sync
    - Firebase adapter
    - Offline queue & conflict resolution
    - Sync UI components
 
-4. **[PHASE_5_DESIGN_SYSTEM_PLAN.md](./PHASE_5_DESIGN_SYSTEM_PLAN.md)** — Next
+**[PHASE_5_DESIGN_SYSTEM_PLAN.md](./PHASE_5_DESIGN_SYSTEM_PLAN.md)** — Next
    - Design tokens (colors, spacing, typography)
    - Component library alignment
    - Page layout standardization
    - Mobile-first responsive design
    - Component documentation
 
-5. **[PHASE_6_I18N_PLAN.md](./PHASE_6_I18N_PLAN.md)** — Coming Soon
+**[PHASE_6_I18N_PLAN.md](./PHASE_6_I18N_PLAN.md)** — Coming Soon
    - i18n infrastructure (next-intl)
    - Translation file structure
    - Locale routing & middleware
@@ -69,23 +110,23 @@ This directory contains all planning documents, phase reports, and development a
 
 ### ✅ Completion Reports
 
-6. **[PHASE_3_COMPLETION_REPORT.md](./PHASE_3_COMPLETION_REPORT.md)**
+**[PHASE_3_COMPLETION_REPORT.md](./PHASE_3_COMPLETION_REPORT.md)**
    - TransactionSheet refactoring (353 → 140 lines)
    - Design system components created
    - Pagination implementation
    - Backup/Restore features
 
-7. **[REFACTORING_PHASE_1_COMPLETE.md](./REFACTORING_PHASE_1_COMPLETE.md)**
+**[REFACTORING_PHASE_1_COMPLETE.md](./REFACTORING_PHASE_1_COMPLETE.md)**
    - DI container implementation
    - Service locator pattern
    - Basic infrastructure
 
-8. **[REFACTORING_PHASE_2_COMPLETE.md](./REFACTORING_PHASE_2_COMPLETE.md)**
+**[REFACTORING_PHASE_2_COMPLETE.md](./REFACTORING_PHASE_2_COMPLETE.md)**
    - MetaRegistry with caching
    - AppState context
    - Validators and error handling
 
-9. **[REFACTORING_PHASE_3_COMPLETE.md](./REFACTORING_PHASE_3_COMPLETE.md)**
+**[REFACTORING_PHASE_3_COMPLETE.md](./REFACTORING_PHASE_3_COMPLETE.md)**
    - Component refactoring results
    - Code reduction metrics
    - Design system foundations
@@ -94,27 +135,27 @@ This directory contains all planning documents, phase reports, and development a
 
 ### 📖 Planning & Reference
 
-10. **[REFACTORING_PLAN.md](./REFACTORING_PLAN.md)**
+**[REFACTORING_PLAN.md](./REFACTORING_PLAN.md)**
     - Original refactoring overview
     - Layer structure (UI → Features → Core → DB)
     - Design patterns used
 
-11. **[REFACTORING_TODO.md](./REFACTORING_TODO.md)**
+**[REFACTORING_TODO.md](./REFACTORING_TODO.md)**
     - Detailed task breakdown
     - Progress tracking
     - Subtask organization
 
-12. **[REFACTORING_CHECKLIST.md](./REFACTORING_CHECKLIST.md)**
+**[REFACTORING_CHECKLIST.md](./REFACTORING_CHECKLIST.md)**
     - Quality checklist by phase
     - Code standards verification
     - Testing requirements
 
-13. **[REFACTORING_CODE_EXAMPLES.md](./REFACTORING_CODE_EXAMPLES.md)**
+**[REFACTORING_CODE_EXAMPLES.md](./REFACTORING_CODE_EXAMPLES.md)**
     - Before/after code samples
     - Pattern implementations
     - Best practices examples
 
-14. **[REFACTORING_GUIDE.md](./REFACTORING_GUIDE.md)**
+**[REFACTORING_GUIDE.md](./REFACTORING_GUIDE.md)**
     - Architecture guidelines
     - Coding patterns
     - File organization

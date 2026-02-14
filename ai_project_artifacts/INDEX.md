@@ -1,8 +1,8 @@
 # 📑 Fluffy Iterations Planning - Complete Documentation Index
 
-**Last Updated:** December 23, 2025  
-**Current Phase:** 4 (Cloud-Sync Preparation)  
-**Next Phases:** 5-6 (Design System + Internationalization)
+**Last Updated:** February 14, 2026  
+**Current Phase:** Feature Polish & Sprint Planning  
+**Focus:** Goals (93%), Categories (95%), Transactions (92%)
 
 ---
 
@@ -89,7 +89,43 @@
 
 ---
 
-## 📋 REFERENCE DOCUMENTS
+## � FEATURE REVIEWS & SPRINT PLANNING
+
+### Feature Completeness Reviews (Feb 14, 2026)
+| Document | Feature | Completeness | Status |
+|----------|---------|--------------|--------|
+| [GOALS_FEATURE_REVIEW.md](./GOALS_FEATURE_REVIEW.md) | Goals & Contributions | 93% | ✅ Production Ready |
+| [CATEGORIES_FEATURE_REVIEW.md](./CATEGORIES_FEATURE_REVIEW.md) | Categories & Icons | 95% | ✅ Production Ready |
+| [TRANSACTIONS_FEATURE_REVIEW.md](./TRANSACTIONS_FEATURE_REVIEW.md) | Transactions & Filters | 92% | ✅ Production Ready |
+
+**What's in Reviews:**
+- Complete architecture overview
+- Implementation details
+- Integration points
+- Identified gaps
+- Completeness scoring per layer
+- Recommendations
+
+### Sprint Tasks (Feb 14, 2026)
+**File:** [NEXT_SPRINT_TASKS.md](./NEXT_SPRINT_TASKS.md)
+- **Sprint 1 (High Priority):** 7 hours
+  - ActionMenu для Categories (long press)
+  - ActionMenu + Delete для Transactions
+  - Note field для Transactions
+- **Sprint 2 (Medium Priority):** 9 hours
+  - Color Picker для Goals
+  - Drag & Drop для Categories
+  - Pagination для Transactions
+- **Backlog (Low Priority):** 24 hours
+  - Type "both" support
+  - Transfer full support
+  - Bulk operations
+  - Export/Import
+  - Currency refactoring
+
+---
+
+## �📋 REFERENCE DOCUMENTS
 
 ### Planning & Strategy
 | Document | Purpose | Length |
