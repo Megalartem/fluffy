@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { EmptyState } from "@/shared/ui/molecules/EmptyState/EmptyState";
 import { TransactionsFilter } from "@/features/transactions/ui/components/TransactionsFilter/TransactionsFilter";
 import TransactionUpsertSheet from "@/features/transactions/ui/components/TransactionUpsertSheet/TransactionUpsertSheet";
@@ -16,6 +15,7 @@ import { useTransactionMutations } from "@/features/transactions/hooks/utils/use
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import { useCategories } from "@/features/categories/hooks/useCategories";
 import { ConfirmDialog } from "@/shared/ui/molecules/ConfirmDialog/ConfirmDialog";
+import { useState, useMemo, useCallback } from "react";
 
 const EMPTY_STATES = {
   noTransactions: {
@@ -47,12 +47,11 @@ export default function TransactionsPage() {
   const { workspaceId } = useWorkspace();
   const { items: categories } = useCategories({ includeArchived: true });
 
-  const [filters, setFilters] = React.useState<TransactionsFilterValues>(INITIAL_FILTERS);
-  const [upsertOpen, setUpsertOpen] = React.useState(false);
-  const [editing, setEditing] = React.useState<Transaction | undefined>(undefined);
-  const [deleting, setDeleting] = React.useState<Transaction | undefined>(undefined);
+  const [filters, setFilters] = useState<TransactionsFilterValues>(INITIAL_FILTERS);
+  const [editingTx, setEditingTx] = useState<Transaction | undefined>(undefined);
+  const [deletingTx, setDeletingTx] = useState<Transaction | undefined>(undefined);
 
-  const sortOptions = React.useMemo(
+  const sortOptions = useMemo(
     () => [
       { key: "date", label: "Date" },
       { key: "amount", label: "Amount" },
@@ -72,23 +71,27 @@ export default function TransactionsPage() {
     refresh,
   });
 
-  const handleRefresh = React.useCallback(async () => {
+  const handleRefresh = useCallback(async () => {
     await refresh();
   }, [refresh]);
 
-  const handleRetry = React.useCallback(() => {
+  const handleRetry = useCallback(() => {
     void handleRefresh();
   }, [handleRefresh]);
 
-  const handleCreated = React.useCallback(async (input: CreateTransactionInput) => {
+  const handleCreated = useCallback(async (input: CreateTransactionInput) => {
     await txCreate(input);
     await handleRefresh();
   }, [txCreate, handleRefresh]);
 
-  const handleUpdated = React.useCallback(async (input: UpdateTransactionInput) => {
+  const handleUpdated = useCallback(async (input: UpdateTransactionInput) => {
     await txUpdate(input);
     await handleRefresh();
   }, [handleRefresh, txUpdate]);
+
+  const handleCreateNew = useCallback(() => {
+    setEditingTx({} as Transaction);
+  }, []);
 
   const filtersActive =
     Boolean(filters.query.trim()) ||
@@ -98,27 +101,44 @@ export default function TransactionsPage() {
 
   const isEmpty = !loading && transactions.length === 0;
 
-  const handleOpenCreate = React.useCallback(() => {
-
-    setEditing(undefined);
-    setUpsertOpen(true);
+  const handleOpenCreate = useCallback(() => {
+    setEditingTx(undefined);
   }, []);
 
-  const handleOpenEdit = React.useCallback((tx: Transaction) => {
-    setEditing(tx);
-    setUpsertOpen(true);
+  const handleOpenEdit = useCallback((tx: Transaction) => {
+    setEditingTx(tx);
   }, []);
 
-  const handleResetFilters = React.useCallback(() => {
+  const handleCloseSheet = useCallback(() => {
+    setEditingTx(undefined);
+  }, []);
+
+  const handleResetFilters = useCallback(() => {
     setFilters(INITIAL_FILTERS);
   }, []);
 
-  const handleFiltersChange = React.useCallback((newFilters: TransactionsFilterValues) => {
+  const handleFiltersChange = useCallback((newFilters: TransactionsFilterValues) => {
     setFilters(newFilters);
   }, []);
 
-  const handleDelete = React.useCallback((tx: Transaction) => {
-    setDeleting(tx);
+  const handleDelete = useCallback((tx: Transaction) => {
+    setDeletingTx(tx);
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+  if (deletingTx) {
+    await txRemove(deletingTx.id);
+    setDeletingTx(undefined);
+    await handleRefresh();
+    
+    setTimeout(() => {
+      setEditingTx(undefined);
+    }, 100);
+  }
+}, [deletingTx, txRemove, handleRefresh]);
+
+  const handleCancelDelete = useCallback(() => {
+    setDeletingTx(undefined);
   }, []);
 
   const defaultCategoryId = categories.find(c => c.type === "expense" && !c.isArchived)?.id;
@@ -126,8 +146,8 @@ export default function TransactionsPage() {
   return (
     <div className={styles.body}>
       <div className="flex items-center justify-between">
-            <div className="text-lg font-semibold">Transactions</div>
-        </div>
+        <div className="text-lg font-semibold">Transactions</div>
+      </div>
       <TransactionsFilter
         value={filters}
         onChange={handleFiltersChange}
@@ -153,14 +173,13 @@ export default function TransactionsPage() {
         <TransactionsList
           transactions={transactions}
           categories={categories}
-          currency="USD"
           loading={loading}
           error={error}
           sort={filters.sort}
           onRetry={handleRetry}
           filtersActive={filtersActive}
           onResetFilters={handleResetFilters}
-          onAddTransaction={handleOpenCreate}
+          onAddTransaction={handleCreateNew}
           onTransactionClick={handleOpenEdit}
           onTransactionDelete={handleDelete}
         />
@@ -169,38 +188,29 @@ export default function TransactionsPage() {
       <FAB
         icon={Plus}
         aria-label="Add transaction"
-        onClick={handleOpenCreate}
+        onClick={handleCreateNew}
       />
 
       <TransactionUpsertSheet
-        open={upsertOpen}
-        onClose={() => setUpsertOpen(false)}
-        workspaceId={workspaceId}
-        currency="USD"
+        open={editingTx !== undefined}
         categories={categories}
-        type="expense"
-        initial={editing}
+        transaction={editingTx}
+
+        onClose={handleCloseSheet}
         onCreate={handleCreated}
         onUpdate={handleUpdated}
+        onDelete={setDeletingTx}
         defaultCategoryState={defaultCategoryId ? { id: defaultCategoryId, type: "expense" } : undefined}
       />
-      
+
       <ConfirmDialog
-      title="Delete transaction?"
-      description="Are you sure you want to delete this transaction? This action cannot be undone."
-      confirmLabel="Delete"
-      cancelLabel="Cancel"
-      open={deleting !== undefined}
-      onConfirm={async () => {
-        if (deleting) {
-          await txRemove(deleting.id);
-          setDeleting(undefined);
-          await handleRefresh();
-        }
-      }}
-      onCancel={function (): void {
-        setDeleting(undefined);
-      } }
+        title="Delete transaction?"
+        description="Are you sure you want to delete this transaction? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        open={deletingTx !== undefined}
+        onConfirm={confirmDelete}
+        onCancel={handleCancelDelete}
       />
     </div>
   );

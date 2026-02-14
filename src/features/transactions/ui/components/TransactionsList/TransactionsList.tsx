@@ -14,6 +14,7 @@ import { Card } from "@/shared/ui/molecules";
 import { Divider } from "@/shared/ui/atoms";
 import { TransactionRow } from "@/features/transactions/ui/molecules";
 import { fromMinorByCurrency } from "@/shared/lib/money/helper";
+import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 
 export type TransactionListEmptyStateStrings = {
     noTransactionsTitle: string;
@@ -93,7 +94,6 @@ function calcDayTotalMinor(transactions: Transaction[]): number {
 export type ITransactionList = {
     transactions: Transaction[];
     categories: Category[];
-    currency: string;
 
     /** Current sort selection; used to avoid overriding sorted data */
     sort?: TransactionsFilterValues["sort"];
@@ -120,7 +120,6 @@ export type ITransactionList = {
 export function TransactionsList({
     transactions,
     categories,
-    currency,
     sort,
     loading = false,
     error,
@@ -133,6 +132,7 @@ export function TransactionsList({
     empty,
     className,
 }: ITransactionList) {
+    const { currency } = useWorkspace();
     const strings = React.useMemo(() => ({ ...DEFAULT_EMPTY, ...(empty ?? {}) }), [empty]);
 
     const categoryById = React.useMemo(() => {

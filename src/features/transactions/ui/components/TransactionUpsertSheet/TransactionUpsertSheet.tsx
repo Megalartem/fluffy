@@ -17,10 +17,9 @@ import type {
   UpdateTransactionInput,
 } from "@/features/transactions/model/types";
 
-import { CurrencyCode } from "@/shared/lib/money/helper";
 
 import type { IOptionBase } from "@/shared/ui/atoms";
-import { ButtonBase } from "@/shared/ui/atoms";
+import { ButtonBase, IconButton } from "@/shared/ui/atoms";
 import { BottomSheet, ModalHeader } from "@/shared/ui/molecules";
 
 import { FormFieldString } from "@/shared/ui/molecules/FormField/FormFieldString";
@@ -38,6 +37,8 @@ import { renderCategoryIcon } from "@/shared/lib/renderCategoryIcon";
 
 import { toMinorByCurrency, fromMinorByCurrency } from "@/shared/lib/money/helper";
 import { AppError } from "@/shared/errors/app-error";
+import { Trash2 } from "lucide-react";
+import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 
 interface defaultCategoryState {
   id: string;
@@ -46,29 +47,14 @@ interface defaultCategoryState {
 
 interface ITransactionUpsertSheet {
   open: boolean;
-  onClose: () => void;
-
-  workspaceId: string;
-  /**
-   * Initial transaction type context.
-   * For MVP we still allow switching between expense/income inside the form
-   * (unless `type === "transfer"`, then type is fixed).
-   */
-  type: TransactionType;
-  currency: CurrencyCode;
-
   categories: Category[];
   defaultCategoryState?: defaultCategoryState;
+  transaction?: Transaction;
 
-  /**
-   * Если передали initial — считаем, что это edit.
-   * (Можно заменить на mode, но так проще в интеграции: initial? значит edit)
-   */
-  initial?: Transaction;
-
-  /** Можно оставить note на потом: в MVP держим null/как есть */
+  onClose: () => void;
   onCreate: (input: CreateTransactionInput) => Promise<void> | void;
   onUpdate: (input: UpdateTransactionInput) => Promise<void> | void;
+  onDelete?: (input: Transaction) => void;
 };
 
 const todayKey = () => new Date().toISOString().slice(0, 10); // YYYY-MM-DD
@@ -88,20 +74,19 @@ type FormValues = {
 export function TransactionUpsertSheet({
   open,
   onClose,
-  workspaceId,
-  type,
-  currency,
   categories,
   defaultCategoryState,
-  initial,
+  transaction,
   onCreate,
   onUpdate,
+  onDelete,
 }: ITransactionUpsertSheet) {
-  const isEdit = Boolean(initial);
+  const isEdit = Boolean(transaction?.id);
+  const { workspaceId, currency } = useWorkspace();
 
   const form = useForm<FormValues>({
     defaultValues: {
-      type: type === "transfer" ? "transfer" : TYPE_OPTIONS[0].value,
+      type: transaction?.type === "transfer" ? "transfer" : (defaultCategoryState?.type ?? TYPE_OPTIONS[0].value),
       amount: "",
       categoryId: null,
       dateKey: todayKey(),
@@ -114,7 +99,7 @@ export function TransactionUpsertSheet({
 
   // Watch type to adjust category options if needed.
   const watchedType = useWatch({ control: form.control, name: "type" });
-  const txTypeForOptions = type === "transfer" ? "transfer" : watchedType;
+  const txTypeForOptions = transaction?.type === "transfer" ? "transfer" : watchedType;
 
   // Options for CategoriesSheet and for FormSelectField (display)
   const categoryOptions = React.useMemo<IOptionBase[]>(
@@ -143,14 +128,10 @@ export function TransactionUpsertSheet({
     setSaving(false);
     setCatOpen(false);
 
-    if (!initial) {
+    if (!transaction) {
       // create
-      const initialType: TransactionType =
-        type === "transfer"
-          ? "transfer"
-          : (defaultCategoryState?.type ?? TYPE_OPTIONS[0].value);
-      const defaultId =
-        initialType === "transfer" ? null : (defaultCategoryState?.id ?? null);
+      const initialType: TransactionType = defaultCategoryState?.type ?? TYPE_OPTIONS[0].value;
+      const defaultId = defaultCategoryState?.id ?? null;
 
       const isDefaultIdValid =
         Boolean(defaultId) && categories.some((c) => c.id === defaultId);
@@ -166,20 +147,20 @@ export function TransactionUpsertSheet({
 
     // edit
     form.reset({
-      type: initial.type,
-      amount: fromMinorByCurrency(initial.amountMinor, currency),
-      categoryId: initial.categoryId ?? null,
-      dateKey: initial.dateKey,
+      type: transaction.type,
+      amount: fromMinorByCurrency(transaction.amountMinor, transaction.currency),
+      categoryId: transaction.categoryId ?? null,
+      dateKey: transaction.dateKey,
     });
-  }, [open, initial, currency, form, type, defaultCategoryState, categories]);
+  }, [open, transaction, form, defaultCategoryState, categories]);
 
   // transfer: category always null and picker must be closed
   React.useEffect(() => {
-    if (type !== "transfer") return;
+    if (transaction?.type !== "transfer") return;
     setCatOpen(false);
     form.setValue("categoryId", null, { shouldValidate: true });
     form.setValue("type", "transfer", { shouldValidate: true });
-  }, [type, form]);
+  }, [transaction, form]);
 
   const categoryId = useWatch({ control: form.control, name: "categoryId" });
   const chosenCategory = React.useMemo<IOptionBase[] | null>(() => {
@@ -192,7 +173,7 @@ export function TransactionUpsertSheet({
 
     form.clearErrors("amount");
 
-    const amountMinor = toMinorByCurrency(values.amount, currency);
+    const amountMinor = toMinorByCurrency(values.amount, transaction?.currency ?? currency);
     if (amountMinor == null || amountMinor <= 0) {
       form.setError("amount", {
         type: "validate",
@@ -214,7 +195,7 @@ export function TransactionUpsertSheet({
           workspaceId,
           type: values.type,
           amountMinor,
-          currency,
+          currency: transaction?.currency ?? currency,
           categoryId: categoryIdValue,
           note: null,
           dateKey,
@@ -231,7 +212,7 @@ export function TransactionUpsertSheet({
         };
 
         const input: UpdateTransactionInput = {
-          id: initial!.id,
+          id: transaction!.id,
           patch,
         };
 
@@ -255,6 +236,12 @@ export function TransactionUpsertSheet({
     }
   };
 
+
+  const handleDelete = () => {
+    if (!isEdit || !onDelete || !transaction) return;
+    onDelete(transaction);
+  };
+
   return (
     <>
       <BottomSheet
@@ -268,6 +255,7 @@ export function TransactionUpsertSheet({
         height="half"
         onClose={onClose}
         footer={
+          <div className={styles.footer}>
           <ButtonBase
             fullWidth
             onClick={form.handleSubmit(onSubmit)}
@@ -275,12 +263,22 @@ export function TransactionUpsertSheet({
           >
             {saving ? "Saving…" : "Save"}
           </ButtonBase>
+          {isEdit && onDelete && (
+            <IconButton
+              icon={Trash2}
+              variant="default"
+              onClick={handleDelete}
+              disabled={saving}
+              className={styles.deleteButton}
+            />
+          )}
+          </div>
         }
       >
         <FormProvider {...form}>
           <div className={styles.form}>
             {/* Type (MVP): allow switching expense/income unless transfer */}
-            {type !== "transfer" && (
+            {transaction?.type !== "transfer" && (
               <FormFieldSegment<FormValues, TransactionType>
                 name="type"
                 label="Transaction type"
@@ -337,7 +335,7 @@ export function TransactionUpsertSheet({
         </FormProvider>
       </BottomSheet>
 
-      {type !== "transfer" && (
+      {transaction?.type !== "transfer" && (
         <CategoriesSheet
           open={catOpen}
           mode="single"
@@ -346,7 +344,6 @@ export function TransactionUpsertSheet({
           options={categoryOptions}
           chosenOptions={chosenCategory}
           onChange={(val) => {
-            // live preview: update field value while browsing
             const next = Array.isArray(val) && val[0] ? String(val[0].value) : null;
             form.setValue("categoryId", next, { shouldValidate: true });
           }}
