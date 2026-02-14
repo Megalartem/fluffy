@@ -97,7 +97,7 @@ export default function CategoriesPage() {
                 open={editingCategory !== undefined}
                 onClose={handleCloseSheet}
                 workspaceId={workspaceId}
-                initial={editingCategory}
+                category={editingCategory}
                 onCreate={handleCreate}
                 onUpdate={handleUpdate}
             />

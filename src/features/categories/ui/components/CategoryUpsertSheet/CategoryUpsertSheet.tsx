@@ -33,8 +33,7 @@ export interface CategoryUpsertSheetProps {
 
   workspaceId: string;
 
-  /** если передали initial — edit mode */
-  initial?: Category;
+  category?: Category;
 
   onCreate: (input: CreateCategoryInput) => Promise<void> | void;
   onUpdate: (input: UpdateCategoryInput) => Promise<void> | void;
@@ -57,11 +56,11 @@ const TYPE_OPTIONS: Array<{ value: CategoryType; label: string }> = [
 export function CategoryUpsertSheet({
   open,
   onClose,
-  initial,
+  category,
   onCreate,
   onUpdate,
 }: CategoryUpsertSheetProps) {
-  const isEdit = Boolean(initial?.id);
+  const isEdit = Boolean(category?.id);
   const [saving, setSaving] = React.useState(false);
   const [isChooseIconSheetOpen, setIsChooseIconSheetOpen] = React.useState(false);
 
@@ -81,7 +80,7 @@ export function CategoryUpsertSheet({
 
     setSaving(false);
 
-    if (!initial?.id) {
+    if (!category?.id) {
       form.reset({
         name: "",
         type: "expense",
@@ -92,12 +91,12 @@ export function CategoryUpsertSheet({
     }
 
     form.reset({
-      name: initial.name,
-      type: initial.type,
-      iconKey: initial.iconKey,
-      colorKey: initial.colorKey,
+      name: category.name,
+      type: category.type,
+      iconKey: category.iconKey,
+      colorKey: category.colorKey,
     });
-  }, [open, initial, form]);
+  }, [open, category, form]);
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     form.clearErrors("name");
@@ -129,7 +128,7 @@ export function CategoryUpsertSheet({
           colorKey: values.colorKey,
         };
 
-        await onUpdate({ id: initial!.id, patch });
+        await onUpdate({ id: category!.id, patch });
       }
 
       onClose();
