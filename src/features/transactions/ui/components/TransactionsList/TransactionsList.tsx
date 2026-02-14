@@ -13,7 +13,6 @@ import type { Category } from "@/features/categories/model/types";
 import { Card } from "@/shared/ui/molecules";
 import { Divider } from "@/shared/ui/atoms";
 import { TransactionRow } from "@/features/transactions/ui/molecules";
-import { dynamicIconImports, type IconName } from "lucide-react/dynamic";
 import { fromMinorByCurrency } from "@/shared/lib/money/helper";
 
 export type TransactionListEmptyStateStrings = {
@@ -104,6 +103,7 @@ export type ITransactionList = {
     filtersActive?: boolean;
 
     onTransactionClick?: (tx: Transaction) => void;
+    onTransactionDelete?: (tx: Transaction) => void;
     onAddTransaction?: () => void;
     onResetFilters?: () => void;
     onRetry?: () => void;
@@ -111,23 +111,6 @@ export type ITransactionList = {
     empty?: Partial<TransactionListEmptyStateStrings>;
     className?: string;
 };
-
-const lazyIconCache = new Map<IconName, React.LazyExoticComponent<React.ComponentType<{ className?: string; size?: string | number }>>>();
-
-function getLazyLucideIcon(name: IconName) {
-    const cached = lazyIconCache.get(name);
-    if (cached) return cached;
-
-    const importer = dynamicIconImports[name];
-    if (!importer) {
-        const Fallback = () => null;
-        return Fallback;
-    }
-
-    const LazyIcon = React.lazy(importer);
-    lazyIconCache.set(name, LazyIcon);
-    return LazyIcon;
-}
 
 /**
  * UI component for the Transactions page content area.
@@ -143,6 +126,7 @@ export function TransactionsList({
     error,
     filtersActive = false,
     onTransactionClick,
+    onTransactionDelete,
     onAddTransaction,
     onResetFilters,
     onRetry,
@@ -252,7 +236,7 @@ export function TransactionsList({
     return (
         <div className={clsx(styles.root, className)}>
             {renderFlat ? (
-                <Card variant="default" padding="md" bgVariant="white">
+                <Card variant="default" padding="m" bgVariant="white">
                     {transactions.map((t, idx) => {
                         const category = categoryById.get(t.categoryId ?? "");
                         if (!category) return null;
@@ -260,14 +244,10 @@ export function TransactionsList({
                         return (
                             <React.Fragment key={t.id}>
                                 <TransactionRow
-                                    title={category.name}
-                                    subtitle={undefined}
-                                    amount={t.amountMinor}
-                                    currency={t.currency}
-                                    txType={t.type}
-                                    icon={getLazyLucideIcon(category.iconKey)}
-                                    categoryColor={category.colorKey}
+                                    transaction={t}
+                                    category={category}
                                     onClick={() => onTransactionClick?.(t)}
+                                    onDelete={() => onTransactionDelete?.(t)}
                                     tone="ghost"
                                     size="m"
                                 />
@@ -285,6 +265,7 @@ export function TransactionsList({
                         title={g.title}
                         totalText={g.totalText}
                         onTransactionClick={onTransactionClick}
+                        onTransactionDelete={onTransactionDelete}
                     />
                 ))
             )}

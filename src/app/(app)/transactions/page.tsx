@@ -15,6 +15,7 @@ import { TransactionsList } from "@/features/transactions/ui/components";
 import { useTransactionMutations } from "@/features/transactions/hooks/utils/useTransactionMutation";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import { useCategories } from "@/features/categories/hooks/useCategories";
+import { ConfirmDialog } from "@/shared/ui/molecules/ConfirmDialog/ConfirmDialog";
 
 const EMPTY_STATES = {
   noTransactions: {
@@ -49,6 +50,7 @@ export default function TransactionsPage() {
   const [filters, setFilters] = React.useState<TransactionsFilterValues>(INITIAL_FILTERS);
   const [upsertOpen, setUpsertOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<Transaction | undefined>(undefined);
+  const [deleting, setDeleting] = React.useState<Transaction | undefined>(undefined);
 
   const sortOptions = React.useMemo(
     () => [
@@ -65,7 +67,7 @@ export default function TransactionsPage() {
     categories,
   });
 
-  const { txCreate, txUpdate } = useTransactionMutations({
+  const { txCreate, txUpdate, txRemove } = useTransactionMutations({
     workspaceId,
     refresh,
   });
@@ -115,6 +117,10 @@ export default function TransactionsPage() {
     setFilters(newFilters);
   }, []);
 
+  const handleDelete = React.useCallback((tx: Transaction) => {
+    setDeleting(tx);
+  }, []);
+
   const defaultCategoryId = categories.find(c => c.type === "expense" && !c.isArchived)?.id;
 
   return (
@@ -156,6 +162,7 @@ export default function TransactionsPage() {
           onResetFilters={handleResetFilters}
           onAddTransaction={handleOpenCreate}
           onTransactionClick={handleOpenEdit}
+          onTransactionDelete={handleDelete}
         />
       )}
 
@@ -176,6 +183,24 @@ export default function TransactionsPage() {
         onCreate={handleCreated}
         onUpdate={handleUpdated}
         defaultCategoryState={defaultCategoryId ? { id: defaultCategoryId, type: "expense" } : undefined}
+      />
+      
+      <ConfirmDialog
+      title="Delete transaction?"
+      description="Are you sure you want to delete this transaction? This action cannot be undone."
+      confirmLabel="Delete"
+      cancelLabel="Cancel"
+      open={deleting !== undefined}
+      onConfirm={async () => {
+        if (deleting) {
+          await txRemove(deleting.id);
+          setDeleting(undefined);
+          await handleRefresh();
+        }
+      }}
+      onCancel={function (): void {
+        setDeleting(undefined);
+      } }
       />
     </div>
   );
