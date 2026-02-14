@@ -175,7 +175,7 @@ export function ContributeGoalSheet({
           >
             {saving ? "Saving…" : "Save"}
           </ButtonBase>
-                    {isEdit && onDelete && (
+          {isEdit && onDelete && (
             <IconButton
               icon={Trash2}
               variant="default"
