@@ -7,7 +7,7 @@ import styles from "./GoalItem.module.css";
 import { GoalStatusBadge } from "../GoalStatusBadge";
 import clsx from "clsx";
 import { useState } from "react";
-import { Archive, Pencil, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, Pencil, Trash2 } from "lucide-react";
 
 export type GoalItemSize = "m" | "l" | "xl";
 export type GoalItemTone = "default" | "muted" | "ghost";
@@ -63,17 +63,20 @@ export function GoalItem({
   const progress = clamp01(goal.currentAmountMinor / goal.targetAmountMinor);
   const label = `${Math.round(progress * 100)}%`;
 
+  const isArchived = goal.status === "archived";
+
   const actions: ActionMenuItem[] = [
     {
       id: "edit",
       icon: Pencil,
       label: "Edit",
       onAction: onEdit,
+      disabled: isArchived,
     },
     {
       id: "archive",
-      icon: Archive,
-      label: "Archive",
+      icon: goal.status === "archived" ? ArchiveRestore : Archive,
+      label: goal.status === "archived" ? "Restore" : "Archive",
       onAction: onArchive,
     },
     {

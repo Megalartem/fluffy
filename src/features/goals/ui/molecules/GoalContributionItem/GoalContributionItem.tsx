@@ -48,22 +48,23 @@ export function GoalContributionItem({
   }, [contribution.dateKey]);
 
    const actions: ActionMenuItem[] = [
-    {
+    onEdit && {
       id: "edit",
       icon: Pencil,
       label: "Edit",
       onAction: onEdit,
     },
-    {
+    onDelete && {
       id: "delete",
       label: "Delete",
       icon: Trash2,
       onAction: onDelete,
       variant: "danger",
     },
-   ]
+   ].filter(Boolean) as ActionMenuItem[];
 
   const hasNote = Boolean(contribution.note && contribution.note.trim());
+  const hasActions = actions.length > 0;
 
   return (
     <ListRowBase
@@ -85,19 +86,21 @@ export function GoalContributionItem({
         ) : undefined
       }
       trailing={
-        <ActionMenu
-          ariaLabel="Contribution actions"
-          items={actions}
-          onAction={() => {}}
-          triggerButtonBody={<></>}
-          isOpen={isActionsMenuOpen}
-          onOpenChange={setIsActionsMenuOpen}
-        />
+        hasActions ? (
+          <ActionMenu
+            ariaLabel="Contribution actions"
+            items={actions}
+            onAction={() => {}}
+            triggerButtonBody={<></>}
+            isOpen={isActionsMenuOpen}
+            onOpenChange={setIsActionsMenuOpen}
+          />
+        ) : undefined
       }
       size={size}
       tone={tone}
       onClick={onClick}
-      onLongPress={() => {setIsActionsMenuOpen(true)}}
+      onLongPress={hasActions ? () => {setIsActionsMenuOpen(true)} : undefined}
       className={clsx(styles.root)}
       ariaLabel={`Open contribution: ${amountText} on ${dateText}`}
     />
