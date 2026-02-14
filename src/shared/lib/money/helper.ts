@@ -47,7 +47,6 @@ export type AmountValidationOptions = {
   soft?: boolean;              // "мягкая" проверка (для onChange)
 };
 
-/** Убираем пробелы, NBSP, приводим запятую к точке. Не форматируем. */
 export function normalizeAmountInput(raw: string): string {
   if (raw == null) return "";
   return String(raw)
@@ -122,7 +121,7 @@ export function toMinor(
  * Keeps a stable string form, avoids floating point issues.
  */
 export function fromMinor(amountMinor: number, decimals = 2): string {
-  if (!Number.isFinite(amountMinor)) return (0).toFixed(decimals);
+  if (!Number.isFinite(amountMinor)) return "0";
 
   const sign = amountMinor < 0 ? "-" : "";
   const abs = Math.abs(Math.trunc(amountMinor));
@@ -131,9 +130,15 @@ export function fromMinor(amountMinor: number, decimals = 2): string {
 
   const base = 10 ** decimals;
   const intPart = Math.floor(abs / base);
-  const fracPart = String(abs % base).padStart(decimals, "0");
+  const fracPart = abs % base;
 
-  return `${sign}${intPart}.${fracPart}`;
+  // Если дробная часть равна 0, возвращаем только целую часть
+  if (fracPart === 0) {
+    return `${sign}${intPart}`;
+  }
+
+  const fracStr = String(fracPart).padStart(decimals, "0");
+  return `${sign}${intPart}.${fracStr}`;
 }
 
 /**
@@ -250,4 +255,19 @@ export function validateAmountStringByCurrency(
 ): true | string {
   const decimals = currencyDecimals(currency);
   return validateAmountString(valueRaw, decimals, { ...options, maxDecimals: options.maxDecimals ?? decimals });
+}
+
+/**
+ * Format number string with thousand separators (space).
+ * Examples:
+ *  "1000" -> "1 000"
+ *  "1000000.50" -> "1 000 000.50"
+ *  "1234.56" -> "1 234.56"
+ */
+export function formatAmountWithSpaces(value: string): string {
+  if (!value) return value;
+  const cleaned = value.replace(/\s/g, "");
+  const [integerPart, decimalPart] = cleaned.split(".");
+  const formatted = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return decimalPart !== undefined ? `${formatted}.${decimalPart}` : formatted;
 }

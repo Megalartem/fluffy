@@ -1,6 +1,6 @@
 import type { IconName } from "lucide-react/dynamic";
 
-export type CategoryType = "expense" | "income" | "both";
+export type CategoryType = "expense" | "income";
 
 export const CATEGORY_COLOR_KEYS = [
   "default",

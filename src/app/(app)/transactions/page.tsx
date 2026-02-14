@@ -141,7 +141,7 @@ export default function TransactionsPage() {
     setDeletingTx(undefined);
   }, []);
 
-  const defaultCategoryId = categories.find(c => c.type === "expense" && !c.isArchived)?.id;
+  const defaultCategory = categories.find(c => c.type === "expense" && !c.isArchived);
 
   return (
     <div className={styles.body}>
@@ -200,7 +200,7 @@ export default function TransactionsPage() {
         onCreate={handleCreated}
         onUpdate={handleUpdated}
         onDelete={setDeletingTx}
-        defaultCategoryState={defaultCategoryId ? { id: defaultCategoryId, type: "expense" } : undefined}
+        defaultCategoryState={defaultCategory ? { id: defaultCategory.id, type: defaultCategory.type } : undefined}
       />
 
       <ConfirmDialog

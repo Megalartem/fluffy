@@ -86,7 +86,7 @@ export function TransactionUpsertSheet({
 
   const form = useForm<FormValues>({
     defaultValues: {
-      type: transaction?.type === "transfer" ? "transfer" : (defaultCategoryState?.type ?? TYPE_OPTIONS[0].value),
+      type: defaultCategoryState?.type ?? TYPE_OPTIONS[0].value,
       amount: "",
       categoryId: null,
       dateKey: todayKey(),
@@ -97,20 +97,20 @@ export function TransactionUpsertSheet({
   const [catOpen, setCatOpen] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
 
-  // Watch type to adjust category options if needed.
   const watchedType = useWatch({ control: form.control, name: "type" });
-  const txTypeForOptions = transaction?.type === "transfer" ? "transfer" : watchedType;
 
-  // Options for CategoriesSheet and for FormSelectField (display)
-  const categoryOptions = React.useMemo<IOptionBase[]>(
-    () =>
-      buildCategoryOptions({
-        categories,
-        txType: txTypeForOptions,
-        renderIcon: renderCategoryIcon,
-      }),
-    [categories, txTypeForOptions]
-  );
+  const categoryOptions = React.useMemo(() => {
+    const effectiveType = watchedType ?? (defaultCategoryState?.type ?? TYPE_OPTIONS[0].value);
+    
+    const opts = buildCategoryOptions({
+      categories,
+      txType: effectiveType,
+      includeArchived: false,
+      renderIcon: renderCategoryIcon,
+    });
+    
+    return opts;
+  }, [categories, watchedType, defaultCategoryState]);
 
   const categoryOptionsByValue = React.useMemo<Record<string, IOptionBase>>(
     () =>
@@ -277,7 +277,6 @@ export function TransactionUpsertSheet({
       >
         <FormProvider {...form}>
           <div className={styles.form}>
-            {/* Type (MVP): allow switching expense/income unless transfer */}
             {transaction?.type !== "transfer" && (
               <FormFieldSegment<FormValues, TransactionType>
                 name="type"
@@ -287,7 +286,6 @@ export function TransactionUpsertSheet({
               />
             )}
 
-            {/* Amount */}
             <FormFieldString<FormValues>
               name="amount"
               label="Amount"
@@ -298,6 +296,7 @@ export function TransactionUpsertSheet({
                 validate: (v) => {
                   if (!v) return "Введите сумму";
                   const minor = toMinorByCurrency(v, currency);
+                  console.log("minor", minor);
                   if (minor == null || minor <= 0) {
                     return "Введите сумму больше нуля";
                   }
@@ -314,14 +313,8 @@ export function TransactionUpsertSheet({
               placeholder="Choose category"
               onOpen={() => setCatOpen(true)}
               optionsByValue={categoryOptionsByValue}
-              rules={{
-                validate: (v) => {
-                  const currentType = form.getValues("type");
-                  if (currentType === "transfer") return true;
-                  return v ? true : "Choose category";
-                },
-              }}
               showChevron
+              removable
               isOpen={catOpen}
             />
 

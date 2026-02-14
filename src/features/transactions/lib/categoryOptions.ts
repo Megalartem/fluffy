@@ -15,7 +15,6 @@ function isCategoryAllowedForTxType(categoryType: Category["type"], txType: Tran
   // transfer не должен иметь категорий
   if (txType === "transfer") return false;
 
-  if (categoryType === "both") return true;
   return categoryType === txType; // expense/income
 }
 
