@@ -28,6 +28,8 @@
 .subtitle {
   display: flex;
   flex-direction: column;
+
+  gap: var(--spacing-2);
 }
 
 .statusBadge {
@@ -44,4 +46,14 @@
 
 .amountsColumn {
   justify-content: center;
+}
+
+.note {
+  white-space: pre-line;
+}
+
+.actionMenuTrigger {
+  width: 1px;
+  height: 1px;
+  padding: 0;
 }

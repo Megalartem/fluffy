@@ -16,9 +16,6 @@ export type GoalItemDirection = "row" | "column";
 export type GoalItemProps = {
   goal: Goal;
 
-  /** Optional small helper text before computed meta */
-  subtitle?: string | null;
-
   trailing?: React.ReactNode;
 
   size?: GoalItemSize;
@@ -50,7 +47,6 @@ function clamp01(x: number) {
 
 export function GoalItem({
   goal,
-  subtitle,
   size = "m",
   direction = "row",
   onClick,
@@ -87,6 +83,7 @@ export function GoalItem({
       variant: "danger",
     },
    ]
+   console.log("GoalItem render", { goal, progress, label, isArchived });
 
 
   return (
@@ -109,8 +106,8 @@ export function GoalItem({
             </Text>
             </div>
 
-            {subtitle && size !== "m" && (
-              <Text variant="caption">{subtitle}</Text>
+            {goal.note && size !== "m" && (
+              <Text variant="caption" className={styles.note}>{goal.note}</Text>
             )}
           </div>
         }
@@ -120,6 +117,7 @@ export function GoalItem({
                     items={actions}
                     onAction={() => {}}
                     triggerButtonBody={<></>}
+                    triggerClassName={styles.actionMenuTrigger}
                     isOpen={isActionsMenuOpen}
                     onOpenChange={setIsActionsMenuOpen}
                   />
