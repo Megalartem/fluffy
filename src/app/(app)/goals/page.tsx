@@ -13,7 +13,7 @@ import { GoalUpsertSheet } from "@/features/goals/ui/components";
 import { GoalItem } from "@/features/goals/ui/molecules";
 
 import { FAB } from "@/shared/ui/atoms";
-import { EmptyState } from "@/shared/ui/molecules";
+import { ConfirmDialog, EmptyState } from "@/shared/ui/molecules";
 import { PageHeader } from "@/shared/ui/molecules/PageHeader/PageHeader";
 import { Skeleton } from "@/shared/ui/molecules";
 
@@ -59,6 +59,7 @@ export default function GoalsPage() {
 
   const [goalSheetOpen, setGoalSheetOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>(undefined);
+  const [goalToDelete, setGoalToDelete] = useState<Goal | undefined>(undefined);
 
   // Track if the goals load attempt has settled (finished loading at least once)
   const [loadSettled, setLoadSettled] = useState(false);
@@ -112,6 +113,7 @@ export default function GoalsPage() {
   }, []);
 
   const openEdit = useCallback((goal: Goal) => {
+    if (goal.status === "archived") return;
     setEditingGoal(goal);
     setGoalSheetOpen(true);
   }, []);
@@ -150,9 +152,9 @@ export default function GoalsPage() {
 
   const handleDeleteGoal = useCallback(
     async (goal: Goal) => {
-      await goalDelete(goal.id);
+      setGoalToDelete(goal);
     },
-    [goalDelete]
+    []
   );
 
   const isInitialLoading = !loadSettled && items.length === 0 && !error;
@@ -209,6 +211,21 @@ export default function GoalsPage() {
         onCreate={goalCreate}
         onUpdate={handleUpdateGoal}
       />
+      <ConfirmDialog
+        title="Delete Goal?"
+        description="Are you sure you want to delete this goal? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        open={goalToDelete !== undefined}
+        onConfirm={async () => {
+          if (goalToDelete) {
+            await goalDelete(goalToDelete.id);
+            setGoalToDelete(undefined);
+          }
+        }}
+        onCancel={() => setGoalToDelete(undefined)}
+      />
+
     </div>
   );
 }

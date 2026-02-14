@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Archive, ArrowLeft, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, ArrowLeft, MoreVertical, Pencil, Trash2 } from "lucide-react";
 
-import type { GoalContribution, GoalStatus } from "@/features/goals/model/types";
+import type { Goal, GoalContribution, GoalStatus } from "@/features/goals/model/types";
 import { useGoal } from "@/features/goals/hooks/useGoal";
 import { useGoalMutation } from "@/features/goals/hooks/useGoalMutation";
 import { useGoalContributions } from "@/features/goals/hooks/useGoalContributions";
@@ -20,6 +20,7 @@ import { PageHeader } from "@/shared/ui/molecules/PageHeader/PageHeader";
 
 import { EmptyState } from "@/shared/ui/molecules/EmptyState/EmptyState";
 import { Skeleton, SkeletonText, ConfirmDialog } from "@/shared/ui/molecules";
+import { useState } from "react";
 
 export default function GoalDetailsPage() {
     const router = useRouter();
@@ -58,29 +59,30 @@ export default function GoalDetailsPage() {
 
 
     // UI state
-    const [isGoalSheetOpen, setIsGoalSheetOpen] = React.useState(false);
-    const [isContributionSheetOpen, setIsContributionSheetOpen] = React.useState(false);
-    const [confirmGoalDeleteOpen, setConfirmGoalDeleteOpen] = React.useState(false);
-    const [confirmContributionDeleteOpen, setConfirmContributionDeleteOpen] = React.useState(false);
-    const [editingContribution, setEditingContribution] = React.useState<
-        GoalContribution | undefined
-    >(undefined);
+    const [isEditingGoal, setIsEditingGoal] = useState(false);
+    const [isCreatingContribution, setIsCreatingContribution] = useState(false);
+    const [editingContribution, setEditingContribution] = React.useState<GoalContribution | undefined>(undefined);
+
+    const [goalToDelete, setGoalToDelete] = useState<Goal | undefined>(undefined);
+    const [contributionToDelete, setContributionToDelete] = useState<GoalContribution | undefined>(undefined);
 
     const toggleArchiveStatus = (status: GoalStatus): GoalStatus =>
         status === "archived" ? "active" : "archived";
+
+    const isArchived = goal?.status === "archived";
 
     const goalActions: ActionMenuItem[] = [
         {
             id: "edit",
             icon: Pencil,
             label: "Edit",
-            onAction: () => setIsGoalSheetOpen(true),
-            disabled: !goal,
+            onAction: () => setIsEditingGoal(true),
+            disabled: !goal || isArchived,
         },
         {
             id: "archive",
-            icon: Archive,
-            label: goal?.status === "archived" ? "Unarchive" : "Archive",
+            icon: goal?.status === "archived" ? ArchiveRestore : Archive,
+            label: goal?.status === "archived" ? "Restore" : "Archive",
             onAction: async () => {
                 if (!goal) return;
                 await goalUpdate(goal.id, { status: toggleArchiveStatus(goal.status) });
@@ -94,7 +96,7 @@ export default function GoalDetailsPage() {
             variant: "danger",
             onAction: async () => {
                 if (!goal) return;
-                setConfirmGoalDeleteOpen(true);
+                setGoalToDelete(goal);
             },
             disabled: !goal,
         },
@@ -194,13 +196,12 @@ export default function GoalDetailsPage() {
             ) : contribs.length === 0 ? (
                 <EmptyState
                     title="No contributions yet"
-                    description="Add a top up to start tracking your progress."
+                    description={isArchived ? "This goal is archived." : "Add a top up to start tracking your progress."}
                     tone="muted"
-                    primaryAction={{
+                    primaryAction={isArchived ? undefined : {
                         label: "Contribute",
                         onClick: () => {
-                            setEditingContribution(undefined);
-                            setIsContributionSheetOpen(true);
+                            setIsCreatingContribution(true);
                         },
                     }}
                 />
@@ -213,17 +214,15 @@ export default function GoalDetailsPage() {
                             tone="ghost"
                             contribution={c}
                             size="m"
-                            onClick={() => {
+                            onClick={isArchived ? undefined : () => {
                                 setEditingContribution(c);
-                                setIsContributionSheetOpen(true);
                             }}
-                            onEdit={() => {
+                            onEdit={isArchived ? undefined : () => {
                                 setEditingContribution(c);
-                                setIsContributionSheetOpen(true);
                             }}
-                            onDelete={() => {
-                                setEditingContribution(c);
-                                setIsContributionSheetOpen(true);
+                            onDelete={isArchived ? undefined : () => {
+                                setContributionToDelete(c);
+                                setEditingContribution(undefined);
                             }}
                         />
                     ))}
@@ -234,12 +233,10 @@ export default function GoalDetailsPage() {
             {goal ? (
                 <>
                     <GoalUpsertSheet
-                        open={isGoalSheetOpen}
-                        onClose={() => setIsGoalSheetOpen(false)}
+                        open={isEditingGoal}
+                        onClose={() => setIsEditingGoal(false)}
                         goal={goal}
-                        onCreate={async () => {
-                            // create on details page is обычно не нужен
-                        }}
+                        onCreate={async () => {}}
                         onUpdate={async (input) => {
                             await goalUpdate(input.id, input.patch);
                         }}
@@ -248,8 +245,11 @@ export default function GoalDetailsPage() {
                     <ContributeGoalSheet
                         goal={goal}
                         contribution={editingContribution}
-                        open={isContributionSheetOpen}
-                        onClose={() => setIsContributionSheetOpen(false)}
+                        open={editingContribution !== undefined || isCreatingContribution}
+                        onClose={() => {
+                            setEditingContribution(undefined);
+                            setIsCreatingContribution(false);
+                        }}
                         onCreate={async (input) => {
                             await goalContribute({
                                 goalId: input.goalId,
@@ -262,25 +262,27 @@ export default function GoalDetailsPage() {
                             await contributionUpdate(input.id, input.patch);
                             await goalRefresh(goal.id);
                         }}
-                        onDelete={async (input) => {
-                            await contributionDelete(input.id);
+                        onDelete={async () => {
+                            setContributionToDelete(editingContribution);
+                            setEditingContribution(undefined);
                         }}
                     />
                 </>
             ) : null}
-            <FAB
-                label="Contribute"
-                onClick={() => {
-                    setEditingContribution(undefined);
-                    setIsContributionSheetOpen(true);
-                }}
-            />
+            {!isArchived && (
+                <FAB
+                    label="Contribute"
+                    onClick={() => {
+                        setIsCreatingContribution(true);
+                    }}
+                />
+            )}
 
             <ConfirmDialog
-                open={confirmGoalDeleteOpen}
-                title="Delete goal?"
+                open={goalToDelete !== undefined}
+                title="Delete Goal?"
                 description="Are you sure you want to delete this goal? This action cannot be undone."
-                confirmLabel="Yes, delete"
+                confirmLabel="Delete"
                 cancelLabel="Cancel"
                 tone="danger"
                 onConfirm={async () => {
@@ -288,23 +290,24 @@ export default function GoalDetailsPage() {
                     await goalDelete(goal.id);
                     router.push("/goals");
                 }}
-                onCancel={() => setConfirmGoalDeleteOpen(false)}
+                onCancel={() => setGoalToDelete(undefined)}
             />
 
             <ConfirmDialog
-                open={confirmContributionDeleteOpen}
-                title="Delete contribution?"
+                open={contributionToDelete !== undefined}
+                title="Delete Contribution?"
                 description="Are you sure you want to delete this contribution? This action cannot be undone."
-                confirmLabel="Yes, delete"
+                confirmLabel="Delete"
                 cancelLabel="Cancel"
                 tone="danger"
                 onConfirm={async () => {
-                    if (!editingContribution) return;
-                    await contributionDelete(editingContribution.id);
-                    setEditingContribution(undefined);
-                    setIsContributionSheetOpen(false);
+                    if (!contributionToDelete) return;
+                    await contributionDelete(contributionToDelete.id);
+                    goalRefresh(contributionToDelete.goalId);
+                    setContributionToDelete(undefined);
+                    
                 }}
-                onCancel={() => setConfirmContributionDeleteOpen(false)}
+                onCancel={() => setContributionToDelete(undefined)}
             />
         </div>
     );
