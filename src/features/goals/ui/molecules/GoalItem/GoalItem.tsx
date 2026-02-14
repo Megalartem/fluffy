@@ -1,7 +1,7 @@
 
 import { ActionMenu, ActionMenuItem, ListRowBase } from "@/shared/ui/molecules";
 import type { Goal } from "@/features/goals/model/types";
-import { GoalProgressRing, Text } from "@/shared/ui/atoms";
+import { ProgressRing, Text } from "@/shared/ui/atoms";
 import { fromMinorByCurrency } from "@/shared/lib/money/helper";
 import styles from "./GoalItem.module.css";
 import { GoalStatusBadge } from "../GoalStatusBadge";
@@ -91,7 +91,7 @@ export function GoalItem({
       <GoalStatusBadge goal={goal} className={styles.statusBadge} />
       <ListRowBase
         leading={
-          <GoalProgressRing size={RING_SIZE_MAP[size]} value={progress} label={label} />
+          <ProgressRing size={RING_SIZE_MAP[size]} value={progress} label={label} />
         }
         title={goal.name}
         subtitle={

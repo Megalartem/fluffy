@@ -1,18 +1,18 @@
 import * as React from "react";
-import styles from "./GoalProgressRing.module.css";
+import styles from "./ProgressRing.module.css";
 
-export type GoalProgressRingSize = "s" | "m" | "l" | "xl" | "xxl";
+export type ProgressRingSize = "s" | "m" | "l" | "xl" | "xxl";
 
-export type GoalProgressRingProps = {
+export type ProgressRingProps = {
   value: number; // 0..1
-  size?: GoalProgressRingSize; // default: m
+  size?: ProgressRingSize; // default: m
   label?: string;
   ariaLabel?: string;
   className?: string;
 };
 
 const SIZE_CONFIG: Record<
-  GoalProgressRingSize,
+  ProgressRingSize,
   { diameter: number; stroke: number; labelSize: number }
 > = {
   s: { diameter: 40, stroke: 6, labelSize: 10 },
@@ -27,13 +27,13 @@ function clamp01(x: number) {
   return Math.max(0, Math.min(1, x));
 }
 
-export function GoalProgressRing({
+export function ProgressRing({
   value,
   size = "m",
   label,
   ariaLabel,
   className,
-}: GoalProgressRingProps) {
+}: ProgressRingProps) {
   const v = clamp01(value);
   const { diameter, stroke, labelSize } = SIZE_CONFIG[size];
 
