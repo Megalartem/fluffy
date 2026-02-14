@@ -76,7 +76,7 @@ export function GoalUpsertSheet({
       name: goal.name,
       targetAmount: fromMinorByCurrency(goal.targetAmountMinor, currency),
       deadline: goal.deadline ?? null,
-      note: goal.note ?? "", // no note field in goal model yet
+      note: goal.note ?? "",
     });
   }, [open, goal, form, currency]);
 
