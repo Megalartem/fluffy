@@ -38,6 +38,7 @@ const renderSection = (
           <GoalItem
             key={goal.id}
             goal={goal}
+            size="m"
             onClick={() => onGoalClick(goal.id)}
             onEdit={() => onEdit(goal)}
             onArchive={() => onArchive(goal)}

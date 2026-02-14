@@ -153,7 +153,11 @@ export default function GoalDetailsPage() {
                         secondaryAction={{ label: "Go back", onClick: () => router.back() }}
                     />
                 ) : (
-                    <GoalItem goal={goal!} direction="column" size="xl" />
+                    <GoalItem
+                    goal={goal!}
+                    direction="column"
+                    size="xl"
+                    />
                 )}
             </div>
 
