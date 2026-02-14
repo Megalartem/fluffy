@@ -5,7 +5,7 @@ import { TransactionCategoryIcon } from "@/features/transactions/ui/atoms";
 import { Amount, Icon } from "@/shared/ui/atoms";
 import { Category } from "@/features/categories/model/types";
 import { Circle, Pencil, Trash2 } from "lucide-react";
-import { fromMinorByCurrency } from "@/shared/lib/money/helper";
+import { shownAmount } from "@/shared/lib/money/helper";
 import { Transaction } from "@/features/transactions/model/types";
 import { dynamicIconImports, IconName } from "lucide-react/dynamic";
 import styles from "./TransactionRow.module.css";
@@ -83,7 +83,7 @@ export function TransactionRow({
                 <Amount
           state={transaction.type === "expense" ? "negative" : "positive"}
         >
-          {fromMinorByCurrency(transaction.amountMinor, transaction.currency)}
+          {shownAmount(transaction.amountMinor, transaction.currency)}
         </Amount>
         <ActionMenu
             ariaLabel="Transaction actions"
