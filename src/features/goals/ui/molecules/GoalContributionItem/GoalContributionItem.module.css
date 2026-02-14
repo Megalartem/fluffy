@@ -19,6 +19,7 @@
 .note {
   margin-top: var(--spacing-1);
   color: var(--color-muted-foreground);
+  white-space: pre-line;
 }
 
 .actionMenuTrigger {
