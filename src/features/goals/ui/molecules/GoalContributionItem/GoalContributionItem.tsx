@@ -92,6 +92,7 @@ export function GoalContributionItem({
             items={actions}
             onAction={() => {}}
             triggerButtonBody={<></>}
+            triggerClassName={styles.actionMenuTrigger}
             isOpen={isActionsMenuOpen}
             onOpenChange={setIsActionsMenuOpen}
           />

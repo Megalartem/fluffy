@@ -20,3 +20,9 @@
   margin-top: var(--spacing-1);
   color: var(--color-muted-foreground);
 }
+
+.actionMenuTrigger {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+}
