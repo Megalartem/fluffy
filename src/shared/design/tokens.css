@@ -130,4 +130,73 @@
   --category-olive-bg: rgba(120, 130, 40, 0.3);
 
   --color-olive: rgba(120, 130, 40, 1);
+
+  /* ================================
+  Goal color palette
+  Background: 40% opacity for swatches
+  Stroke: full opacity for ProgressRing
+  ================================ */
+
+  --color-violet-bg: rgba(97, 62, 234, 0.4);
+  --color-violet: rgb(97, 62, 234);
+
+  --color-indigo-bg: rgba(76, 81, 191, 0.4);
+  --color-indigo: rgb(76, 81, 191);
+
+  --color-blue-bg: rgba(25, 86, 140, 0.4);
+  --color-blue: rgb(25, 86, 140);
+
+  --color-cyan-bg: rgba(43, 176, 237, 0.4);
+  --color-cyan: rgb(43, 176, 237);
+
+  --color-teal-bg: rgba(43, 174, 158, 0.4);
+  --color-teal: rgb(43, 174, 158);
+
+  --color-amber-bg: rgba(246, 201, 14, 0.4);
+  --color-amber: rgb(246, 201, 14);
+
+  --color-orange-bg: rgba(255, 158, 59, 0.4);
+  --color-orange: rgb(255, 158, 59);
+
+  --color-coral-bg: rgba(255, 122, 90, 0.4);
+  --color-coral: rgb(255, 122, 90);
+
+  --color-red-bg: rgba(229, 83, 61, 0.4);
+  --color-red: rgb(229, 83, 61);
+
+  --color-green-bg: rgba(63, 168, 107, 0.4);
+  --color-green: rgb(63, 168, 107);
+
+  --color-lime-bg: rgba(155, 197, 61, 0.4);
+  --color-lime: rgb(155, 197, 61);
+
+  --color-mint-bg: rgba(110, 219, 213, 0.4);
+  --color-mint: rgb(110, 219, 213);
+
+  --color-pink-bg: rgba(240, 98, 146, 0.4);
+  --color-pink: rgb(240, 98, 146);
+
+  --color-magenta-bg: rgba(194, 59, 122, 0.4);
+  --color-magenta: rgb(194, 59, 122);
+
+  --color-plum-bg: rgba(123, 63, 228, 0.4);
+  --color-plum: rgb(123, 63, 228);
+
+  --color-slate-bg: rgba(100, 116, 139, 0.4);
+  --color-slate: rgb(100, 116, 139);
+
+  --color-steel-bg: rgba(122, 140, 164, 0.4);
+  --color-steel: rgb(122, 140, 164);
+
+  --color-graphite-bg: rgba(75, 85, 99, 0.4);
+  --color-graphite: rgb(75, 85, 99);
+
+  --color-sand-bg: rgba(199, 184, 161, 0.4);
+  --color-sand: rgb(199, 184, 161);
+
+  --color-brown-bg: rgba(139, 94, 60, 0.4);
+  --color-brown: rgb(139, 94, 60);
+
+  --color-olive-bg: rgba(120, 130, 40, 0.4);
+  --color-olive: rgb(120, 130, 40);
 }

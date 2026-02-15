@@ -1,5 +1,6 @@
 import * as React from "react";
 import styles from "./ProgressRing.module.css";
+import { GoalColor } from "@/features/goals/model/types";
 
 export type ProgressRingSize = "s" | "m" | "l" | "xl" | "xxl";
 
@@ -8,6 +9,7 @@ export type ProgressRingProps = {
   size?: ProgressRingSize; // default: m
   label?: string;
   ariaLabel?: string;
+  color?: GoalColor; // CSS color value for progress stroke
   className?: string;
 };
 
@@ -32,6 +34,7 @@ export function ProgressRing({
   size = "m",
   label,
   ariaLabel,
+  color = "default",
   className,
 }: ProgressRingProps) {
   const v = clamp01(value);
@@ -119,6 +122,7 @@ export function ProgressRing({
         />
         <circle
           className={progressClassName}
+          data-color={color ?? "default"}
           cx={half}
           cy={half}
           r={geometry.r}
