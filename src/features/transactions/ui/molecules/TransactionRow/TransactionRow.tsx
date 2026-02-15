@@ -2,7 +2,7 @@ import React, { Suspense, useState } from "react";
 
 import { ActionMenu, ActionMenuItem, ListRowBase } from "@/shared/ui/molecules";
 import { TransactionCategoryIcon } from "@/features/transactions/ui/atoms";
-import { Amount, Icon } from "@/shared/ui/atoms";
+import { Amount, Icon, Text } from "@/shared/ui/atoms";
 import { Category } from "@/features/categories/model/types";
 import { Circle, Pencil, Trash2 } from "lucide-react";
 import { shownAmount } from "@/shared/lib/money/helper";
@@ -25,18 +25,18 @@ export type TransactionRowProps = {
 const lazyIconCache = new Map<IconName, React.LazyExoticComponent<React.ComponentType<{ className?: string; size?: string | number }>>>();
 
 function getLazyLucideIcon(name: IconName) {
-    const cached = lazyIconCache.get(name);
-    if (cached) return cached;
+  const cached = lazyIconCache.get(name);
+  if (cached) return cached;
 
-    const importer = dynamicIconImports[name];
-    if (!importer) {
-        const Fallback = () => null;
-        return Fallback;
-    }
+  const importer = dynamicIconImports[name];
+  if (!importer) {
+    const Fallback = () => null;
+    return Fallback;
+  }
 
-    const LazyIcon = React.lazy(importer);
-    lazyIconCache.set(name, LazyIcon);
-    return LazyIcon;
+  const LazyIcon = React.lazy(importer);
+  lazyIconCache.set(name, LazyIcon);
+  return LazyIcon;
 }
 
 export function TransactionRow({
@@ -77,15 +77,15 @@ export function TransactionRow({
         </Suspense>
       }
       title={category?.name ?? "Unknown category"}
-      subtitle={transaction.note ?? undefined}
+      subtitle={transaction.note ? <Text variant="caption" className={styles.note}>{transaction.note}</Text> : undefined}
       trailing={
         <>
-                <Amount
-          state={transaction.type === "expense" ? "negative" : "positive"}
-        >
-          {shownAmount(transaction.amountMinor, transaction.currency)}
-        </Amount>
-        <ActionMenu
+          <Amount
+            state={transaction.type === "expense" ? "negative" : "positive"}
+          >
+            {shownAmount(transaction.amountMinor, transaction.currency)}
+          </Amount>
+          <ActionMenu
             ariaLabel="Transaction actions"
             items={actions}
             onAction={() => { }}
@@ -95,7 +95,6 @@ export function TransactionRow({
             onOpenChange={setIsActionsMenuOpen}
           />
         </>
-
       }
       size={size}
       tone={tone}
