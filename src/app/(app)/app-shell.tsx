@@ -2,6 +2,14 @@
 
 // import { usePathname } from "next/navigation";
 import { WorkspaceProvider } from "@/shared/config/WorkspaceProvider";
+import { useGoalTransactionMigration } from "@/features/goals/hooks/useGoalTransactionMigration";
+
+function AppShellContent({ children }: { children: React.ReactNode }) {
+  // Auto-migrate old goal transactions on app load
+  useGoalTransactionMigration();
+
+  return <>{children}</>;
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   // const pathname = usePathname();
@@ -20,7 +28,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <WorkspaceProvider>
-        {children}
-     </WorkspaceProvider>
+      <AppShellContent>{children}</AppShellContent>
+    </WorkspaceProvider>
   );
 }

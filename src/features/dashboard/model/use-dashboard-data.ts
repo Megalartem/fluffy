@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useWorkspace } from "@/shared/config/workspace-context";
+import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import { DashboardService } from "@/features/dashboard/model/service";
 import type { MonthlySummary } from "@/features/dashboard/model/types";
 import { BudgetService } from "@/features/budgets/model/service";
