@@ -7,7 +7,7 @@ import type { Goal, GoalContribution } from "@/features/goals/model/types";
 import { IconName } from "lucide-react/dynamic";
 
 
-const DB_SCHEMA_VERSION = 8;
+const DB_SCHEMA_VERSION = 9;
 
 
 
@@ -269,6 +269,27 @@ export class BudgetDB extends Dexie {
 
           if (g.deadline === "") g.deadline = null;
         });
+      });
+
+    // v9: add linkedGoalId to transactions schema
+    this.version(9)
+      .stores({
+        meta: "&key",
+        settings: "&id, workspaceId",
+
+        transactions:
+          "&id, workspaceId, dateKey, type, categoryId, linkedGoalId, updatedAt, deletedAt, [workspaceId+dateKey], [workspaceId+type], [workspaceId+categoryId], [workspaceId+linkedGoalId], [workspaceId+updatedAt]",
+
+        categories:
+          "&id, workspaceId, type, order, isArchived, updatedAt, deletedAt, [workspaceId+type], [workspaceId+isArchived], [workspaceId+updatedAt]",
+
+        budgets: "&id, workspaceId, month, deletedAt",
+
+        goals:
+          "&id, workspaceId, status, deadline, updatedAt, deletedAt, [workspaceId+status], [workspaceId+updatedAt]",
+
+        goalContributions:
+          "&id, workspaceId, goalId, dateKey, linkedTransactionId, updatedAt, deletedAt, [workspaceId+goalId], [workspaceId+dateKey], [workspaceId+updatedAt]",
       });
   }
 }

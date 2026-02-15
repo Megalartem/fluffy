@@ -11,6 +11,7 @@ export type Transaction = {
   amountMinor: number;
   currency: CurrencyCode;
   categoryId?: string | null;
+  linkedGoalId?: string | null;
   note?: string | null;
 
   dateKey: string; // YYYY-MM-DD
@@ -26,7 +27,7 @@ export type CreateTransactionInput = Omit<
 >;
 
 export type UpdateTransactionPatch = Partial<
-  Pick<Transaction, "type" | "amountMinor" | "currency" | "categoryId" | "note" | "dateKey">
+  Pick<Transaction, "type" | "amountMinor" | "currency" | "categoryId" | "linkedGoalId" | "note" | "dateKey">
 >;
 
 export type UpdateTransactionInput = {
