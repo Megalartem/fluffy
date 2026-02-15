@@ -9,6 +9,27 @@ type UseGoalOptions = {
   fromList?: Goal[];
 };
 
+// Simple in-memory cache for goals (performance optimization)
+const goalCache = new Map<string, { goal: Goal; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function getCachedGoal(goalId: string): Goal | null {
+  const cached = goalCache.get(goalId);
+  if (!cached) return null;
+  
+  // Check if cache is still valid
+  if (Date.now() - cached.timestamp > CACHE_TTL) {
+    goalCache.delete(goalId);
+    return null;
+  }
+  
+  return cached.goal;
+}
+
+function setCachedGoal(goal: Goal): void {
+  goalCache.set(goal.id, { goal, timestamp: Date.now() });
+}
+
 export function useGoal(goalId: string | null | undefined, options: UseGoalOptions = {}) {
   const { workspaceId } = useWorkspace();
 
@@ -28,6 +49,14 @@ export function useGoal(goalId: string | null | undefined, options: UseGoalOptio
     const fromList = options.fromList?.find((g) => g.id === goalId) ?? null;
     if (fromList) {
       setItem(fromList);
+      setCachedGoal(fromList); // Update cache
+      return;
+    }
+    
+    // Check cache
+    const cached = getCachedGoal(goalId);
+    if (cached) {
+      setItem(cached);
       return;
     }
 
@@ -35,6 +64,7 @@ export function useGoal(goalId: string | null | undefined, options: UseGoalOptio
     try {
       const g = await goalsRepo.getById(workspaceId, goalId);
       setItem(g);
+      if (g) setCachedGoal(g); // Update cache
     } catch (e) {
       setError(e);
     } finally {
