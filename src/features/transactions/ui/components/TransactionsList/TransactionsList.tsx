@@ -102,6 +102,10 @@ export type ITransactionList = {
     error?: unknown;
     filtersActive?: boolean;
 
+    /** Pagination - infinite scroll */
+    hasMore?: boolean;
+    onLoadMore?: () => void;
+
     onTransactionClick?: (tx: Transaction) => void;
     onTransactionDelete?: (tx: Transaction) => void;
     onAddTransaction?: () => void;
@@ -124,6 +128,8 @@ export function TransactionsList({
     loading = false,
     error,
     filtersActive = false,
+    hasMore = false,
+    onLoadMore,
     onTransactionClick,
     onTransactionDelete,
     onAddTransaction,
@@ -134,6 +140,33 @@ export function TransactionsList({
 }: ITransactionList) {
     const { currency } = useWorkspace();
     const strings = React.useMemo(() => ({ ...DEFAULT_EMPTY, ...(empty ?? {}) }), [empty]);
+
+    // Intersection Observer для infinite scroll
+    const observerTarget = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        if (!hasMore || !onLoadMore || loading) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    onLoadMore();
+                }
+            },
+            { threshold: 0.1, rootMargin: '100px' }
+        );
+
+        const target = observerTarget.current;
+        if (target) {
+            observer.observe(target);
+        }
+
+        return () => {
+            if (target) {
+                observer.unobserve(target);
+            }
+        };
+    }, [hasMore, onLoadMore, loading]);
 
     const categoryById = React.useMemo(() => {
         const m = new Map<string, Category>();
@@ -268,6 +301,17 @@ export function TransactionsList({
                         onTransactionDelete={onTransactionDelete}
                     />
                 ))
+            )}
+            
+            {/* Infinite scroll trigger */}
+            {hasMore && (
+                <div ref={observerTarget} className={styles.infiniteScrollTrigger}>
+                    {loading && (
+                        <div className={styles.loadingMore}>
+                            <Skeleton variant="line" width="100%" height={24} />
+                        </div>
+                    )}
+                </div>
             )}
         </div>
     );

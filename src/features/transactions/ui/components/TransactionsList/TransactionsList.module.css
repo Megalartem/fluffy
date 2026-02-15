@@ -9,3 +9,13 @@
   display: grid;
   gap: 12px;
 }
+.infiniteScrollTrigger {
+  min-height: 1px;
+  padding: 16px 0;
+}
+
+.loadingMore {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}

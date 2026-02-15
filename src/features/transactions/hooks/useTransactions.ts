@@ -82,24 +82,18 @@ export function useTransactions(params: {
     didSeedRef.current = false;
   }, [workspaceId]);
 
-  
+  // Reset limit and refresh when filters change
   React.useEffect(() => {
     setLimit(initialLimit);
-  }, [
-    filters.type,
-    filters.query,
-    categoryIdsKey,
-    sortKey,
-    initialLimit,
-  ]);
-
-  React.useEffect(() => {
     void refresh();
-  }, [refresh, 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
     filters.type,
     filters.query, 
     categoryIdsKey, 
-    sortKey]);
+    sortKey,
+    initialLimit,
+  ]);
 
   const loadMore = React.useCallback(() => {
     setLimit((prev) => prev + step);

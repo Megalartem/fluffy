@@ -59,7 +59,7 @@ export default function TransactionsPage() {
     []
   );
 
-  const { transactions, loading, error, refresh } = useTransactions({
+  const { transactions, loading, error, refresh, loadMore, hasMore } = useTransactions({
     workspaceId,
     filters,
     repo: transactionsRepo,
@@ -176,6 +176,8 @@ export default function TransactionsPage() {
           loading={loading}
           error={error}
           sort={filters.sort}
+          hasMore={hasMore}
+          onLoadMore={loadMore}
           onRetry={handleRetry}
           filtersActive={filtersActive}
           onResetFilters={handleResetFilters}

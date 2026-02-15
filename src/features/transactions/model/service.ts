@@ -4,7 +4,7 @@ import type { SettingsRepo } from "../../settings/api/repo";
 import { AppError } from "@/shared/errors/app-error";
 import { nowIso, todayIsoDate } from "@/shared/lib/storage/db";
 import type { UpdateTransactionInput } from "./types";
-import { toDateKey } from "./helpers/date";
+import { toDateKey } from "@/shared/lib/formatter";
 import { transactionsRepo } from "../api/repo.dexie";
 import { settingsRepo } from "@/features/settings/api/repo.dexie";
 
