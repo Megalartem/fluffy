@@ -69,6 +69,10 @@ export default function CategoriesPage() {
         setEditingCategory({} as Category);
     }, []);
 
+    const handleReorder = useCallback(async (categoryId: string, newOrder: number) => {
+        await catUpdate(categoryId, { order: newOrder });
+    }, [catUpdate]);
+
     return (
         <div className="flex flex-col min-h-screen bg-bg-main p-4 gap-4">
             <div className="flex items-center justify-between">
@@ -84,9 +88,11 @@ export default function CategoriesPage() {
                 categories={categories}
                 filters={filters}
                 groupByType
+                draggable
                 onEdit={handleEdit}
                 onArchive={handleArchive}
                 onDelete={handleDelete}
+                onReorder={handleReorder}
             />
 
             {/* Spacer for FAB */}

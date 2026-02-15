@@ -16,11 +16,12 @@
 
 ### Task 1.1: ActionMenu для Categories (Long Press) ⭐⭐⭐
 
-**Status:** 🆕 NEW  
+**Status:** Rejected
 **Priority:** P0 (High)  
 **Estimate:** 2 hours  
 **Feature:** Categories  
 **Impact:** Consistency с Goals UI pattern
+**Reason** У категорий уже есть понятный флоу открытия этого окна. дополнительный longpress будет избыточен
 
 **Description:**
 Добавить ActionMenu по долгому нажатию для CategoryRow, аналогично GoalItem.
@@ -79,7 +80,7 @@ const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
 
 ### Task 1.2: ActionMenu для Transactions (Long Press + Delete) ⭐⭐⭐
 
-**Status:** 🆕 NEW  
+**Status:** 🆕 Completed 
 **Priority:** P0 (High)  
 **Estimate:** 3 hours  
 **Feature:** Transactions  
@@ -146,19 +147,19 @@ const confirmDelete = async () => {
 - Ensure ConfirmDialog component exists in shared/ui
 
 **Acceptance Criteria:**
-- [ ] Long press на TransactionRow открывает ActionMenu
-- [ ] Menu содержит: Edit, Delete
-- [ ] Delete показывает ConfirmDialog
-- [ ] После подтверждения транзакция удаляется
-- [ ] Day totals пересчитываются после удаления
-- [ ] Empty state появляется если удалена последняя транзакция
-- [ ] Works на desktop и mobile
+- [x] Long press на TransactionRow открывает ActionMenu
+- [x] Menu содержит: Edit, Delete
+- [x] Delete показывает ConfirmDialog
+- [x] После подтверждения транзакция удаляется
+- [x] Day totals пересчитываются после удаления
+- [x] Empty state появляется если удалена последняя транзакция
+- [x] Works на desktop и mobile
 
 ---
 
 ### Task 1.3: Note Field для Transactions ⭐⭐
 
-**Status:** 🆕 NEW  
+**Status:** 🆕 Done  
 **Priority:** P1 (High-Medium)  
 **Estimate:** 2 hours  
 **Feature:** Transactions  
@@ -234,14 +235,14 @@ if (query) {
 - `src/features/transactions/hooks/utils/transactions.ts` (optional - search)
 
 **Acceptance Criteria:**
-- [ ] Note field присутствует в create/edit форме
-- [ ] Note опционально (не required)
-- [ ] Multiline support (2 rows)
-- [ ] Note отображается в TransactionRow как subtitle
-- [ ] Если note пустая - subtitle не показывается
-- [ ] Long note truncates с ellipsis (2 lines max)
-- [ ] `white-space: pre-line` для поддержки переносов
-- [ ] (Optional) Search работает по note
+- [x] Note field присутствует в create/edit форме
+- [x] Note опционально (не required)
+- [x] Multiline support (2 rows)
+- [x] Note отображается в TransactionRow как subtitle
+- [x] Если note пустая - subtitle не показывается
+- [x] Long note truncates с ellipsis (2 lines max)
+- [x] `white-space: pre-line` для поддержки переносов
+- [x] (Optional) Search работает по note
 
 ---
 
@@ -249,7 +250,7 @@ if (query) {
 
 ### Task 2.1: Color Picker для Goals ⭐
 
-**Status:** 🆕 NEW  
+**Status:** 🆕 Done  
 **Priority:** P2 (Medium)  
 **Estimate:** 3 hours  
 **Feature:** Goals  
@@ -308,18 +309,18 @@ export type GoalColor = typeof GOAL_COLORS[number];
 - Если ProgressRing не поддерживает кастомные цвета - просто сохраняем colorKey для будущего использования
 
 **Acceptance Criteria:**
-- [ ] Color picker присутствует в GoalUpsertSheet
-- [ ] Поддерживает 10+ цветов
-- [ ] BezelCarousel UI pattern (reuse from categories)
-- [ ] colorKey сохраняется в БД
-- [ ] (Optional) Цвет применяется к ProgressRing
-- [ ] (Optional) Null colorKey = default color
+- [x] Color picker присутствует в GoalUpsertSheet
+- [x] Поддерживает 10+ цветов
+- [x] BezelCarousel UI pattern (reuse from categories)
+- [x] colorKey сохраняется в БД
+- [x] (Optional) Цвет применяется к ProgressRing
+- [x] (Optional) Null colorKey = default color
 
 ---
 
 ### Task 2.2: Drag & Drop Reordering для Categories ⭐
 
-**Status:** 🆕 NEW  
+**Status:** 🆕 Done ✅  
 **Priority:** P2 (Medium)  
 **Estimate:** 4 hours  
 **Feature:** Categories  
@@ -331,7 +332,7 @@ export type GoalColor = typeof GOAL_COLORS[number];
 **Current State:**
 - ✅ Поле `order` работает
 - ✅ Сортировка по order в repo
-- ❌ Нельзя изменить order через UI
+- ✅ Можно изменить order через drag & drop UI
 
 **Implementation:**
 1. **Library:** Install `@dnd-kit/core` + `@dnd-kit/sortable`
@@ -408,13 +409,13 @@ const handleDragEnd = (event) => {
 - `package.json` (add dependencies)
 
 **Acceptance Criteria:**
-- [ ] Long press → drag mode активируется
-- [ ] Visual feedback (elevation, opacity) при drag
-- [ ] Drop между элементами
-- [ ] Order пересчитывается и сохраняется
-- [ ] Optimistic UI update (instant feedback)
-- [ ] Works на desktop (mouse drag) и mobile (touch drag)
-- [ ] Animation smooth (не прыгает)
+- [x] Long press → drag mode активируется
+- [x] Visual feedback (elevation, opacity) при drag
+- [x] Drop между элементами
+- [x] Order пересчитывается и сохраняется
+- [x] Optimistic UI update (instant feedback)
+- [x] Works на desktop (mouse drag) и mobile (touch drag)
+- [x] Animation smooth (не прыгает)
 
 ---
 

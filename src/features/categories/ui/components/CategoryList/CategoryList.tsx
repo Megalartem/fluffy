@@ -2,7 +2,22 @@
 
 import * as React from "react";
 import { AnimatePresence } from "framer-motion";
-import { AnimatedCategoryItem } from "../../molecules/CategoryRow/AnimatedCategoryItem";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { SortableCategoryRow } from "../../molecules/CategoryRow/SortableCategoryRow";
 import { CategoryGroup } from "../CategoryGroup/CategoryGroup";
 import { CategoryListEmpty } from "./CategoryListStates";
 import { EmptyState } from "@/shared/ui/molecules";
@@ -26,6 +41,12 @@ export interface CategoryListProps {
   onDelete?: (category: Category) => void;
   onClick?: (category: Category) => void;
   
+  /** Callback для изменения порядка (drag & drop) */
+  onReorder?: (categoryId: string, newOrder: number) => Promise<void>;
+  
+  /** Enable drag & drop reordering */
+  draggable?: boolean;
+  
   /** Кастомный empty state */
   emptyState?: React.ReactNode;
 }
@@ -38,9 +59,25 @@ export const CategoryList = React.memo(function CategoryList({
   onArchive,
   onDelete,
   onClick,
+  onReorder,
+  draggable = false,
   emptyState,
 }: CategoryListProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px movement before drag starts
+        delay: 150, // 150ms delay to distinguish from click
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Фильтрация по типу и поиску
   const filteredCategories = React.useMemo(() => {
@@ -94,6 +131,43 @@ export const CategoryList = React.memo(function CategoryList({
   const hasCategories = categories.length > 0;
   const hasVisibleCategories = visibleIds.size > 0;
 
+  // Handle drag end
+  const handleDragEnd = React.useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over } = event;
+
+      if (!over || active.id === over.id || !onReorder) {
+        return;
+      }
+
+      const visibleCategoriesList = filteredCategories.filter((c) =>
+        visibleIds.has(c.id)
+      );
+
+      const oldIndex = visibleCategoriesList.findIndex(
+        (c) => c.id === active.id
+      );
+      const newIndex = visibleCategoriesList.findIndex(
+        (c) => c.id === over.id
+      );
+
+      if (oldIndex === -1 || newIndex === -1) {
+        return;
+      }
+
+      // Reorder array
+      const reordered = arrayMove(visibleCategoriesList, oldIndex, newIndex);
+
+      // Update order for all affected categories
+      await Promise.all(
+        reordered.map((category, index) =>
+          onReorder(category.id, index)
+        )
+      );
+    },
+    [filteredCategories, visibleIds, onReorder]
+  );
+
   if (!hasCategories) {
     return <CategoryListEmpty>{emptyState}</CategoryListEmpty>;
   }
@@ -115,6 +189,8 @@ export const CategoryList = React.memo(function CategoryList({
             onArchive={onArchive}
             onDelete={onDelete}
             onClick={onClick}
+            onReorder={onReorder}
+            draggable={draggable}
           />
           <CategoryGroup
             title="Income"
@@ -124,25 +200,41 @@ export const CategoryList = React.memo(function CategoryList({
             onArchive={onArchive}
             onDelete={onDelete}
             onClick={onClick}
+            onReorder={onReorder}
+            draggable={draggable}
           />
         </>
       ) : (
-        <div className={styles.list}>
-          <AnimatePresence initial={false} mode="popLayout">
-            {filteredCategories
-              .filter(c => visibleIds.has(c.id))
-              .map((category) => (
-                <AnimatedCategoryItem
-                  key={category.id}
-                  category={category}
-                  onEdit={onEdit}
-                  onArchive={onArchive}
-                  onDelete={onDelete}
-                  onClick={onClick}
-                />
-              ))}
-          </AnimatePresence>
-        </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={filteredCategories
+              .filter((c) => visibleIds.has(c.id))
+              .map((c) => c.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className={styles.list}>
+              <AnimatePresence initial={false} mode="popLayout">
+                {filteredCategories
+                  .filter((c) => visibleIds.has(c.id))
+                  .map((category) => (
+                    <SortableCategoryRow
+                      key={category.id}
+                      category={category}
+                      onEdit={onEdit}
+                      onArchive={onArchive}
+                      onDelete={onDelete}
+                      onClick={onClick}
+                      draggable={draggable}
+                    />
+                  ))}
+              </AnimatePresence>
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
     </div>
   );
