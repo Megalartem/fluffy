@@ -90,7 +90,12 @@ export function GoalItem({
       <GoalStatusBadge goal={goal} className={styles.statusBadge} />
       <ListRowBase
         leading={
-          <ProgressRing size={RING_SIZE_MAP[size]} value={progress} label={label} />
+          <ProgressRing 
+            size={RING_SIZE_MAP[size]} 
+            value={progress} 
+            color={goal.colorKey ?? "blue"}
+            label={label}
+          />
         }
         title={goal.name}
         subtitle={

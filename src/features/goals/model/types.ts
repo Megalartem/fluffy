@@ -1,4 +1,4 @@
-import type { CategoryColor } from "@/features/categories/model/types";
+import { CATEGORY_COLOR_KEYS, COLOR_LABELS, type CategoryColor } from "@/features/categories/model/types";
 import type { CurrencyCode } from "@/shared/di/types";
 
 export type GoalStatus = "active" | "completed" | "archived";
@@ -10,10 +10,6 @@ export const GOAL_STATUS_LABELS: Record<GoalStatus, string> = {
   completed: "Completed",
   archived: "Archived",
 };
-
-// В MVP палитра целей совпадает с палитрой категорий.
-// В UI можно просто использовать один accent, но тип оставляем расширяемым.
-export type GoalColor = CategoryColor;
 
 export interface Goal {
   id: string; // uuid
@@ -55,7 +51,7 @@ export interface GoalContribution {
 }
 
 // Inputs
-export type CreateGoalInput = Pick<Goal, "name" | "targetAmountMinor" | "deadline" | "currentAmountMinor" | "currency" | "status" | "note">;
+export type CreateGoalInput = Pick<Goal, "name" | "targetAmountMinor" | "deadline" | "currentAmountMinor" | "currency" | "status" | "note" | "colorKey">;
 export type CreateGoalContributionInput =
   Pick<GoalContribution, "goalId" | "amountMinor" | "currency" | "dateKey" | "note" | "linkedTransactionId">;
 
@@ -78,3 +74,10 @@ export type ContributeToGoalInput = {
 };
 
 export type SoftDeleteGoalContributionInput = { id: string };
+
+
+export const GOAL_COLORS = CATEGORY_COLOR_KEYS;
+
+export type GoalColor = CategoryColor;
+
+export const GOAL_COLOR_LABELS = COLOR_LABELS;

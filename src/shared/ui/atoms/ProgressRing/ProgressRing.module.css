@@ -19,16 +19,27 @@
 }
 
 .progress[data-color="default"] { --progress-color: var(--color-primary); }
-.progress[data-color="blue"] { --progress-color: var(--goal-blue-bg); }
-.progress[data-color="green"] { --progress-color: var(--goal-green-bg); }
-.progress[data-color="red"] { --progress-color: var(--goal-red-bg); }
-.progress[data-color="purple"] { --progress-color: var(--goal-purple-bg); }
-.progress[data-color="orange"] { --progress-color: var(--goal-orange-bg); }
-.progress[data-color="yellow"] { --progress-color: var(--goal-yellow-bg); } 
-.progress[data-color="pink"] { --progress-color: var(--goal-pink-bg); }
-.progress[data-color="teal"] { --progress-color: var(--goal-teal-bg); }
-.progress[data-color="indigo"] { --progress-color: var(--goal-indigo-bg); }
-.progress[data-color="gray"] { --progress-color: var(--goal-gray-bg); }
+.progress[data-color="violet"] { --progress-color: var(--color-violet-bg); }
+.progress[data-color="indigo"] { --progress-color: var(--color-indigo-bg); }
+.progress[data-color="blue"] { --progress-color: var(--color-blue-bg); }
+.progress[data-color="cyan"] { --progress-color: var(--color-cyan-bg); }
+.progress[data-color="teal"] { --progress-color: var(--color-teal-bg); }
+.progress[data-color="amber"] { --progress-color: var(--color-amber-bg); }
+.progress[data-color="orange"] { --progress-color: var(--color-orange-bg); }
+.progress[data-color="coral"] { --progress-color: var(--color-coral-bg); }
+.progress[data-color="red"] { --progress-color: var(--color-red-bg); }
+.progress[data-color="green"] { --progress-color: var(--color-green-bg); }
+.progress[data-color="lime"] { --progress-color: var(--color-lime-bg); }
+.progress[data-color="mint"] { --progress-color: var(--color-mint-bg); }
+.progress[data-color="pink"] { --progress-color: var(--color-pink-bg); }
+.progress[data-color="magenta"] { --progress-color: var(--color-magenta-bg); }
+.progress[data-color="plum"] { --progress-color: var(--color-plum-bg); }
+.progress[data-color="slate"] { --progress-color: var(--color-slate-bg); }
+.progress[data-color="steel"] { --progress-color: var(--color-steel-bg); }
+.progress[data-color="graphite"] { --progress-color: var(--color-graphite-bg); }
+.progress[data-color="sand"] { --progress-color: var(--color-sand-bg); }
+.progress[data-color="brown"] { --progress-color: var(--color-brown-bg); }
+.progress[data-color="olive"] { --progress-color: var(--color-olive-bg); }
 
 .animated {
   transition: stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1);
