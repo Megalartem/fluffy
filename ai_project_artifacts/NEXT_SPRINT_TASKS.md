@@ -500,13 +500,13 @@ useEffect(() => {
 ```
 
 **Acceptance Criteria:**
-- [ ] Transactions загружаются постепенно (50 по умолчанию)
-- [ ] "Load More" button внизу списка
-- [ ] Button скрывается когда все загружено
-- [ ] Loading indicator при загрузке следующей порции
-- [ ] Works с фильтрами и сортировкой
-- [ ] (Alternative) Infinite scroll работает
-- [ ] Performance: no re-renders всего списка
+- [x] Transactions загружаются постепенно (50 по умолчанию)
+- [x] "Load More" button внизу списка
+- [x] Button скрывается когда все загружено
+- [x] Loading indicator при загрузке следующей порции
+- [x] Works с фильтрами и сортировкой
+- [x] (Alternative) Infinite scroll работает
+- [x] Performance: no re-renders всего списка
 
 ---
 
@@ -516,7 +516,9 @@ useEffect(() => {
 
 **Priority:** P3 (Low)  
 **Estimate:** 2 hours  
-**Feature:** Categories  
+**Feature:** Categories 
+**Status:** Rejected
+**Reason:** both удален и больше не поддерживается 
 
 **Description:**
 Добавить поддержку типа "both" для универсальных категорий.
