@@ -5,15 +5,10 @@ import { AnimatePresence } from "framer-motion";
 import {
   DndContext,
   closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
-  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
@@ -23,6 +18,7 @@ import { CategoryListEmpty } from "./CategoryListStates";
 import { EmptyState } from "@/shared/ui/molecules";
 import type { Category } from "@/features/categories/model/types";
 import type { CategoriesFilterValues } from "@/features/categories/model/filter-types";
+import { useDndSensors } from "@/shared/hooks/useDndSensors";
 import styles from "./CategoryList.module.css";
 
 export interface CategoryListProps {
@@ -65,19 +61,8 @@ export const CategoryList = React.memo(function CategoryList({
 }: CategoryListProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  // DnD sensors
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // 8px movement before drag starts
-        delay: 150, // 150ms delay to distinguish from click
-        tolerance: 5,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  // DnD sensors - shared configuration
+  const sensors = useDndSensors();
 
   // Фильтрация по типу и поиску
   const filteredCategories = React.useMemo(() => {
@@ -144,6 +129,16 @@ export const CategoryList = React.memo(function CategoryList({
         visibleIds.has(c.id)
       );
 
+      const activeCategory = visibleCategoriesList.find((c) => c.id === active.id);
+      const overCategory = visibleCategoriesList.find((c) => c.id === over.id);
+
+      // Prevent dragging between different types when groupByType is enabled
+      if (groupByType && activeCategory && overCategory) {
+        if (activeCategory.type !== overCategory.type) {
+          return;
+        }
+      }
+
       const oldIndex = visibleCategoriesList.findIndex(
         (c) => c.id === active.id
       );
@@ -165,7 +160,7 @@ export const CategoryList = React.memo(function CategoryList({
         )
       );
     },
-    [filteredCategories, visibleIds, onReorder]
+    [filteredCategories, visibleIds, onReorder, groupByType]
   );
 
   if (!hasCategories) {
@@ -179,61 +174,76 @@ export const CategoryList = React.memo(function CategoryList({
           title="No categories found"
           description="Try adjusting your search or filters"
         />
-      ) : groupByType ? (
-        <>
-          <CategoryGroup
-            title="Expenses"
-            categories={groupedCategories.expense || []}
-            visibleIds={visibleIds}
-            onEdit={onEdit}
-            onArchive={onArchive}
-            onDelete={onDelete}
-            onClick={onClick}
-            onReorder={onReorder}
-            draggable={draggable}
-          />
-          <CategoryGroup
-            title="Income"
-            categories={groupedCategories.income || []}
-            visibleIds={visibleIds}
-            onEdit={onEdit}
-            onArchive={onArchive}
-            onDelete={onDelete}
-            onClick={onClick}
-            onReorder={onReorder}
-            draggable={draggable}
-          />
-        </>
       ) : (
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext
-            items={filteredCategories
-              .filter((c) => visibleIds.has(c.id))
-              .map((c) => c.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className={styles.list}>
-              <AnimatePresence initial={false} mode="popLayout">
-                {filteredCategories
+          {groupByType ? (
+            <>
+              {/* Each group wrapped in its own SortableContext */}
+              <SortableContext
+                items={(groupedCategories.expense || [])
                   .filter((c) => visibleIds.has(c.id))
-                  .map((category) => (
-                    <SortableCategoryRow
-                      key={category.id}
-                      category={category}
-                      onEdit={onEdit}
-                      onArchive={onArchive}
-                      onDelete={onDelete}
-                      onClick={onClick}
-                      draggable={draggable}
-                    />
-                  ))}
-              </AnimatePresence>
-            </div>
-          </SortableContext>
+                  .map((c) => c.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <CategoryGroup
+                  title="Expenses"
+                  categories={groupedCategories.expense || []}
+                  visibleIds={visibleIds}
+                  onEdit={onEdit}
+                  onArchive={onArchive}
+                  onDelete={onDelete}
+                  onClick={onClick}
+                  draggable={draggable}
+                />
+              </SortableContext>
+              <SortableContext
+                items={(groupedCategories.income || [])
+                  .filter((c) => visibleIds.has(c.id))
+                  .map((c) => c.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <CategoryGroup
+                  title="Income"
+                  categories={groupedCategories.income || []}
+                  visibleIds={visibleIds}
+                  onEdit={onEdit}
+                  onArchive={onArchive}
+                  onDelete={onDelete}
+                  onClick={onClick}
+                  draggable={draggable}
+                />
+              </SortableContext>
+            </>
+          ) : (
+            <SortableContext
+              items={filteredCategories
+                .filter((c) => visibleIds.has(c.id))
+                .map((c) => c.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className={styles.list}>
+                <AnimatePresence initial={false} mode="popLayout">
+                  {filteredCategories
+                    .filter((c) => visibleIds.has(c.id))
+                    .map((category) => (
+                      <SortableCategoryRow
+                        key={category.id}
+                        category={category}
+                        onEdit={onEdit}
+                        onArchive={onArchive}
+                        onDelete={onDelete}
+                        onClick={onClick}
+                        draggable={draggable}
+                      />
+                    ))}
+                </AnimatePresence>
+              </div>
+            </SortableContext>
+          )}
         </DndContext>
       )}
     </div>
