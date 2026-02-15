@@ -7,7 +7,7 @@ import styles from "./GoalUpsertSheet.module.css";
 
 import { toMinorByCurrency, fromMinorByCurrency } from "@/shared/lib/money/helper";
 
-import type { Goal, CreateGoalInput, UpdateGoalInput } from "@/features/goals/model/types";
+import type { Goal, CreateGoalInput, UpdateGoalInput, GoalColor } from "@/features/goals/model/types";
 
 import { ButtonBase, IconButton } from "@/shared/ui/atoms";
 import { BottomSheet, ModalHeader } from "@/shared/ui/molecules";
@@ -15,12 +15,15 @@ import { FormFieldString } from "@/shared/ui/molecules/FormField/FormFieldString
 import { FormFieldDate } from "@/shared/ui/molecules/FormField/FormFieldDate";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import { Trash2 } from "lucide-react";
+import { GoalColorField } from "../../molecules";
+
 
 type FormValues = {
   name: string;
   targetAmount: string;      // major units string
   deadline: string | null;   // YYYY-MM-DD
   note: string;
+  colorKey: GoalColor | null;
 };
 
 export type GoalUpsertSheetProps = {
@@ -53,6 +56,7 @@ export function GoalUpsertSheet({
       targetAmount: "",
       deadline: null,
       note: "",
+      colorKey: null,
     },
     mode: "onSubmit",
   });
@@ -73,6 +77,7 @@ export function GoalUpsertSheet({
         targetAmount: "",
         deadline: null,
         note: "",
+        colorKey: null,
       });
       return;
     }
@@ -82,6 +87,7 @@ export function GoalUpsertSheet({
       targetAmount: fromMinorByCurrency(goal.targetAmountMinor, currency),
       deadline: goal.deadline ?? null,
       note: goal.note ?? "",
+      colorKey: goal.colorKey ?? null,
     });
   }, [open, goal, form, currency]);
 
@@ -107,6 +113,7 @@ export function GoalUpsertSheet({
 
     const deadline = values.deadline ?? null;
     const note = values.note?.trim() ?? "";
+    const colorKey = values.colorKey ?? null;
 
     setSaving(true);
     try {
@@ -118,6 +125,7 @@ export function GoalUpsertSheet({
           currency: currency,
           deadline,
           note,
+          colorKey,
           status: "active",
         };
 
@@ -130,6 +138,7 @@ export function GoalUpsertSheet({
             targetAmountMinor: targetAmountMinor,
             deadline,
             note,
+            colorKey,
           },
         };
 
@@ -164,13 +173,13 @@ export function GoalUpsertSheet({
       onClose={onClose}
       footer={
         <div className={styles.footer}>
-        <ButtonBase
-          fullWidth
-          onClick={form.handleSubmit(onSubmit)}
-          disabled={saving || deleting}>
-          {saving ? "Saving…" : "Save"}
-        </ButtonBase>
-        {isEdit && onDelete && (
+          <ButtonBase
+            fullWidth
+            onClick={form.handleSubmit(onSubmit)}
+            disabled={saving || deleting}>
+            {saving ? "Saving…" : "Save"}
+          </ButtonBase>
+          {isEdit && onDelete && (
             <IconButton
               icon={Trash2}
               variant="default"
@@ -179,7 +188,7 @@ export function GoalUpsertSheet({
               className={styles.deleteButton}
             />
           )}
-      </div>
+        </div>
       }
     >
       <FormProvider {...form}>
@@ -206,7 +215,7 @@ export function GoalUpsertSheet({
               },
             }}
           />
-
+          {/* Deadline */}
           <FormFieldDate<FormValues>
             name="deadline"
             label="Deadline (optional)"
@@ -218,12 +227,16 @@ export function GoalUpsertSheet({
             }}
           />
 
+          {/* Note */}
           <FormFieldString<FormValues>
             name="note"
             label="Note (optional)"
             placeholder="Add a note"
             multiline={true}
           />
+
+          {/* Color */}
+          <GoalColorField name="colorKey" label="Color (optional)" />
         </div>
       </FormProvider>
     </BottomSheet>
