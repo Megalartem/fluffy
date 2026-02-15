@@ -14,6 +14,8 @@ export interface AnimatedCategoryItemProps {
   onArchive?: (category: Category, isArchived: boolean) => void;
   onDelete?: (category: Category) => void;
   onClick?: (category: Category) => void;
+  /** Disable layout animations (used when in sortable context) */
+  disableLayoutAnimation?: boolean;
 }
 
 export function AnimatedCategoryItem({
@@ -22,6 +24,7 @@ export function AnimatedCategoryItem({
   onArchive,
   onDelete,
   onClick,
+  disableLayoutAnimation = false,
 }: AnimatedCategoryItemProps) {
   const shouldReduceMotion = useReducedMotion();
 
@@ -46,16 +49,16 @@ export function AnimatedCategoryItem({
     transition: { 
       duration: ANIMATION_DURATION,
       ease: ANIMATION_EASE,
-      layout: {
+      layout: disableLayoutAnimation ? undefined : {
         duration: ANIMATION_DURATION,
         ease: ANIMATION_EASE,
       }
     }
-  }), [shouldReduceMotion]);
+  }), [shouldReduceMotion, disableLayoutAnimation]);
 
   return (
     <motion.div
-      layout="position"
+      layout={disableLayoutAnimation ? false : "position"}
       {...animationConfig}
       style={{
         transformOrigin: "center center",

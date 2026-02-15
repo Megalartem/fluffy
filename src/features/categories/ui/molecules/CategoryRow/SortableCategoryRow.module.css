@@ -1,0 +1,9 @@
+.dragging {
+  z-index: 1000;
+  cursor: grabbing !important;
+  opacity: 0.5;
+}
+
+.sortableWrapper {
+  transition: transform 200ms ease-out;
+}
