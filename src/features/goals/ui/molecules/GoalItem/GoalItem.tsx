@@ -117,9 +117,8 @@ export function GoalItem({
         }
         trailing={
           <ActionMenu
-                    ariaLabel="Contribution actions"
+                    ariaLabel="Goal actions"
                     items={actions}
-                    onAction={() => {}}
                     triggerButtonBody={<></>}
                     triggerClassName={styles.actionMenuTrigger}
                     isOpen={isActionsMenuOpen}
