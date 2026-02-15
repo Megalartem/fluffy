@@ -69,6 +69,7 @@ type FormValues = {
   amount: string;
   categoryId: string | null;
   dateKey: string | null; // YYYY-MM-DD
+  note?: string;
 };
 
 export function TransactionUpsertSheet({
@@ -90,6 +91,7 @@ export function TransactionUpsertSheet({
       amount: "",
       categoryId: null,
       dateKey: todayKey(),
+      note: "",
     },
     mode: "onSubmit",
   });
@@ -101,14 +103,14 @@ export function TransactionUpsertSheet({
 
   const categoryOptions = React.useMemo(() => {
     const effectiveType = watchedType ?? (defaultCategoryState?.type ?? TYPE_OPTIONS[0].value);
-    
+
     const opts = buildCategoryOptions({
       categories,
       txType: effectiveType,
       includeArchived: false,
       renderIcon: renderCategoryIcon,
     });
-    
+
     return opts;
   }, [categories, watchedType, defaultCategoryState]);
 
@@ -141,6 +143,7 @@ export function TransactionUpsertSheet({
         amount: "",
         categoryId: isDefaultIdValid ? defaultId : null,
         dateKey: todayKey(),
+        note: "",
       });
       return;
     }
@@ -151,6 +154,7 @@ export function TransactionUpsertSheet({
       amount: fromMinorByCurrency(transaction.amountMinor, transaction.currency),
       categoryId: transaction.categoryId ?? null,
       dateKey: transaction.dateKey,
+      note: transaction.note ?? "",
     });
   }, [open, transaction, form, defaultCategoryState, categories]);
 
@@ -197,7 +201,7 @@ export function TransactionUpsertSheet({
           amountMinor,
           currency: transaction?.currency ?? currency,
           categoryId: categoryIdValue,
-          note: null,
+          note: values.note ?? null,
           dateKey,
         };
 
@@ -208,7 +212,7 @@ export function TransactionUpsertSheet({
           amountMinor,
           dateKey,
           categoryId: categoryIdValue,
-          // currency/note — не трогаем, так как в форме их нет
+          note: values.note ?? null,
         };
 
         const input: UpdateTransactionInput = {
@@ -256,22 +260,22 @@ export function TransactionUpsertSheet({
         onClose={onClose}
         footer={
           <div className={styles.footer}>
-          <ButtonBase
-            fullWidth
-            onClick={form.handleSubmit(onSubmit)}
-            disabled={saving}
-          >
-            {saving ? "Saving…" : "Save"}
-          </ButtonBase>
-          {isEdit && onDelete && (
-            <IconButton
-              icon={Trash2}
-              variant="default"
-              onClick={handleDelete}
+            <ButtonBase
+              fullWidth
+              onClick={form.handleSubmit(onSubmit)}
               disabled={saving}
-              className={styles.deleteButton}
-            />
-          )}
+            >
+              {saving ? "Saving…" : "Save"}
+            </ButtonBase>
+            {isEdit && onDelete && (
+              <IconButton
+                icon={Trash2}
+                variant="default"
+                onClick={handleDelete}
+                disabled={saving}
+                className={styles.deleteButton}
+              />
+            )}
           </div>
         }
       >
@@ -296,7 +300,6 @@ export function TransactionUpsertSheet({
                 validate: (v) => {
                   if (!v) return "Введите сумму";
                   const minor = toMinorByCurrency(v, currency);
-                  console.log("minor", minor);
                   if (minor == null || minor <= 0) {
                     return "Введите сумму больше нуля";
                   }
@@ -323,6 +326,14 @@ export function TransactionUpsertSheet({
               name="dateKey"
               label="Date"
               rules={{ required: "Choose a date" }}
+            />
+
+            {/* Note */}
+            <FormFieldString<FormValues>
+              name="note"
+              label="Note (optional)"
+              placeholder="Add a note"
+              multiline={true}
             />
           </div>
         </FormProvider>
