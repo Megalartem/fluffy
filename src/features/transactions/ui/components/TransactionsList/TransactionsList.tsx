@@ -15,6 +15,7 @@ import { Divider } from "@/shared/ui/atoms";
 import { TransactionRow } from "@/features/transactions/ui/molecules";
 import { shownAmount } from "@/shared/lib/money/helper";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
+import { useGoals } from "@/features/goals/hooks";
 
 export type TransactionListEmptyStateStrings = {
     noTransactionsTitle: string;
@@ -140,6 +141,9 @@ export function TransactionsList({
 }: ITransactionList) {
     const { currency } = useWorkspace();
     const strings = React.useMemo(() => ({ ...DEFAULT_EMPTY, ...(empty ?? {}) }), [empty]);
+    
+    // Load goals once for all goal-linked transactions (N+1 optimization)
+    const { items: goals } = useGoals({ includeArchived: true, includeCompleted: true });
 
     // Intersection Observer для infinite scroll
     const observerTarget = React.useRef<HTMLDivElement>(null);
@@ -272,13 +276,13 @@ export function TransactionsList({
                 <Card variant="default" padding="m" bgVariant="white">
                     {transactions.map((t, idx) => {
                         const category = categoryById.get(t.categoryId ?? "");
-                        if (!category) return null;
 
                         return (
                             <React.Fragment key={t.id}>
                                 <TransactionRow
                                     transaction={t}
                                     category={category}
+                                    goals={goals}
                                     onClick={() => onTransactionClick?.(t)}
                                     onDelete={() => onTransactionDelete?.(t)}
                                     tone="ghost"
@@ -295,6 +299,7 @@ export function TransactionsList({
                         key={g.dateKey}
                         transactions={g.transactions}
                         categories={categories}
+                        goals={goals}
                         title={g.title}
                         totalText={g.totalText}
                         onTransactionClick={onTransactionClick}

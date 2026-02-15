@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./TransactionCategoryIcon.module.css";
 import { CategoryIcon } from "@/shared/ui/atoms";
-import { ArrowDown, ArrowUp, ArrowRight } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowRight, Target } from "lucide-react";
 import { CategoryColor } from "@/features/categories/model/types";
 
 type TxCategoryIconSize = "s" | "m" | "l";
@@ -12,6 +12,7 @@ export type TransactionCategoryIconProps = React.HTMLAttributes<HTMLDivElement> 
     size?: TxCategoryIconSize;
     color?: CategoryColor;
     txType?: TxType;
+    linkedGoalId?: string | null;
 };
 
 const TxBadgeIcon = ({ txType }: { txType: TxType }) => {
@@ -32,9 +33,14 @@ export function TransactionCategoryIcon({
     size = "m",
     color = "default",
     txType = "expense",
+    linkedGoalId,
     className,
     ...rest
 }: TransactionCategoryIconProps) {
+    // Use Target icon for goal-linked transactions
+    const displayIcon = linkedGoalId ? Target : icon;
+    const displayColor = linkedGoalId ? "green" : color;
+
     return (
         <div
             className={[styles.wrap, className].filter(Boolean).join(" ")}
@@ -42,9 +48,9 @@ export function TransactionCategoryIcon({
         >
             <CategoryIcon
                 {...rest}
-                icon={icon}
+                icon={displayIcon}
                 size={size}
-                color={color}
+                color={displayColor}
                 importance={"secondary"}
                 className={styles.root}
             />
