@@ -9,6 +9,12 @@ import { GOAL_COLORS, GOAL_COLOR_LABELS, type GoalColor } from "../../../model/t
 
 type ColorItem = { id: GoalColor; name: string };
 
+// Static color items - no need to recalculate on each render
+const COLOR_ITEMS: ColorItem[] = GOAL_COLORS.map((id) => ({ 
+  id, 
+  name: GOAL_COLOR_LABELS[id] ?? id 
+}));
+
 interface GoalColorFieldProps {
   name: string;
   label?: string;
@@ -18,14 +24,10 @@ export function GoalColorField({ name, label = "Color" }: GoalColorFieldProps) {
   const { watch, setValue } = useFormContext();
   const selectedColor = watch(name) as GoalColor | null;
 
-  const items: ColorItem[] = useMemo(() => {
-    return GOAL_COLORS.map((id) => ({ id, name: GOAL_COLOR_LABELS[id] ?? id }));
-  }, []);
-
   const selected = useMemo(() => {
-    if (!selectedColor) return items[0];
-    return items.find((c) => c.id === selectedColor) ?? items[0];
-  }, [items, selectedColor]);
+    if (!selectedColor) return COLOR_ITEMS[0];
+    return COLOR_ITEMS.find((c) => c.id === selectedColor) ?? COLOR_ITEMS[0];
+  }, [selectedColor]);
 
   const handleColorChange = (key: string) => {
     setValue(name, key as GoalColor, { shouldDirty: true, shouldValidate: true });
@@ -35,7 +37,7 @@ export function GoalColorField({ name, label = "Color" }: GoalColorFieldProps) {
     <FormFieldBase label={label}>
       <div className={styles.container}>
         <BezelCarousel<ColorItem>
-          items={items}
+          items={COLOR_ITEMS}
           getKey={(c) => c.id}
           selectedKey={selected.id}
           onChangeSelected={handleColorChange}
