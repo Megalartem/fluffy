@@ -110,6 +110,16 @@ export class DexieGoalContributionsRepo implements GoalContributionsRepo {
     return gc;
   }
 
+  async findByLinkedTransactionId(workspaceId: string, txId: string): Promise<GoalContribution | null> {
+    await ensureDbInitialized();
+    const gc = await db.goalContributions
+      .where("linkedTransactionId")
+      .equals(txId)
+      .and((c) => c.workspaceId === workspaceId && !c.deletedAt)
+      .first();
+    return gc ?? null;
+  }
+
   async add(workspaceId: string, input: CreateGoalContributionInput): Promise<GoalContribution> {
     try {
       await ensureDbInitialized();

@@ -28,6 +28,7 @@ export interface GoalContributionsRepo {
   listByGoalId(workspaceId: string, goalId: string): Promise<GoalContribution[]>;
   listByWorkspaceId(workspaceId: string): Promise<GoalContribution[]>;
   getById(workspaceId: string, id: string): Promise<GoalContribution | null>;
+  findByLinkedTransactionId(workspaceId: string, txId: string): Promise<GoalContribution | null>;
 
   add(workspaceId: string, input: CreateGoalContributionInput): Promise<GoalContribution>;
   update(workspaceId: string, id: string, patch: UpdateGoalContributionPatch): Promise<GoalContribution>;

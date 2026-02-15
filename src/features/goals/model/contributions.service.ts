@@ -5,6 +5,7 @@ import type {
   UpdateGoalContributionPatch,
 } from "@/features/goals/model/types";
 import { contributionsRepo } from "@/features/goals/api/repo.dexie";
+import { transactionService } from "@/features/transactions/model/service";
 
 const isDateKey = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v);
 
@@ -44,6 +45,11 @@ export class GoalContributionsService {
     return contributionsRepo.getById(workspaceId, id);
   }
 
+  async findByLinkedTransactionId(workspaceId: string, txId: string): Promise<GoalContribution | null> {
+    if (!txId) return null;
+    return contributionsRepo.findByLinkedTransactionId(workspaceId, txId);
+  }
+
   async add(workspaceId: string, input: CreateGoalContributionInput): Promise<GoalContribution> {
     if (!input.goalId) {
       throw new AppError("VALIDATION_ERROR", "Goal is required", { field: "goalId" });
@@ -80,6 +86,31 @@ export class GoalContributionsService {
 
   async delete(workspaceId: string, id: string): Promise<void> {
     if (!id) return;
+    
+    // 1. Get contribution to check for linked transaction
+    const contribution = await contributionsRepo.getById(workspaceId, id);
+    if (!contribution) return;
+    
+    // 2. If there's a linked transaction, delete it first
+    if (contribution.linkedTransactionId) {
+      try {
+        await transactionService.deleteTransaction(workspaceId, contribution.linkedTransactionId);
+      } catch (e) {
+        // Check if transaction still exists before treating as error
+        const tx = await transactionService.getTransaction(workspaceId, contribution.linkedTransactionId);
+        if (tx && !tx.deletedAt) {
+          // Transaction exists but failed to delete - this is a real error
+          throw new AppError("STORAGE_ERROR", "Failed to delete linked transaction", {
+            cause: e instanceof Error ? e.message : String(e),
+            linkedTransactionId: contribution.linkedTransactionId,
+          });
+        }
+        // Transaction already deleted or doesn't exist - safe to continue
+        console.log("Linked transaction already deleted:", contribution.linkedTransactionId);
+      }
+    }
+    
+    // 3. Delete the contribution
     await contributionsRepo.softDelete(workspaceId, id);
   }
 }

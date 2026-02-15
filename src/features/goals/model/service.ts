@@ -121,6 +121,7 @@ export class GoalsService {
       amountMinor,
       currency: goal.currency,
       categoryId: null,
+      linkedGoalId: goal.id,
       note: input.note?.trim() || null,
       dateKey,
     };

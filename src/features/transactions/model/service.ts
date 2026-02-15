@@ -38,6 +38,7 @@ export class TransactionService {
       currency: input.currency || settings.defaultCurrency,
       dateKey: input.dateKey ?? todayIsoDate(),
       categoryId: input.categoryId ?? null,
+      linkedGoalId: input.linkedGoalId ?? null,
       note: input.note ?? null,
       createdAt: nowIso(),
       updatedAt: nowIso(),
@@ -68,6 +69,10 @@ export class TransactionService {
       ...input.patch,
       updatedAt: nowIso(),
     });
+  }
+
+  async getTransaction(workspaceId: string, id: string): Promise<Transaction | null> {
+    return this.transactionsRepo.getById(workspaceId, id);
   }
 
   async deleteTransaction(workspaceId: string, id: string) {
