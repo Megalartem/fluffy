@@ -7,6 +7,7 @@ import type {
   UpdateGoalContributionPatch,
 } from "@/features/goals/model/types";
 import { goalContributionsService } from "@/features/goals/model/contributions.service";
+import { goalsService } from "@/features/goals/model/service";
 import { transactionService } from "@/features/transactions/model/service";
 import { UpdateTransactionPatch } from "@/features/transactions/model/types";
 
@@ -47,12 +48,13 @@ export function useGoalContributionMutation(params: { refresh?: () => Promise<vo
       await withState(async () => {
         // 1. Get the contribution to check for linked transaction
         const contribution = await goalContributionsService.getById(workspaceId, id);
+        if (!contribution) return;
         
         // 2. Update the contribution
         await goalContributionsService.update(workspaceId, id, patch);
         
         // 3. If there's a linked transaction, sync the changes
-        if (contribution?.linkedTransactionId) {
+        if (contribution.linkedTransactionId) {
           const txPatch: UpdateTransactionPatch = {};
           
           if (patch.amountMinor !== undefined) {
@@ -78,6 +80,23 @@ export function useGoalContributionMutation(params: { refresh?: () => Promise<vo
             }
           }
         }
+
+        // 4. Recalculate goal progress
+        const goalId = contribution.goalId;
+        const allContributions = await goalContributionsService.listByGoalId(workspaceId, goalId);
+        const goal = await goalsService.getById(workspaceId, goalId);
+        
+        if (goal) {
+          const currentAmount = allContributions.reduce((sum, c) => sum + c.amountMinor, 0);
+          const newStatus = goal.status === "archived" 
+            ? "archived" 
+            : (currentAmount >= goal.targetAmountMinor ? "completed" : "active");
+          
+          await goalsService.update(workspaceId, goalId, { 
+            currentAmountMinor: currentAmount,
+            status: newStatus,
+          });
+        }
       });
     },
     [withState, workspaceId]
@@ -86,7 +105,30 @@ export function useGoalContributionMutation(params: { refresh?: () => Promise<vo
   const contributionDelete = React.useCallback(
     async (id: string) => {
       await withState(async () => {
+        // 1. Get the contribution to know which goal to update
+        const contribution = await goalContributionsService.getById(workspaceId, id);
+        if (!contribution) return;
+        
+        const goalId = contribution.goalId;
+        
+        // 2. Delete the contribution
         await goalContributionsService.delete(workspaceId, id);
+        
+        // 3. Recalculate goal progress
+        const allContributions = await goalContributionsService.listByGoalId(workspaceId, goalId);
+        const goal = await goalsService.getById(workspaceId, goalId);
+        
+        if (goal) {
+          const currentAmount = allContributions.reduce((sum, c) => sum + c.amountMinor, 0);
+          const newStatus = goal.status === "archived" 
+            ? "archived" 
+            : (currentAmount >= goal.targetAmountMinor ? "completed" : "active");
+          
+          await goalsService.update(workspaceId, goalId, { 
+            currentAmountMinor: currentAmount,
+            status: newStatus,
+          });
+        }
       });
     },
     [withState, workspaceId]

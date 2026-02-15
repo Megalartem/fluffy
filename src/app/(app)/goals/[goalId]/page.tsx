@@ -49,7 +49,6 @@ export default function GoalDetailsPage() {
         goalUpdate,
         goalDelete,
         goalContribute,
-        goalRefresh,
     } = useGoalMutation({ refresh: refreshAll });
 
     const {
@@ -264,7 +263,6 @@ export default function GoalDetailsPage() {
                         }}
                         onUpdate={async (input) => {
                             await contributionUpdate(input.id, input.patch);
-                            await goalRefresh(goal.id);
                         }}
                         onDelete={async () => {
                             setContributionToDelete(editingContribution);
@@ -307,9 +305,7 @@ export default function GoalDetailsPage() {
                 onConfirm={async () => {
                     if (!contributionToDelete) return;
                     await contributionDelete(contributionToDelete.id);
-                    goalRefresh(contributionToDelete.goalId);
                     setContributionToDelete(undefined);
-                    
                 }}
                 onCancel={() => setContributionToDelete(undefined)}
             />
