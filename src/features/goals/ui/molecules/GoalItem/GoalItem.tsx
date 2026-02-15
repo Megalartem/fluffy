@@ -2,7 +2,7 @@
 import { ActionMenu, ActionMenuItem, ListRowBase } from "@/shared/ui/molecules";
 import type { Goal } from "@/features/goals/model/types";
 import { ProgressRing, Text } from "@/shared/ui/atoms";
-import { fromMinorByCurrency } from "@/shared/lib/money/helper";
+import { shownAmount } from "@/shared/lib/money/helper";
 import styles from "./GoalItem.module.css";
 import { GoalStatusBadge } from "../GoalStatusBadge";
 import clsx from "clsx";
@@ -97,11 +97,11 @@ export function GoalItem({
           <div className={styles.subtitle}>
             <div className={clsx(styles.amounts, direction === "column" && styles.amountsColumn)}>
             <Text variant="body">
-              {fromMinorByCurrency(goal.currentAmountMinor, goal.currency)}
+              {shownAmount(goal.currentAmountMinor, goal.currency)}
               </Text>
               <Text variant="caption">
               {" / "}
-              {fromMinorByCurrency(goal.targetAmountMinor, goal.currency)}
+              {shownAmount(goal.targetAmountMinor, goal.currency)}
             </Text>
             </div>
 

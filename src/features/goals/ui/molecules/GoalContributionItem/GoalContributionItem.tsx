@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 import { ActionMenu, ActionMenuItem, ListRowBase } from "@/shared/ui/molecules";
 import { Text } from "@/shared/ui/atoms";
-import { fromMinorByCurrency } from "@/shared/lib/money/helper";
+import { shownAmount } from "@/shared/lib/money/helper";
 
 import type { GoalContribution } from "@/features/goals/model/types";
 import styles from "./GoalContributionItem.module.css";
@@ -39,7 +39,7 @@ export function GoalContributionItem({
   const [isActionsMenuOpen, setIsActionsMenuOpen] = React.useState(false);
 
   const amountText = useMemo(() => {
-    const val = fromMinorByCurrency(contribution.amountMinor, contribution.currency);
+    const val = shownAmount(contribution.amountMinor, contribution.currency);
     return `+ ${val}`;
   }, [contribution.amountMinor, contribution.currency]);
 
