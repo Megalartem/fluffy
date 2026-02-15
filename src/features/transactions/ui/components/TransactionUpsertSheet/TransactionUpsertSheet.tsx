@@ -16,10 +16,11 @@ import type {
   CreateTransactionInput,
   UpdateTransactionInput,
 } from "@/features/transactions/model/types";
+import { useGoal } from "@/features/goals/hooks";
 
 
 import type { IOptionBase } from "@/shared/ui/atoms";
-import { ButtonBase, IconButton } from "@/shared/ui/atoms";
+import { ButtonBase, IconButton, CategoryIcon } from "@/shared/ui/atoms";
 import { BottomSheet, ModalHeader } from "@/shared/ui/molecules";
 
 import { FormFieldString } from "@/shared/ui/molecules/FormField/FormFieldString";
@@ -37,8 +38,9 @@ import { renderCategoryIcon } from "@/shared/lib/renderCategoryIcon";
 
 import { toMinorByCurrency, fromMinorByCurrency } from "@/shared/lib/money/helper";
 import { AppError } from "@/shared/errors/app-error";
-import { Trash2 } from "lucide-react";
+import { Trash2, Target } from "lucide-react";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
+import { goalContributionsService } from "@/features/goals/model/contributions.service";
 
 interface defaultCategoryState {
   id: string;
@@ -85,6 +87,10 @@ export function TransactionUpsertSheet({
   const isEdit = Boolean(transaction?.id);
   const { workspaceId, currency } = useWorkspace();
 
+  // Load goal if transaction is linked to one
+  const { item: linkedGoal } = useGoal(transaction?.linkedGoalId ?? null);
+  const isGoalTransaction = Boolean(transaction?.linkedGoalId);
+
   const form = useForm<FormValues>({
     defaultValues: {
       type: defaultCategoryState?.type ?? TYPE_OPTIONS[0].value,
@@ -114,13 +120,38 @@ export function TransactionUpsertSheet({
     return opts;
   }, [categories, watchedType, defaultCategoryState]);
 
+  // Special option for goal-linked transactions
+  const goalCategoryOption = React.useMemo<IOptionBase | null>(() => {
+    if (!isGoalTransaction || !linkedGoal) return null;
+    return {
+      value: `goal:${linkedGoal.id}`,
+      label: linkedGoal.name,
+      icon: (
+        <CategoryIcon
+          icon={Target}
+          size="s"
+          color="green"
+          importance="secondary"
+        />
+      ),
+    };
+  }, [isGoalTransaction, linkedGoal]);
+
   const categoryOptionsByValue = React.useMemo<Record<string, IOptionBase>>(
-    () =>
-      categoryOptions.reduce<Record<string, IOptionBase>>((acc, opt) => {
+    () => {
+      const base = categoryOptions.reduce<Record<string, IOptionBase>>((acc, opt) => {
         acc[String(opt.value)] = opt;
         return acc;
-      }, {}),
-    [categoryOptions]
+      }, {});
+
+      // Add goal option if transaction is linked to a goal
+      if (goalCategoryOption) {
+        base[String(goalCategoryOption.value)] = goalCategoryOption;
+      }
+
+      return base;
+    },
+    [categoryOptions, goalCategoryOption]
   );
 
   // Prefill / reset on open
@@ -158,6 +189,12 @@ export function TransactionUpsertSheet({
     });
   }, [open, transaction, form, defaultCategoryState, categories]);
 
+  // Set special category value for goal transactions
+  React.useEffect(() => {
+    if (!isGoalTransaction || !linkedGoal || !open) return;
+    form.setValue("categoryId", `goal:${linkedGoal.id}`, { shouldValidate: false });
+  }, [isGoalTransaction, linkedGoal, form, open]);
+
   // transfer: category always null and picker must be closed
   React.useEffect(() => {
     if (transaction?.type !== "transfer") return;
@@ -165,6 +202,12 @@ export function TransactionUpsertSheet({
     form.setValue("categoryId", null, { shouldValidate: true });
     form.setValue("type", "transfer", { shouldValidate: true });
   }, [transaction, form]);
+
+  // Goal transactions: block category editing
+  React.useEffect(() => {
+    if (!isGoalTransaction) return;
+    setCatOpen(false);
+  }, [isGoalTransaction]);
 
   const categoryId = useWatch({ control: form.control, name: "categoryId" });
   const chosenCategory = React.useMemo<IOptionBase[] | null>(() => {
@@ -221,6 +264,27 @@ export function TransactionUpsertSheet({
         };
 
         await onUpdate(input);
+        
+        // Sync changes to linked goal contribution if this is a goal transaction
+        if (transaction && isGoalTransaction && transaction.linkedGoalId) {
+          try {
+            const contribution = await goalContributionsService.findByLinkedTransactionId(
+              workspaceId,
+              transaction.id
+            );
+            
+            if (contribution) {
+              await goalContributionsService.update(workspaceId, contribution.id, {
+                amountMinor: patch.amountMinor,
+                dateKey: patch.dateKey,
+                note: patch.note ?? null,
+              });
+            }
+          } catch (e) {
+            console.warn("Failed to sync goal contribution:", e);
+            // Don't fail the transaction update if contribution sync fails
+          }
+        }
       }
 
       onClose();
@@ -287,6 +351,7 @@ export function TransactionUpsertSheet({
                 label="Transaction type"
                 options={TYPE_OPTIONS}
                 size="m"
+                disabled={isGoalTransaction}
               />
             )}
 
@@ -314,11 +379,12 @@ export function TransactionUpsertSheet({
               label="Category"
               mode="single"
               placeholder="Choose category"
-              onOpen={() => setCatOpen(true)}
+              onOpen={() => !isGoalTransaction && setCatOpen(true)}
               optionsByValue={categoryOptionsByValue}
               showChevron
               removable
               isOpen={catOpen}
+              disabled={isGoalTransaction}
             />
 
             {/* Date */}
