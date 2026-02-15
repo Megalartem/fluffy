@@ -161,7 +161,7 @@ export function TransactionUpsertSheet({
     setSaving(false);
     setCatOpen(false);
 
-    if (!transaction) {
+    if (!isEdit) {
       // create
       const initialType: TransactionType = defaultCategoryState?.type ?? TYPE_OPTIONS[0].value;
       const defaultId = defaultCategoryState?.id ?? null;
@@ -181,18 +181,18 @@ export function TransactionUpsertSheet({
 
     // edit
     form.reset({
-      type: transaction.type,
-      amount: fromMinorByCurrency(transaction.amountMinor, transaction.currency),
-      categoryId: transaction.categoryId ?? null,
-      dateKey: transaction.dateKey,
-      note: transaction.note ?? "",
+      type: transaction?.type ?? TYPE_OPTIONS[0].value,
+      amount: transaction ? fromMinorByCurrency(transaction?.amountMinor, transaction?.currency) : "",
+      categoryId: transaction?.categoryId ?? null,
+      dateKey: transaction?.dateKey ?? todayKey(),
+      note: transaction?.note ?? "",
     });
-  }, [open, transaction, form, defaultCategoryState, categories]);
+  }, [open, isEdit, transaction, form, defaultCategoryState, categories]);
 
   // Set special category value for goal transactions
   React.useEffect(() => {
     if (!isGoalTransaction || !linkedGoal || !open) return;
-    form.setValue("categoryId", `goal:${linkedGoal.id}`, { shouldValidate: false });
+    form.setValue("categoryId", `goal:${linkedGoal.id}`);
   }, [isGoalTransaction, linkedGoal, form, open]);
 
   // transfer: category always null and picker must be closed
@@ -217,8 +217,8 @@ export function TransactionUpsertSheet({
   }, [categoryId, categoryOptions]);
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
-
     form.clearErrors("amount");
+    form.clearErrors("dateKey");
 
     const amountMinor = toMinorByCurrency(values.amount, transaction?.currency ?? currency);
     if (amountMinor == null || amountMinor <= 0) {
@@ -231,6 +231,10 @@ export function TransactionUpsertSheet({
     }
 
     const dateKey = values.dateKey ?? todayKey();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) {
+      form.setError("dateKey", { type: "validate", message: "Некорректная дата" });
+      return;
+    }
 
     const categoryIdValue =
       values.type === "transfer" ? null : (values.categoryId ?? null);
@@ -264,7 +268,7 @@ export function TransactionUpsertSheet({
         };
 
         await onUpdate(input);
-        
+
         // Sync changes to linked goal contribution if this is a goal transaction
         if (transaction && isGoalTransaction && transaction.linkedGoalId) {
           try {
@@ -272,7 +276,7 @@ export function TransactionUpsertSheet({
               workspaceId,
               transaction.id
             );
-            
+
             if (contribution) {
               await goalContributionsService.update(workspaceId, contribution.id, {
                 amountMinor: patch.amountMinor,
