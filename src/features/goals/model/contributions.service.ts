@@ -130,6 +130,42 @@ export class GoalContributionsService {
     await this.recalculateGoalProgress(workspaceId, contribution.goalId);
   }
 
+  async updateAndRecalculate(
+    workspaceId: string,
+    id: string,
+    patch: UpdateGoalContributionPatch
+  ): Promise<void> {
+    const contribution = await this.getById(workspaceId, id);
+    if (!contribution) return;
+
+    await this.update(workspaceId, id, patch);
+
+    if (contribution.linkedTransactionId) {
+      const txPatch: UpdateTransactionPatch = {};
+      if (patch.amountMinor !== undefined) txPatch.amountMinor = patch.amountMinor;
+      if (patch.dateKey !== undefined) txPatch.dateKey = patch.dateKey;
+      if (patch.note !== undefined) txPatch.note = patch.note;
+
+      if (Object.keys(txPatch).length > 0) {
+        try {
+          await transactionService.updateTransaction(workspaceId, {
+            id: contribution.linkedTransactionId,
+            patch: txPatch,
+          });
+        } catch (error) {
+          logger.warn("failed to sync linked transaction", {
+            workspaceId,
+            contributionId: id,
+            linkedTransactionId: contribution.linkedTransactionId,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+    }
+
+    await this.recalculateGoalProgress(workspaceId, contribution.goalId);
+  }
+
   async delete(workspaceId: string, id: string): Promise<void> {
     if (!id) return;
 
