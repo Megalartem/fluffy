@@ -6,7 +6,9 @@ import type {
   CreateGoalContributionInput,
   UpdateGoalContributionPatch,
 } from "@/features/goals/model/types";
-import { goalContributionsService } from "@/features/goals/model/contributions.service";
+import { getGoalContributionsService } from "@/shared/di/domain-services";
+
+const goalContributionsService = getGoalContributionsService();
 
 export function useGoalContributionMutation(params: { refresh?: () => Promise<void> | void }) {
   const { workspaceId } = useWorkspace();

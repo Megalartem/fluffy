@@ -1,9 +1,11 @@
 import * as React from "react";
 import type { CreateTransactionInput, UpdateTransactionInput } from "@/features/transactions/model/types";
-import { transactionService } from "@/features/transactions/model/service";
+import { getTransactionService } from "@/shared/di/domain-services";
 import { createDomainLogger } from "@/shared/logging/logger";
 
 const logger = createDomainLogger("transactions:mutation");
+
+const transactionService = getTransactionService();
 
 export function useTransactionMutations(params: {
   workspaceId: string;

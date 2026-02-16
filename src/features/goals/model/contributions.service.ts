@@ -5,8 +5,8 @@ import type {
   GoalStatus,
   UpdateGoalContributionPatch,
 } from "@/features/goals/model/types";
-import { contributionsRepo, goalsRepo } from "@/features/goals/api/repo.dexie";
-import { transactionService } from "@/features/transactions/model/service";
+import type { GoalContributionsRepo, GoalsRepo } from "@/features/goals/api/repo";
+import type { TransactionService } from "@/features/transactions/model/service";
 import type { UpdateTransactionPatch } from "@/features/transactions/model/types";
 import { createDomainLogger } from "@/shared/logging/logger";
 
@@ -41,21 +41,27 @@ function resolveStatus(currentAmountMinor: number, targetAmountMinor: number, cu
 }
 
 export class GoalContributionsService {
+  constructor(
+    private readonly contributionsRepo: GoalContributionsRepo,
+    private readonly goalsRepo: GoalsRepo,
+    private readonly transactionService: TransactionService
+  ) {}
+
   async listByGoalId(workspaceId: string, goalId: string): Promise<GoalContribution[]> {
     if (!goalId) return [];
-    const list = await contributionsRepo.listByGoalId(workspaceId, goalId);
+    const list = await this.contributionsRepo.listByGoalId(workspaceId, goalId);
     list.sort((a: GoalContribution, b: GoalContribution) => (b.dateKey ?? "").localeCompare(a.dateKey ?? ""));
     return list;
   }
 
   async getById(workspaceId: string, id: string): Promise<GoalContribution | null> {
     if (!id) return null;
-    return contributionsRepo.getById(workspaceId, id);
+    return this.contributionsRepo.getById(workspaceId, id);
   }
 
   async findByLinkedTransactionId(workspaceId: string, txId: string): Promise<GoalContribution | null> {
     if (!txId) return null;
-    return contributionsRepo.findByLinkedTransactionId(workspaceId, txId);
+    return this.contributionsRepo.findByLinkedTransactionId(workspaceId, txId);
   }
 
   async add(workspaceId: string, input: CreateGoalContributionInput): Promise<GoalContribution> {
@@ -71,7 +77,7 @@ export class GoalContributionsService {
       linkedTransactionId: input.linkedTransactionId ?? null,
     };
 
-    return contributionsRepo.add(workspaceId, payload);
+    return this.contributionsRepo.add(workspaceId, payload);
   }
 
   async update(workspaceId: string, id: string, patch: UpdateGoalContributionPatch): Promise<GoalContribution> {
@@ -85,7 +91,43 @@ export class GoalContributionsService {
       note: patch.note !== undefined ? normalizeNote(patch.note) : undefined,
     };
 
-    return contributionsRepo.update(workspaceId, id, payload);
+    return this.contributionsRepo.update(workspaceId, id, payload);
+  }
+
+  async updateAndRecalculate(
+    workspaceId: string,
+    id: string,
+    patch: UpdateGoalContributionPatch
+  ): Promise<void> {
+    const contribution = await this.getById(workspaceId, id);
+    if (!contribution) return;
+
+    await this.update(workspaceId, id, patch);
+
+    if (contribution.linkedTransactionId) {
+      const txPatch: UpdateTransactionPatch = {};
+      if (patch.amountMinor !== undefined) txPatch.amountMinor = patch.amountMinor;
+      if (patch.dateKey !== undefined) txPatch.dateKey = patch.dateKey;
+      if (patch.note !== undefined) txPatch.note = patch.note;
+
+      if (Object.keys(txPatch).length > 0) {
+        try {
+          await this.transactionService.updateTransaction(workspaceId, {
+            id: contribution.linkedTransactionId,
+            patch: txPatch,
+          });
+        } catch (error) {
+          logger.warn("failed to sync linked transaction", {
+            workspaceId,
+            contributionId: id,
+            linkedTransactionId: contribution.linkedTransactionId,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+    }
+
+    await this.recalculateGoalProgress(workspaceId, contribution.goalId);
   }
 
   async updateAndRecalculate(
@@ -127,14 +169,14 @@ export class GoalContributionsService {
   async delete(workspaceId: string, id: string): Promise<void> {
     if (!id) return;
 
-    const contribution = await contributionsRepo.getById(workspaceId, id);
+    const contribution = await this.contributionsRepo.getById(workspaceId, id);
     if (!contribution) return;
 
     if (contribution.linkedTransactionId) {
       try {
-        await transactionService.deleteTransaction(workspaceId, contribution.linkedTransactionId);
+        await this.transactionService.deleteTransaction(workspaceId, contribution.linkedTransactionId);
       } catch (e) {
-        const tx = await transactionService.getTransaction(workspaceId, contribution.linkedTransactionId);
+        const tx = await this.transactionService.getTransaction(workspaceId, contribution.linkedTransactionId);
         if (tx && !tx.deletedAt) {
           throw new AppError("STORAGE_ERROR", "Failed to delete linked transaction", {
             cause: e instanceof Error ? e.message : String(e),
@@ -149,7 +191,7 @@ export class GoalContributionsService {
       }
     }
 
-    await contributionsRepo.softDelete(workspaceId, id);
+    await this.contributionsRepo.softDelete(workspaceId, id);
   }
 
   async deleteAndRecalculate(workspaceId: string, id: string): Promise<void> {
@@ -161,17 +203,15 @@ export class GoalContributionsService {
   }
 
   private async recalculateGoalProgress(workspaceId: string, goalId: string): Promise<void> {
-    const goal = await goalsRepo.getById(workspaceId, goalId);
+    const goal = await this.goalsRepo.getById(workspaceId, goalId);
     if (!goal) return;
 
-    const allContributions = await contributionsRepo.listByGoalId(workspaceId, goalId);
+    const allContributions = await this.contributionsRepo.listByGoalId(workspaceId, goalId);
     const currentAmountMinor = allContributions.reduce((sum, c) => sum + c.amountMinor, 0);
 
-    await goalsRepo.update(workspaceId, goalId, {
+    await this.goalsRepo.update(workspaceId, goalId, {
       currentAmountMinor,
       status: resolveStatus(currentAmountMinor, goal.targetAmountMinor, goal.status),
     });
   }
 }
-
-export const goalContributionsService = new GoalContributionsService();

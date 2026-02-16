@@ -4,8 +4,6 @@ import type { TransactionsRepo } from "@/features/transactions/api/repo";
 import { AppError } from "@/shared/errors/app-error";
 import { nowIso } from "@/shared/lib/storage/db";
 
-import { transactionsRepo } from "@/features/transactions/api/repo.dexie";
-import { DexieCategoriesRepo } from "../api/repo.dexie"; // подправь импорт под свой файл
 import type { UpdateCategoryInput } from "./types";
 
 function makeId(prefix: string): string {
@@ -98,9 +96,3 @@ export class CategoryService {
     await this.transactionsRepo.unsetCategory(workspaceId, id);
   }
 }
-
-// singleton как у тебя
-export const categoryService = new CategoryService(
-  new DexieCategoriesRepo(),
-  transactionsRepo
-);

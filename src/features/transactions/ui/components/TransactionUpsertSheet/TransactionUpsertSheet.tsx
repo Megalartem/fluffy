@@ -40,7 +40,7 @@ import { toMinorByCurrency, fromMinorByCurrency } from "@/shared/lib/money/helpe
 import { AppError } from "@/shared/errors/app-error";
 import { Trash2, Target } from "lucide-react";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
-import { goalContributionsService } from "@/features/goals/model/contributions.service";
+import { getGoalContributionsService } from "@/shared/di/domain-services";
 import { createDomainLogger } from "@/shared/logging/logger";
 
 interface defaultCategoryState {
@@ -76,6 +76,8 @@ type FormValues = {
   dateKey: string | null; // YYYY-MM-DD
   note?: string;
 };
+
+const goalContributionsService = getGoalContributionsService();
 
 export function TransactionUpsertSheet({
   open,
