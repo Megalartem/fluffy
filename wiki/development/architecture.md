@@ -351,6 +351,94 @@ class AppError extends Error {
 - Sync scenarios
 - Conflict resolution
 
+---
+
+## Current State: Architecture Review
+
+*Last reviewed: February 16, 2026*
+
+### Scope
+This review covers the implemented features: **transactions**, **categories**, and **goals**.
+
+### Architectural Strengths
+
+#### 1. Feature Modularity
+All three domains follow a consistent structure with `api / model / hooks / ui`, making changes local and predictable. This alignment simplifies onboarding and reduces cognitive overhead.
+
+#### 2. Explicit Cross-Domain Relationships
+- **Category deletion** correctly nullifies `categoryId` in affected transactions (no cascading hard deletes)
+- **Goal contributions** link to transactions via `linkedTransactionId`, and contribution deletion removes the associated transaction
+- Business rules are enforced at the service layer, not just UI
+
+#### 3. Service-Layer Validation
+Key invariants (positive amounts, valid dates, required names) are validated in services, not just in UI forms, providing defense in depth.
+
+#### 4. Soft Delete as Standard Pattern
+Transactions, categories, goals, and contributions all use `softDelete`, reducing data loss risk and enabling audit trails.
+
+### Architectural Risks & Technical Debt
+
+#### 1. Orchestration Logic in Hooks
+Logic for recalculating goal progress and synchronizing linked transactions exists in `useGoalContributionMutation`. Some of this responsibility already exists in services, creating potential for behavior divergence between UI flows.
+
+**Impact**: Medium — increases maintenance burden  
+**Recommendation**: Consolidate orchestration into service-layer use cases; keep hooks thin
+
+#### 2. Non-Atomic Cross-Domain Operations
+In `GoalsService.contribute`, a transaction is created first, then a separate Dexie transaction writes the contribution and updates the goal. Rollback exists but isn't truly atomic across all affected tables/services.
+
+**Impact**: Low — rollback mitigates most risks  
+**Recommendation**: Document transaction boundaries; consider distributed transaction patterns if complexity grows
+
+#### 3. Singleton Dependency Injection
+Feature services are imported directly as singletons, not through a centralized composition root. This reduces testability and lifecycle control.
+
+**Impact**: Medium — affects testing and future refactoring  
+**Recommendation**: Introduce DI container for service composition
+
+### Code Quality Review
+
+#### Strengths
+
+1. **Transactions**: Basic guardrails in place
+   - Amount validation on create/update
+   - Date normalization with `toDateKey` and fallbacks
+
+2. **Categories**: Correct domain semantics
+   - Soft-delete triggers `transactionsRepo.unsetCategory(...)`
+   - Auto-assigns valid `order` on creation
+
+3. **Goals**: Improved transaction linkage
+   - `contribute` creates a transfer transaction and stores `linkedTransactionId`
+   - Contribution deletion includes defensive checks for already-deleted transactions
+
+#### Areas for Improvement
+
+1. **Read Hook Mixing Concerns**
+   `useTransactions` performs `cleanupOldMockData` and `ensureSampleTransactionsSeeded` alongside data fetching. Better suited for separate bootstrap/initialization layer.
+
+2. **Disabled ESLint Hooks Rules**
+   `useTransactions` uses `filtersRef` with disabled `react-hooks/exhaustive-deps`. While functional, increases risk of stale state bugs.
+
+3. **Silent Error Handling**
+   Some synchronization errors (e.g., updating linked transactions) are logged to `console.warn` without raising to telemetry. Good for UX, but may hide systemic issues.
+
+### Priority Improvements
+
+#### P0 (Critical)
+1. Extract seed/cleanup logic from `useTransactions` into dev/bootstrap layer
+2. Consolidate goal-contribution orchestration into a single service use case (thin hooks, thick services)
+3. Add structured logging for "soft-failed" synchronization errors
+
+#### P1 (High)
+1. Introduce composition root for transactions/categories/goals (eliminate singleton imports)
+2. Add unit tests for critical cases:
+   - Category deletion → unset categoryId in transactions
+   - Contribution update/delete → recalculate goal.currentAmountMinor
+   - Rollback scenario in `GoalsService.contribute`
+
+---
+
 ## Deployment Architecture
 
 ### Development
@@ -410,8 +498,9 @@ class AppError extends Error {
 - [Offline-First Architecture](https://offlinefirst.org/)
 - [Feature-Sliced Design](https://feature-sliced.design/)
 - [Next.js Documentation](https://nextjs.org/docs)
+- [Offline-First Patterns Guide](offline-first.md)
 
 ---
 
-**Last Updated**: December 2025  
+**Last Updated**: February 16, 2026  
 **Version**: Phase 4 Complete

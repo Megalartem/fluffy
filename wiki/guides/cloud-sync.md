@@ -479,7 +479,7 @@ A: Supabase support (planned) allows self-hosting.
 
 ## Support
 
-- **Documentation**: See [ARCHITECTURE.md](./ARCHITECTURE.md)
+- **Documentation**: See [Architecture](../development/architecture.md)
 - **Issues**: [GitHub Issues](https://github.com/Megalartem/fluffy/issues)
 - **Discord**: Coming soon
 

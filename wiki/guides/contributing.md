@@ -360,7 +360,7 @@ fluffy/
 └── tests/                # Test files
 ```
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for details.
+See [Architecture](../development/architecture.md) for details.
 
 ## Questions?
 

@@ -1,10 +1,11 @@
+````markdown
 # Shared UI Components — Atoms & Molecules
 
 > **Версия:** 1.0  
 > **Дата:** 5 января 2026  
 > **Статус:** Production-ready
 
-Этот документ содержит полную справку по всем shared UI компонентам системы Fluffy.  
+Полная справка по всем shared UI компонентам системы Fluffy.  
 Компоненты разделены на **Atoms** (атомарные элементы) и **Molecules** (композитные компоненты).
 
 ---
@@ -32,7 +33,9 @@
 ## Принципы проектирования
 
 ### Что такое Atoms?
+
 Атомы — минимальные визуальные единицы интерфейса:
+
 - ❌ не знают про features
 - ❌ не знают про domain data
 - ❌ не принимают сложные пропсы
@@ -41,7 +44,9 @@
 - ✅ являются строительными блоками
 
 ### Что такое Molecules?
+
 Молекулы — композитные компоненты из атомов:
+
 - Решают конкретную UI-задачу
 - Могут содержать внутреннюю логику взаимодействия
 - Не зависят от бизнес-доменов
@@ -60,6 +65,7 @@
 Базовый текстовый компонент для отображения текста.
 
 **Варианты:**
+
 - `body` — основной текст (по умолчанию)
 - `caption` — мелкий вторичный текст
 - `label` — подписи к полям
@@ -75,6 +81,7 @@ import { Text } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface TextProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: 'body' | 'caption' | 'label' | 'muted';
@@ -90,6 +97,7 @@ interface TextProps extends React.HTMLAttributes<HTMLSpanElement> {
 Заголовки разного уровня с семантическими HTML тегами.
 
 **Варианты:**
+
 - `page` — заголовок экрана (h1 по умолчанию)
 - `section` — заголовок секции (h2 по умолчанию)
 - `amount` — крупный заголовок для сумм (h3 по умолчанию)
@@ -103,6 +111,7 @@ import { Heading } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface HeadingProps extends React.HTMLAttributes<HTMLElement> {
   variant?: 'page' | 'section' | 'amount';
@@ -119,6 +128,7 @@ interface HeadingProps extends React.HTMLAttributes<HTMLElement> {
 Специализированный компонент для отображения денежных сумм с цветовой индикацией.
 
 **Состояния:**
+
 - `neutral` — нейтральное значение (по умолчанию)
 - `positive` — положительное значение (зелёный)
 - `negative` — отрицательное значение (красный)
@@ -132,6 +142,7 @@ import { Amount } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface AmountProps extends React.HTMLAttributes<HTMLSpanElement> {
   state?: 'positive' | 'negative' | 'neutral';
@@ -149,10 +160,12 @@ interface AmountProps extends React.HTMLAttributes<HTMLSpanElement> {
 Базовая кнопка с основными визуальными вариациями.
 
 **Размеры:**
+
 - `s` — компактная
 - `m` — средняя (по умолчанию)
 
 **Варианты:**
+
 - `default` — стандартная кнопка с фоном
 - `muted` — приглушенная кнопка
 - `ghost` — прозрачная кнопка
@@ -165,6 +178,7 @@ import { ButtonBase } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface ButtonBaseProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 's' | 'm';
@@ -195,6 +209,7 @@ import { Settings } from "lucide-react";
 ```
 
 **Props:**
+
 ```ts
 interface IconButtonProps extends ButtonBaseProps {
   icon: LucideIcon;
@@ -220,6 +235,7 @@ import { Plus } from "lucide-react";
 ```
 
 **Props:**
+
 ```ts
 interface FABProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: LucideIcon;
@@ -227,6 +243,7 @@ interface FABProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 ```
 
 **Использование:**
+
 - Основное действие на экране (Add Transaction, Create Goal)
 - Всегда одно на экран
 - Фиолетовый accent цвет
@@ -242,6 +259,7 @@ interface FABProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 Базовое поле ввода.
 
 **Состояния:**
+
 - `default` — обычное состояние
 - `error` — с ошибкой валидации
 - `disabled` — отключено
@@ -258,6 +276,7 @@ import { InputBase } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface InputBaseProps extends React.InputHTMLAttributes<HTMLInputElement> {
   state?: 'default' | 'error' | 'disabled';
@@ -283,6 +302,7 @@ import { SearchInput } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface SearchInputProps extends InputBaseProps {
   onClear?: () => void;
@@ -316,6 +336,7 @@ import { Toggle } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface ToggleProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
   enabled: boolean;
@@ -335,11 +356,13 @@ interface ToggleProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>
 Обёртка для Lucide иконок с консистентными размерами и цветами.
 
 **Размеры:**
+
 - `s` — маленькая (16px)
 - `m` — средняя (20px, по умолчанию)
 - `l` — большая (24px)
 
 **Варианты:**
+
 - `default` — основной цвет
 - `on-default` — для использования на цветном фоне
 - `muted` — приглушённый
@@ -354,6 +377,7 @@ import { Wallet } from "lucide-react";
 ```
 
 **Props:**
+
 ```ts
 interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
   icon: LucideIcon;
@@ -371,15 +395,18 @@ interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
 Иконка с цветным фоном для категорий.
 
 **Размеры:**
+
 - `xs` — очень маленькая
 - `s` — маленькая
 - `m` — средняя (по умолчанию)
 - `l` — большая
 
-**Цвета:** 
+**Цвета:**
+
 `violet`, `indigo`, `blue`, `cyan`, `teal`, `amber`, `orange`, `coral`, `red`, `green`, `lime`, `mint`, `pink`, `magenta`, `plum`, `slate`, `steel`, `graphite`, `sand`, `brown`, `default`
 
 **Importance:**
+
 - `primary` — насыщенный (для списков транзакций)
 - `secondary` — приглушённый (для форм)
 
@@ -396,6 +423,7 @@ import { Coffee } from "lucide-react";
 ```
 
 **Props:**
+
 ```ts
 interface CategoryIconProps extends React.HTMLAttributes<HTMLDivElement> {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -415,6 +443,7 @@ interface CategoryIconProps extends React.HTMLAttributes<HTMLDivElement> {
 Маленький цветной badge для статусов.
 
 **Варианты:**
+
 - `default` — нейтральный
 - `success` — зелёный
 - `warning` — жёлтый/оранжевый
@@ -428,6 +457,7 @@ import { Badge } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'success' | 'warning' | 'error';
@@ -461,10 +491,12 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 Базовая фоновая поверхность с тенью или без.
 
 **Варианты:**
+
 - `default` — с тенью/рамкой
 - `ghost` — прозрачная
 
 **Background варианты:**
+
 - `default` — стандартный фон
 - `white` — белый фон
 
@@ -477,6 +509,7 @@ import { Surface } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface SurfaceProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'ghost';
@@ -493,6 +526,7 @@ interface SurfaceProps extends React.HTMLAttributes<HTMLDivElement> {
 Разделитель.
 
 **Ориентация:**
+
 - `horizontal` — горизонтальный (по умолчанию)
 - `vertical` — вертикальный
 
@@ -503,6 +537,7 @@ import { Divider } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: 'horizontal' | 'vertical';
@@ -524,6 +559,7 @@ import { Overlay } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface OverlayProps extends React.HTMLAttributes<HTMLDivElement> {
   visible: boolean;
@@ -544,10 +580,12 @@ interface OverlayProps extends React.HTMLAttributes<HTMLDivElement> {
 Карточка-контейнер с опциональным padding и вариантами фона.
 
 **Варианты:**
+
 - `default` — с тенью/границей
 - `ghost` — прозрачная
 
 **Padding:**
+
 - `md` — средний padding (по умолчанию)
 - `lg` — большой padding
 
@@ -564,6 +602,7 @@ import { Card } from "@/shared/ui/molecules";
 ```
 
 **Props:**
+
 ```ts
 interface CardProps {
   variant?: 'default' | 'ghost';
@@ -598,6 +637,7 @@ import { ArrowLeft, Settings } from "lucide-react";
 ```
 
 **Props:**
+
 ```ts
 interface TopBarProps {
   title: string;
@@ -637,6 +677,7 @@ import { InputBase } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface FormFieldBaseProps {
   fieldType?: 'string' | 'number' | 'select';
@@ -650,6 +691,7 @@ interface FormFieldBaseProps {
 ```
 
 **Специализированные компоненты:**
+
 - `FormStringField` — для текстовых полей
 - `FormNumberField` — для числовых полей
 - `FormSelectField` — для select полей
@@ -674,6 +716,7 @@ import { SectionHeader } from "@/shared/ui/molecules";
 ```
 
 **Props:**
+
 ```ts
 interface SectionHeaderProps {
   title: React.ReactNode;
@@ -695,6 +738,7 @@ interface SectionHeaderProps {
 Центрированное модальное окно.
 
 **Размеры:**
+
 - `s` — маленькое
 - `m` — среднее (по умолчанию)
 - `l` — большое
@@ -714,6 +758,7 @@ import { Modal } from "@/shared/ui/molecules";
 ```
 
 **Props:**
+
 ```ts
 interface ModalProps {
   open: boolean;
@@ -728,6 +773,7 @@ interface ModalProps {
 ```
 
 **Особенности:**
+
 - Блокирует scroll документа когда открыта
 - Закрывается по Escape (если `dismissible=true`)
 - Закрывается по клику на overlay (если `dismissible=true`)
@@ -741,6 +787,7 @@ interface ModalProps {
 Bottom sheet (выдвигающаяся снизу панель).
 
 **Высота:**
+
 - `auto` — по контенту (по умолчанию)
 - `half` — половина экрана
 - `full` — полный экран
@@ -760,6 +807,7 @@ import { BottomSheet } from "@/shared/ui/molecules";
 ```
 
 **Props:**
+
 ```ts
 interface BottomSheetProps {
   open: boolean;
@@ -773,6 +821,7 @@ interface BottomSheetProps {
 ```
 
 **Особенности:**
+
 - Имеет handle для свайпа (визуальная полоска сверху)
 - Блокирует scroll документа когда открыта
 - Закрывается по Escape и клику на overlay (если `dismissible=true`)
@@ -801,6 +850,7 @@ import { ConfirmDialog } from "@/shared/ui/molecules";
 ```
 
 **Props:**
+
 ```ts
 interface ConfirmDialogProps {
   open: boolean;
@@ -844,11 +894,13 @@ interface ConfirmDialogProps {
 Базовая строка списка с leading/trailing элементами.
 
 **Tone:**
+
 - `default` — обычная
 - `muted` — приглушённая
 - `ghost` — прозрачная
 
 **Size:**
+
 - `m` — средняя (по умолчанию)
 - `l` — большая
 
@@ -868,6 +920,7 @@ import { CategoryIcon, Amount } from "@/shared/ui/atoms";
 ```
 
 **Props:**
+
 ```ts
 interface ListRowBaseProps {
   leading?: React.ReactNode;
@@ -894,10 +947,12 @@ interface ListRowBaseProps {
 Пустое состояние с иконкой, текстом и действиями.
 
 **Tone:**
+
 - `default` — обычный
 - `muted` — приглушённый
 
 **Size:**
+
 - `m` — средний (по умолчанию)
 - `l` — большой
 
@@ -917,6 +972,7 @@ import { Inbox } from "lucide-react";
 ```
 
 **Props:**
+
 ```ts
 interface EmptyStateProps {
   title: React.ReactNode;
@@ -957,6 +1013,7 @@ Skeleton loader для индикации загрузки (если сущес�
 Переключатель между несколькими опциями (iOS-style segmented control).
 
 **Размеры:**
+
 - `s` — маленький
 - `m` — средний (по умолчанию)
 
@@ -980,6 +1037,7 @@ const options = [
 ```
 
 **Props:**
+
 ```ts
 interface SegmentedControlProps<T extends string> {
   value: T;
@@ -997,255 +1055,38 @@ type SegmentedOption<T extends string> = {
 ```
 
 **Особенности:**
+
 - Анимированный индикатор выбранного элемента
-- Локальное состояние для мгновенной визуальной реакции
-
----
-
-#### OptionControl
-
-**Путь:** `@/shared/ui/molecules/OptionControl`
-
-Контрол с чекбоксом или радио-кнопкой и текстом (если существует).
-
----
-
-#### SortControl
-
-**Путь:** `@/shared/ui/molecules/SortControl`
-
-Контрол для выбора сортировки (если существует).
-
----
-
-#### SearchBar
-
-**Путь:** `@/shared/ui/molecules/SearchBar`
-
-Расширенная панель поиска (если существует как отдельная молекула).
-
----
-
-### Sheets & Dialogs (Extended)
-
-#### FiltersSheet
-
-**Путь:** `@/shared/ui/molecules/FiltersSheet`
-
-Bottom sheet с фильтрами (если существует).
-
----
-
-#### SortSheet
-
-**Путь:** `@/shared/ui/molecules/SortSheet`
-
-Bottom sheet для выбора сортировки (если существует).
-
----
-
-#### InlineNotice
-
-**Путь:** `@/shared/ui/molecules/InlineNotice`
-
-Встроенное уведомление/предупреждение (если существует).
-
----
-
-#### NoticeStack
-
-**Путь:** `@/shared/ui/molecules/NoticeStack`
-
-Стек toast-уведомлений (если существует).
+- Работает как radio group
+- Клавиатурная навигация
 
 ---
 
 ## Design Tokens
 
-**Путь:** `@/shared/design/tokens`
+### Путь к токенам
 
-### tokens.css
+`src/shared/design/tokens.css`
 
-CSS custom properties (CSS variables) для цветов, spacing, typography, shadows, etc.
+### Основные группы
 
-```css
-:root {
-  /* Colors */
-  --color-accent: #8B5CF6;
-  --color-text-primary: #1A1A1A;
-  --color-surface-default: #FFFFFF;
-  
-  /* Spacing */
-  --space-xs: 4px;
-  --space-s: 8px;
-  --space-m: 16px;
-  --space-l: 24px;
-  
-  /* Typography */
-  --font-body: 15px;
-  --font-caption: 13px;
-  
-  /* Shadows */
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.08);
-}
-```
+- **Colors:** bg, surface, border, accent, semantic
+- **Spacing:** xs, sm, md, lg, xl, 2xl, 3xl
+- **Border-radius:** r-sm, r-md, r-lg, r-xl
+- **Shadows:** shadow-soft, shadow-lift, shadow-float
+- **Typography:** font-family, font-size, line-height
 
-### tokens.ts
-
-TypeScript константы для использования в JS/TS коде.
-
-```ts
-export const SPACING = {
-  xs: 4,
-  s: 8,
-  m: 16,
-  l: 24,
-  xl: 32,
-} as const;
-
-export const COLORS = {
-  accent: '#8B5CF6',
-  // ...
-} as const;
-```
+**Подробнее:** см. [Foundation](./foundation.md#13-design-tokens)
 
 ---
 
-## Примеры использования
+## См. также
 
-### Пример 1: Форма с полями
-
-```tsx
-import { FormFieldBase } from "@/shared/ui/molecules/FormField";
-import { InputBase } from "@/shared/ui/atoms";
-
-function TransactionForm() {
-  return (
-    <form>
-      <FormFieldBase
-        label="Amount"
-        required
-        error={errors.amount}
-      >
-        <InputBase 
-          type="number"
-          value={amount}
-          onChange={handleAmountChange}
-          state={errors.amount ? 'error' : 'default'}
-        />
-      </FormFieldBase>
-
-      <FormFieldBase
-        label="Description"
-        helperText="Optional note"
-      >
-        <InputBase 
-          value={description}
-          onChange={handleDescriptionChange}
-        />
-      </FormFieldBase>
-    </form>
-  );
-}
-```
-
-### Пример 2: Список транзакций
-
-```tsx
-import { ListRowBase } from "@/shared/ui/molecules";
-import { CategoryIcon, Amount, Text } from "@/shared/ui/atoms";
-
-function TransactionList({ transactions }) {
-  return (
-    <div>
-      {transactions.map(tx => (
-        <ListRowBase
-          key={tx.id}
-          leading={
-            <CategoryIcon 
-              icon={tx.category.icon} 
-              color={tx.category.color}
-              size="m"
-              importance="primary"
-            />
-          }
-          title={<Text variant="body">{tx.category.name}</Text>}
-          subtitle={<Text variant="caption">{tx.description}</Text>}
-          trailing={
-            <Amount state={tx.type === 'expense' ? 'negative' : 'positive'}>
-              {tx.type === 'expense' ? '-' : '+'}{tx.amount}
-            </Amount>
-          }
-          onClick={() => openTransaction(tx.id)}
-        />
-      ))}
-    </div>
-  );
-}
-```
-
-### Пример 3: Modal с подтверждением
-
-```tsx
-import { Modal } from "@/shared/ui/molecules";
-import { ButtonBase, Text } from "@/shared/ui/atoms";
-
-function DeleteConfirmModal({ open, onConfirm, onCancel }) {
-  return (
-    <Modal open={open} title="Delete Transaction?" onClose={onCancel}>
-      <Text variant="body">
-        This action cannot be undone. Are you sure?
-      </Text>
-      
-      <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-        <ButtonBase variant="default" onClick={onConfirm}>
-          Delete
-        </ButtonBase>
-        <ButtonBase variant="ghost" onClick={onCancel}>
-          Cancel
-        </ButtonBase>
-      </div>
-    </Modal>
-  );
-}
-```
+- [Foundation](./foundation.md) — дизайн-система и принципы
+- [UI Patterns](./ui-patterns.md) — спецификация экранов
+- [README](./README.md) — навигация по wiki/design
 
 ---
 
-## Рекомендации по использованию
-
-### DO ✅
-
-- Используйте atoms для построения feature-specific компонентов
-- Комбинируйте molecules для создания сложных UI
-- Придерживайтесь design tokens для цветов и spacing
-- Используйте семантические HTML элементы через prop `as`
-- Добавляйте aria-атрибуты для доступности
-- Используйте TypeScript types для props
-
-### DON'T ❌
-
-- Не модифицируйте atoms/molecules напрямую в features
-- Не смешивайте inline styles с design tokens
-- Не дублируйте логику из shared компонентов
-- Не добавляйте бизнес-логику в atoms/molecules
-- Не игнорируйте accessibility
-
----
-
-## Changelog
-
-### v1.0 (5 января 2026)
-- ✅ Полная документация atoms
-- ✅ Полная документация molecules
-- ✅ Примеры использования
-- ✅ TypeScript interfaces
-- ✅ Design tokens reference
-
----
-
-## Ссылки
-
-- [UI_ATOMS.md](../docs/UI_ATOMS.md) — исходная документация atoms (концептуальная)
-- [Design System v1 — Foundation](../product_info/Design%20System%20v1%20—%20Foundation.md) — дизайн-система
-- [Lucide Icons](https://lucide.dev/) — библиотека иконок
+**Последнее обновление:** Февраль 2026
+````

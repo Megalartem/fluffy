@@ -673,8 +673,9 @@ describe('Offline scenarios', () => {
 - [CRDTs](https://crdt.tech/)
 - [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
 - [IndexedDB Best Practices](https://web.dev/indexeddb-best-practices/)
+- [Architecture Guide](architecture.md)
 
 ---
 
-**Last Updated**: December 2025  
+**Last Updated**: February 16, 2026  
 **Version**: Phase 4 Complete

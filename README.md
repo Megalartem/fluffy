@@ -2,12 +2,20 @@
 
 Offline-first personal finance manager on Next.js + React + TypeScript with local-first storage (Dexie / IndexedDB).
 
+> 📚 **[Full Documentation in Wiki](./wiki/README.md)**
+
 ## Current status
 
-- **App type:** Next.js App Router web application.
-- **Main domains:** `transactions`, `categories`, `goals`.
-- **Architecture work:** P0/P1/P2 review steps are documented in `docs/ARCHITECTURE_AND_CODE_REVIEW.md`.
-- **Architecture decisions (ADR):** `docs/adr/*`.
+**Phase:** 5 - Design System Implementation (In Progress)  
+**Progress:** 40% (Phases 1-4 Complete)
+
+- **App type:** Next.js App Router web application
+- **Main domains:** `transactions`, `categories`, `goals`
+- **Architecture:** See [Architecture Docs](./wiki/development/architecture.md)
+- **Design System:** See [Design Foundation](./wiki/design/foundation.md)
+- **ADR:** [Architecture Decision Records](./wiki/decisions/README.md)
+
+👉 [View Current Status & Roadmap](./wiki/planning/current-status.md)
 
 ## Tech stack (actual)
 
@@ -21,19 +29,6 @@ Offline-first personal finance manager on Next.js + React + TypeScript with loca
 
 > Versions above are synced with `package.json`.
 
-## Scripts
-
-`package.json` currently defines only these scripts:
-
-```bash
-npm run dev
-npm run build
-npm run start
-npm run lint
-```
-
-There are **no** `test` / `test:unit` / `test:e2e` scripts at the moment.
-
 ## Quick start
 
 ```bash
@@ -46,6 +41,33 @@ npm run dev
 # 3) open app
 # http://localhost:3000
 ```
+
+📖 **Detailed guide:** [Installation Documentation](./wiki/getting-started/installation.md)
+
+## Documentation
+
+All documentation is now organized in the [wiki](./wiki/) folder:
+
+- 🚀 **[Getting Started](./wiki/getting-started/README.md)** - installation, project structure, first contribution
+- 📦 **[Product](./wiki/product/README.md)** - vision, data model, user flows
+- 🎨 **[Design](./wiki/design/README.md)** - design system, UI patterns, components
+- 💻 **[Development](./wiki/development/README.md)** - architecture, patterns, testing
+- 📖 **[Guides](./wiki/guides/README.md)** - cloud sync, deployment, contributing
+- 🗓️ **[Planning](./wiki/planning/README.md)** - roadmap, current sprint, backlog
+- 🧠 **[Decisions](./wiki/decisions/README.md)** - architecture decision records (ADR)
+
+## Scripts
+
+`package.json` currently defines only these scripts:
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+```
+
+There are **no** `test` / `test:unit` / `test:e2e` scripts at the moment.
 
 ## Project structure
 
@@ -66,44 +88,30 @@ src/
 ├── shared/               # cross-cutting UI/lib/config/di
 └── lib/
 
-docs/
-├── ARCHITECTURE.md
-├── ARCHITECTURE_AND_CODE_REVIEW.md
-├── OFFLINE_FIRST_PATTERNS.md
-├── CLOUD_SYNC_GUIDE.md
-└── adr/
+wiki/                     # 📚 All documentation
+├── getting-started/      # Installation, project structure, first contribution
+├── product/              # Product vision, data model, backlog
+├── design/               # Design system, UI patterns, components
+├── development/          # Architecture, offline-first patterns
+├── guides/               # Cloud sync, deployment, contributing
+├── planning/             # Roadmap, current status, sprints
+├── decisions/            # Architecture Decision Records (ADR)
+└── archive/              # Historical documentation
 ```
 
-## Architecture notes (current)
+📖 **Full documentation:** [wiki/README.md](./wiki/README.md)
 
-- Local-first data model with domain services and repository abstractions.
-- Domain composition root for service wiring is in:
-  - `src/shared/di/domain-services.ts`.
-- For `goals` / `transactions` relationships and consistency trade-offs see:
-  - `docs/adr/0001-goals-contributions-transactions.md`.
-- For category deletion semantics see:
-  - `docs/adr/0002-categories-deletion-semantics.md`.
+## Architecture notes
 
-## Documentation index
-
-- [Architecture Guide](./docs/ARCHITECTURE.md)
-- [Architecture & Code Review](./docs/ARCHITECTURE_AND_CODE_REVIEW.md)
-- [ADR index](./docs/adr/README.md)
-- [Offline-first patterns](./docs/OFFLINE_FIRST_PATTERNS.md)
-- [Cloud sync guide](./docs/CLOUD_SYNC_GUIDE.md)
-- [Deployment guide](./docs/DEPLOYMENT.md)
-- [Contributing](./docs/CONTRIBUTING.md)
-
-## Environment
-
-Optional cloud/sync related environment variables are documented in:
-- `docs/CLOUD_SYNC_GUIDE.md`
-- `docs/DEPLOYMENT.md`
+- Local-first data model with domain services and repository abstractions
+- Domain composition root for service wiring: `src/shared/di/domain-services.ts`
+- For `goals` / `transactions` relationships: [ADR-0001](./wiki/decisions/0001-goals-contributions-transactions.md)
+- For category deletion semantics: [ADR-0002](./wiki/decisions/0002-categories-deletion-semantics.md)
 
 ## Contributing
 
-Please follow [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md).
+Please follow [Contributing Guide](./wiki/guides/contributing.md).
 
 ---
 
-If you want, next step I can also align `docs/ARCHITECTURE.md` with the same level of factual accuracy as this README (scripts, versions, and current DI/service wiring).
+**Need help?** Check out our [wiki](./wiki/) or ask in [GitHub Discussions](https://github.com/Megalartem/fluffy/discussions).
