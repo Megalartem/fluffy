@@ -3,12 +3,14 @@
 import * as React from "react";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import type { GoalContribution } from "@/features/goals/model/types";
-import { goalContributionsService } from "@/features/goals/model/contributions.service";
+import { getGoalContributionsService } from "@/shared/di/domain-services";
 
 type UseGoalContributionsOptions = {
   fromList?: GoalContribution[];
   sort?: "date_desc" | "date_asc";
 };
+
+const goalContributionsService = getGoalContributionsService();
 
 export function useGoalContributions(
   goalId: string | null | undefined,

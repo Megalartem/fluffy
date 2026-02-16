@@ -1,6 +1,9 @@
+import { createDomainLogger } from "@/shared/logging/logger";
 import { db, ensureDbInitialized, nowIso } from "@/shared/lib/storage/db";
 import type { Transaction } from "./types";
 import { categoriesRepo } from "@/features/categories/api/repo.dexie";
+
+const logger = createDomainLogger("transactions:seed");
 
 const seedKey = (workspaceId: string) => `seed_transactions_${workspaceId}`;
 
@@ -21,7 +24,7 @@ export async function ensureSampleTransactionsSeeded(workspaceId: string): Promi
   // Get real categories to reference
   const categories = await categoriesRepo.list(workspaceId);
   if (categories.length === 0) {
-    console.warn("[seed] No categories found, skipping transaction seed");
+    logger.warn("no categories found, skipping transaction seed", { workspaceId });
     return;
   }
 
@@ -30,7 +33,7 @@ export async function ensureSampleTransactionsSeeded(workspaceId: string): Promi
   const incomeCategory = categories.find(c => c.type === "income" && !c.isArchived);
 
   if (!expenseCategory) {
-    console.warn("[seed] No expense category found, skipping transaction seed");
+    logger.warn("no expense category found, skipping transaction seed", { workspaceId });
     return;
   }
 

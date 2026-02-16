@@ -1,4 +1,7 @@
+import { createDomainLogger } from "@/shared/logging/logger";
 import { db, ensureDbInitialized } from "@/shared/lib/storage/db";
+
+const logger = createDomainLogger("transactions:cleanup");
 
 /**
  * Removes old mock transactions and categories with hardcoded IDs.
@@ -40,5 +43,5 @@ export async function cleanupOldMockData(): Promise<void> {
     }
   });
 
-  console.log("[cleanup] Removed old mock data");
+  logger.info("removed old mock data");
 }

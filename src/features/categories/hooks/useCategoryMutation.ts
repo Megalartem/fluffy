@@ -3,9 +3,11 @@
 import * as React from "react";
 // import { useWorkspace } from "@/shared/config/workspace-context";
 import type { CreateCategoryInput, UpdateCategoryPatch } from "@/features/categories/model/types";
-import { categoryService } from "../model/service"
+import { getCategoryService } from "@/shared/di/domain-services"
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 
+
+const categoryService = getCategoryService();
 
 export function useCategoryMutation(params: {
   refresh?: () => Promise<void> | void;

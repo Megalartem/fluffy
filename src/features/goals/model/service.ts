@@ -12,10 +12,7 @@ import type {
 import type { CreateTransactionInput } from "@/features/transactions/model/types";
 import type { TransactionService } from "@/features/transactions/model/service";
 
-import { transactionService } from "@/features/transactions/model/service";
-import { settingsRepo } from "@/features/settings/api/repo.dexie";
 import type { SettingsRepo } from "@/features/settings/api/repo";
-import { contributionsRepo, goalsRepo } from "../api/repo.dexie";
 
 function normalizeName(name: string): string {
   return name.trim().replace(/\s+/g, " ");
@@ -163,10 +160,3 @@ export class GoalsService {
     }
   }
 }
-
-export const goalsService = new GoalsService(
-  goalsRepo,
-  contributionsRepo,
-  settingsRepo,
-  transactionService
-);
