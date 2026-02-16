@@ -41,6 +41,7 @@ import { AppError } from "@/shared/errors/app-error";
 import { Trash2, Target } from "lucide-react";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import { goalContributionsService } from "@/features/goals/model/contributions.service";
+import { createDomainLogger } from "@/shared/logging/logger";
 
 interface defaultCategoryState {
   id: string;
@@ -65,6 +66,8 @@ const TYPE_OPTIONS: Array<{ value: TransactionType; label: string }> = [
   { value: "expense", label: "Expense" },
   { value: "income", label: "Income" },
 ];
+
+const logger = createDomainLogger("transactions:upsert-sheet");
 
 type FormValues = {
   type: TransactionType;
@@ -285,7 +288,12 @@ export function TransactionUpsertSheet({
               });
             }
           } catch (e) {
-            console.warn("Failed to sync goal contribution:", e);
+            logger.warn("failed to sync linked goal contribution", {
+              workspaceId,
+              transactionId: transaction.id,
+              linkedGoalId: transaction.linkedGoalId,
+              error: e instanceof Error ? e.message : String(e),
+            });
             // Don't fail the transaction update if contribution sync fails
           }
         }

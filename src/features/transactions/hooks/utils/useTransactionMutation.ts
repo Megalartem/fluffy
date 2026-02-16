@@ -1,6 +1,9 @@
 import * as React from "react";
 import type { CreateTransactionInput, UpdateTransactionInput } from "@/features/transactions/model/types";
 import { transactionService } from "@/features/transactions/model/service";
+import { createDomainLogger } from "@/shared/logging/logger";
+
+const logger = createDomainLogger("transactions:mutation");
 
 export function useTransactionMutations(params: {
   workspaceId: string;
@@ -18,7 +21,7 @@ export function useTransactionMutations(params: {
       await refresh?.();
     } catch (e) {
       // refresh ошибки не должны ломать UX сохранения
-      console.warn("[useTransactionMutations] refresh failed", e);
+      logger.warn("refresh failed", { error: e instanceof Error ? e.message : String(e) });
     }
   }, [refresh]);
 

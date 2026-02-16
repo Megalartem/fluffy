@@ -2,11 +2,15 @@ import { AppError } from "@/shared/errors/app-error";
 import type {
   CreateGoalContributionInput,
   GoalContribution,
+  GoalStatus,
   UpdateGoalContributionPatch,
 } from "@/features/goals/model/types";
-import { contributionsRepo } from "@/features/goals/api/repo.dexie";
+import { contributionsRepo, goalsRepo } from "@/features/goals/api/repo.dexie";
 import { transactionService } from "@/features/transactions/model/service";
+import type { UpdateTransactionPatch } from "@/features/transactions/model/types";
+import { createDomainLogger } from "@/shared/logging/logger";
 
+const logger = createDomainLogger("goals:contributions");
 const isDateKey = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v);
 
 function normalizeNote(note?: string | null) {
@@ -31,11 +35,15 @@ function assertDateKey(dateKey: string) {
   }
 }
 
+function resolveStatus(currentAmountMinor: number, targetAmountMinor: number, currentStatus: GoalStatus): GoalStatus {
+  if (currentStatus === "archived") return "archived";
+  return currentAmountMinor >= targetAmountMinor ? "completed" : "active";
+}
+
 export class GoalContributionsService {
   async listByGoalId(workspaceId: string, goalId: string): Promise<GoalContribution[]> {
     if (!goalId) return [];
     const list = await contributionsRepo.listByGoalId(workspaceId, goalId);
-    // default sort: newest first
     list.sort((a: GoalContribution, b: GoalContribution) => (b.dateKey ?? "").localeCompare(a.dateKey ?? ""));
     return list;
   }
@@ -66,11 +74,7 @@ export class GoalContributionsService {
     return contributionsRepo.add(workspaceId, payload);
   }
 
-  async update(
-    workspaceId: string,
-    id: string,
-    patch: UpdateGoalContributionPatch
-  ): Promise<GoalContribution> {
+  async update(workspaceId: string, id: string, patch: UpdateGoalContributionPatch): Promise<GoalContribution> {
     if (!id) throw new AppError("VALIDATION_ERROR", "Id is required", { field: "id" });
 
     if (patch.amountMinor !== undefined) assertPositiveMinor(patch.amountMinor);
@@ -84,34 +88,89 @@ export class GoalContributionsService {
     return contributionsRepo.update(workspaceId, id, payload);
   }
 
+  async updateAndRecalculate(
+    workspaceId: string,
+    id: string,
+    patch: UpdateGoalContributionPatch
+  ): Promise<void> {
+    const contribution = await this.getById(workspaceId, id);
+    if (!contribution) return;
+
+    await this.update(workspaceId, id, patch);
+
+    if (contribution.linkedTransactionId) {
+      const txPatch: UpdateTransactionPatch = {};
+      if (patch.amountMinor !== undefined) txPatch.amountMinor = patch.amountMinor;
+      if (patch.dateKey !== undefined) txPatch.dateKey = patch.dateKey;
+      if (patch.note !== undefined) txPatch.note = patch.note;
+
+      if (Object.keys(txPatch).length > 0) {
+        try {
+          await transactionService.updateTransaction(workspaceId, {
+            id: contribution.linkedTransactionId,
+            patch: txPatch,
+          });
+        } catch (error) {
+          logger.warn("failed to sync linked transaction", {
+            workspaceId,
+            contributionId: id,
+            linkedTransactionId: contribution.linkedTransactionId,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+    }
+
+    await this.recalculateGoalProgress(workspaceId, contribution.goalId);
+  }
+
   async delete(workspaceId: string, id: string): Promise<void> {
     if (!id) return;
-    
-    // 1. Get contribution to check for linked transaction
+
     const contribution = await contributionsRepo.getById(workspaceId, id);
     if (!contribution) return;
-    
-    // 2. If there's a linked transaction, delete it first
+
     if (contribution.linkedTransactionId) {
       try {
         await transactionService.deleteTransaction(workspaceId, contribution.linkedTransactionId);
       } catch (e) {
-        // Check if transaction still exists before treating as error
         const tx = await transactionService.getTransaction(workspaceId, contribution.linkedTransactionId);
         if (tx && !tx.deletedAt) {
-          // Transaction exists but failed to delete - this is a real error
           throw new AppError("STORAGE_ERROR", "Failed to delete linked transaction", {
             cause: e instanceof Error ? e.message : String(e),
             linkedTransactionId: contribution.linkedTransactionId,
           });
         }
-        // Transaction already deleted or doesn't exist - safe to continue
-        console.log("Linked transaction already deleted:", contribution.linkedTransactionId);
+
+        logger.info("linked transaction already deleted", {
+          workspaceId,
+          linkedTransactionId: contribution.linkedTransactionId,
+        });
       }
     }
-    
-    // 3. Delete the contribution
+
     await contributionsRepo.softDelete(workspaceId, id);
+  }
+
+  async deleteAndRecalculate(workspaceId: string, id: string): Promise<void> {
+    const contribution = await this.getById(workspaceId, id);
+    if (!contribution) return;
+
+    await this.delete(workspaceId, id);
+    await this.recalculateGoalProgress(workspaceId, contribution.goalId);
+  }
+
+  private async recalculateGoalProgress(workspaceId: string, goalId: string): Promise<void> {
+    const goal = await goalsRepo.getById(workspaceId, goalId);
+    if (!goal) return;
+
+    const allContributions = await contributionsRepo.listByGoalId(workspaceId, goalId);
+    const currentAmountMinor = allContributions.reduce((sum, c) => sum + c.amountMinor, 0);
+
+    await goalsRepo.update(workspaceId, goalId, {
+      currentAmountMinor,
+      status: resolveStatus(currentAmountMinor, goal.targetAmountMinor, goal.status),
+    });
   }
 }
 
