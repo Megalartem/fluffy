@@ -5,15 +5,7 @@ import { AppError } from "@/shared/errors/app-error";
 import { nowIso, todayIsoDate } from "@/shared/lib/storage/db";
 import type { UpdateTransactionInput } from "./types";
 import { toDateKey } from "@/shared/lib/formatter";
-
-function makeId(prefix: string): string {
-  // SSR-safe uuid generation
-  const uuid = typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
-
-  return `${prefix}_${uuid}`;
-}
+import { makeId } from "@/shared/lib/id";
 
 export class TransactionService {
   constructor(

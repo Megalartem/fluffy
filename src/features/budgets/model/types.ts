@@ -17,7 +17,9 @@ export interface Budget {
   deletedAt?: string | null;
 }
 
-export type CreateBudgetInput = Omit<Budget, "id" | "workspaceId" | "createdAt" | "updatedAt" | "deletedAt">;
+export type CreateBudgetInput = Omit<Budget, "id" | "workspaceId" | "createdAt" | "updatedAt" | "deletedAt"> & {
+  currency?: CurrencyCode; // Optional - will use workspace default if not provided
+};
 export type UpdateBudgetPatch = Partial<Pick<Budget, "limitMinor" | "period">>;
 export type UpdateBudgetInput = { id: string; patch: UpdateBudgetPatch };
 

@@ -3,16 +3,9 @@ import type { ICategoriesRepository } from "@/core/repositories"; // или тв
 import type { TransactionsRepo } from "@/features/transactions/api/repo";
 import { AppError } from "@/shared/errors/app-error";
 import { nowIso } from "@/shared/lib/storage/db";
+import { makeId } from "@/shared/lib/id";
 
 import type { UpdateCategoryInput } from "./types";
-
-function makeId(prefix: string): string {
-  const uuid = typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
-
-  return `${prefix}_${uuid}`;
-}
 
 function normalizeName(name: string): string {
   return name.trim().replace(/\s+/g, " ");
