@@ -31,7 +31,8 @@ export enum DI_KEYS {
   // Services
   TRANSACTION_SERVICE = "TransactionService",
   CATEGORIES_SERVICE = "CategoriesService",
-  BUDGETS_SERVICE = "BudgetService",
+  BUDGETS_SERVICE = "BudgetsService",
+  BUDGET_SUMMARY_SERVICE = "BudgetSummaryService",
   GOALS_SERVICE = "GoalsService",
   NOTIFICATIONS_SERVICE = "NotificationsService",
   DASHBOARD_SERVICE = "DashboardService",
