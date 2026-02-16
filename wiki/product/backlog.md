@@ -271,6 +271,105 @@ As a user, I want to add an expense or income in seconds from any screen.
 
 ---
 
+## EPIC 9. Budgets (MVP)
+
+### Story 9.1 — Create Category Budget
+
+**Priority:** 🔥 P0  
+**Status:** 🔵 Planned  
+**Description:**  
+As a user, I want to set a monthly spending limit for a category to control my expenses.
+
+**Acceptance Criteria:**
+- [ ] can select expense category
+- [ ] can set limit amount
+- [ ] period defaults to "Monthly"
+- [ ] currency auto-filled from settings
+- [ ] validation: limit > 0
+- [ ] validation: one budget per category
+- [ ] validation: only expense categories allowed
+
+---
+
+### Story 9.2 — View Budget Progress
+
+**Priority:** 🔥 P0  
+**Status:** 🔵 Planned  
+**Description:**  
+As a user, I want to see how much I've spent vs my budget for each category.
+
+**AC:**
+- [ ] see spent / limit for each category
+- [ ] visual progress bar
+- [ ] color coding: green → yellow (80%) → red (100%+)
+- [ ] "Over by X" indicator when exceeded
+- [ ] remaining amount clearly shown
+
+---
+
+### Story 9.3 — Total Budget Overview
+
+**Priority:** P1  
+**Status:** 🔵 Planned  
+**Description:**  
+As a user, I want to see my overall budget status across all categories.
+
+**AC:**
+- [ ] total spent / total limit
+- [ ] overall progress percentage
+- [ ] total remaining amount
+- [ ] unbudgeted spending shown separately (if > 0)
+
+---
+
+### Story 9.4 — Identify Unbudgeted Spending
+
+**Priority:** P1  
+**Status:** 🔵 Planned  
+**Description:**  
+As a user, I want to see expenses that aren't covered by any budget.
+
+**AC:**
+- [ ] categories without budgets listed
+- [ ] spent amount shown for each
+- [ ] CTA to "Set budget" for each category
+- [ ] total unbudgeted amount in overview
+
+---
+
+### Story 9.5 — Edit/Delete Budget
+
+**Priority:** P1  
+**Status:** 🔵 Planned  
+**Description:**  
+As a user, I want to adjust or remove budget limits.
+
+**AC:**
+- [ ] can edit limit amount
+- [ ] can delete budget
+- [ ] update reflected immediately in UI
+- [ ] confirmation for delete action
+- [ ] handle case: reduce limit below current spending
+
+---
+
+### Story 9.6 — Budget Warnings
+
+**Priority:** P2  
+**Status:** 🔵 Planned  
+**Description:**  
+As a user, I want to be warned when approaching or exceeding my budget.
+
+**AC:**
+- [ ] soft warning at 80% (yellow state)
+- [ ] hard warning at 100% (red state)
+- [ ] visual indicators on budget cards
+- [ ] clear messaging: "X remaining" or "Over by X"
+
+**Documentation:** [Budgets Feature Spec](../planning/BUDGETS_FEATURE_SPEC.md) | [Implementation Tracker](../planning/BUDGETS_IMPLEMENTATION_TRACKER.md)
+
+---
+
 ## Priority Legend
 
 - 🔥 **P0** - Critical path, blocks everything

@@ -303,6 +303,27 @@
 
 ---
 
+## Next Features (Post-Phase 5)
+
+### Budgets Feature (MVP)
+**Status:** 🔵 Planned | **Estimate:** 20-24 hours
+
+**Overview:**
+Category-based budgeting with computed overall budget, unbudgeted spend tracking, and progress monitoring.
+
+**Key Deliverables:**
+- Budget data model and repositories
+- Budget summary service with spent/limit calculations
+- Budget UI components (cards, progress bars, sheets)
+- /budgets page with category budgets list
+- Integration with transactions and categories
+
+**Documentation:**
+- [Budgets Feature Spec](BUDGETS_FEATURE_SPEC.md)
+- [Implementation Tracker](BUDGETS_IMPLEMENTATION_TRACKER.md)
+
+---
+
 ## Post-Launch Vision
 
 After Phase 10 completion, foundation for:

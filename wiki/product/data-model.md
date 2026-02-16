@@ -144,6 +144,36 @@ _На будущее:_ `syncStatus` / `version` / `lastSyncedAt` — не нуж
 
 ---
 
+### Budget
+
+Бюджеты для контроля расходов по категориям.
+
+| Поле         | Тип                  | Обяз. | Пример                     | Правила                    |
+| ------------ | -------------------- | ----- | -------------------------- | -------------------------- |
+| `id`         | string               | ✅     | `bdg_...`                  | уникальный                 |
+| `workspaceId`| string               | ✅     | `ws_local`                 |                            |
+| `categoryId` | string               | ✅     | `cat_food`                 | только expense категории   |
+| `period`     | enum                 | ✅     | `monthly`                  | в MVP только monthly       |
+| `currency`   | string               | ✅     | `VND`                      | фиксируется при создании   |
+| `limitMinor` | number               | ✅     | `5000000`                  | > 0, в минорных единицах   |
+| `createdAt`  | ISO datetime         | ✅     |                            |                            |
+| `updatedAt`  | ISO datetime         | ✅     |                            |                            |
+| `deletedAt`  | ISO datetime \| null | ➖     |                            |                            |
+
+**Правила:**
+- Один активный бюджет на категорию
+- При удалении категории → бюджет soft-delete
+- Потраченная сумма (spent) не хранится — всегда вычисляется из транзакций
+- Общий бюджет = сумма лимитов категорий (не хранится отдельно)
+
+**Индексы:** 
+- `workspaceId+categoryId` - для быстрого поиска бюджета категории
+- `workspaceId+deletedAt` - для фильтрации активных бюджетов
+
+**См. также:** [Budgets Feature Spec](../planning/BUDGETS_FEATURE_SPEC.md)
+
+---
+
 ### AppSettings
 
 Настройки приложения (привязаны к workspace).
