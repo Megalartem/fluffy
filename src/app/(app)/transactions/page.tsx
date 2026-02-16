@@ -12,6 +12,7 @@ import { transactionsRepo } from "@/features/transactions/api/repo.dexie";
 import styles from "./transactions.module.css";
 import { TransactionsList } from "@/features/transactions/ui/components";
 import { useTransactionMutations } from "@/features/transactions/hooks/utils/useTransactionMutation";
+import { useTransactionsBootstrap } from "@/features/transactions/hooks/useTransactionsBootstrap";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import { useCategories } from "@/features/categories/hooks/useCategories";
 import { ConfirmDialog } from "@/shared/ui/molecules/ConfirmDialog/ConfirmDialog";
@@ -69,6 +70,11 @@ export default function TransactionsPage() {
   const { txCreate, txUpdate, txRemove } = useTransactionMutations({
     workspaceId,
     refresh,
+  });
+
+  useTransactionsBootstrap({
+    workspaceId,
+    enabled: categories.length > 0,
   });
 
   const handleRefresh = useCallback(async () => {
