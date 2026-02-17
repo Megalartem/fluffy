@@ -60,6 +60,14 @@
   user-select: none;
 }
 
+.center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  user-select: none;
+}
+
 .label[data-size="s"] {
   font-size: var(--text-sm);
 }
