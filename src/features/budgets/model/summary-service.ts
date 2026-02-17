@@ -83,19 +83,11 @@ export class BudgetSummaryService {
     if (!category) return null;
 
     const spentMinor = await this.getCategorySpent(workspaceId, categoryId, month);
-    const remainingMinor = budget.limitMinor - spentMinor;
-    const progress = budget.limitMinor > 0 ? spentMinor / budget.limitMinor : 0;
-    const isOverBudget = spentMinor > budget.limitMinor;
-    const isWarning = progress >= 0.8 && !isOverBudget;
 
     return {
       budget,
       category,
       spentMinor,
-      remainingMinor,
-      progress,
-      isOverBudget,
-      isWarning,
     };
   }
 
@@ -128,10 +120,7 @@ export class BudgetSummaryService {
       return {
         totalLimitMinor: 0,
         totalSpentMinor: 0,
-        totalRemainingMinor: 0,
         unbudgetedMinor: totalExpenseMinor,
-        progress: 0,
-        isOverBudget: false,
         categoryBudgets: [],
       };
     }
@@ -166,18 +155,10 @@ export class BudgetSummaryService {
     const totalExpenseMinor = allExpenses.reduce((sum, tx) => sum + tx.amountMinor, 0);
     const unbudgetedMinor = Math.max(0, totalExpenseMinor - totalSpentMinor);
 
-    // Calculate overall metrics
-    const totalRemainingMinor = totalLimitMinor - totalSpentMinor;
-    const progress = totalLimitMinor > 0 ? totalSpentMinor / totalLimitMinor : 0;
-    const isOverBudget = totalSpentMinor > totalLimitMinor;
-
     return {
       totalLimitMinor,
       totalSpentMinor,
-      totalRemainingMinor,
       unbudgetedMinor,
-      progress,
-      isOverBudget,
       categoryBudgets,
     };
   }

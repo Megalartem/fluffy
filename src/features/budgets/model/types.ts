@@ -28,18 +28,11 @@ export interface CategoryBudgetSummary {
   budget: Budget;
   category: Category;
   spentMinor: number;
-  remainingMinor: number;
-  progress: number; // 0-1
-  isOverBudget: boolean;
-  isWarning: boolean; // >= 80%
 }
 
 export interface TotalBudgetSummary {
   totalLimitMinor: number;
   totalSpentMinor: number;
-  totalRemainingMinor: number;
   unbudgetedMinor: number;
-  progress: number;
-  isOverBudget: boolean;
   categoryBudgets: CategoryBudgetSummary[];
 }
