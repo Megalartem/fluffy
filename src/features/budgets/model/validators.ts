@@ -67,6 +67,15 @@ export function validateBudgetInput(input: CreateBudgetInput): void {
  * @throws AppError if validation fails
  */
 export function validateBudgetPatch(patch: UpdateBudgetPatch): void {
+  // Validate categoryId if provided
+  if (patch.categoryId !== undefined) {
+    if (typeof patch.categoryId !== "string" || !patch.categoryId.trim()) {
+      throw new AppError("VALIDATION_ERROR", "Category ID must be a non-empty string", {
+        field: "categoryId"
+      });
+    }
+  }
+
   // Validate limitMinor if provided
   if (patch.limitMinor !== undefined) {
     if (!Number.isFinite(patch.limitMinor)) {

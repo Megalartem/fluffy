@@ -95,10 +95,39 @@ export class BudgetsService {
   /**
    * Update budget
    * 
-   * Currently only limitMinor and period can be updated
+   * Can update: limitMinor, period, categoryId
+   * When changing categoryId, validates no duplicate budget exists
    */
   async update(workspaceId: string, input: UpdateBudgetInput): Promise<Budget> {
     const patch = { ...input.patch };
+
+    // Validate categoryId if provided (check for duplicates)
+    if (patch.categoryId !== undefined) {
+      // Check category exists and is expense type
+      const category = await this.categoriesRepo.getById(workspaceId, patch.categoryId);
+      if (!category) {
+        throw new AppError("NOT_FOUND", "Category not found", { 
+          field: "categoryId",
+          categoryId: patch.categoryId 
+        });
+      }
+
+      if (category.type !== "expense") {
+        throw new AppError("VALIDATION_ERROR", "Budget can only be set for expense categories", {
+          field: "categoryId",
+          categoryType: category.type
+        });
+      }
+
+      // Check if another budget already exists for this category
+      const existing = await this.budgetsRepo.getByCategoryId(workspaceId, patch.categoryId);
+      if (existing && existing.id !== input.id) {
+        throw new AppError("CONFLICT", "Budget already exists for this category", {
+          field: "categoryId",
+          existingBudgetId: existing.id
+        });
+      }
+    }
 
     // Validate limitMinor if provided
     if (patch.limitMinor !== undefined) {

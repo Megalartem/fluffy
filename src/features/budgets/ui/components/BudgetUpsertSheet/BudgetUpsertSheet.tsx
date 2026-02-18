@@ -29,12 +29,12 @@ import { toMinorByCurrency, fromMinorByCurrency } from "@/shared/lib/money/helpe
 
 // +++
 import {
-  buildCategoryOptions,
-  findCategoryOption,
+    buildCategoryOptions,
 } from "@/features/transactions/lib/categoryOptions";
 import { renderCategoryIcon } from "@/shared/lib/renderCategoryIcon";
 import { CategoriesSheet } from "@/features/transactions/ui/components/CategoryField/CategoriesSheet";
 import { useCategories } from "@/features/categories/hooks/useCategories";
+import { useBudgets } from "@/features/budgets/hooks/useBudgets";
 // ---
 
 type FormValues = {
@@ -75,31 +75,71 @@ export function BudgetUpsertSheet({
 
     // +++ categoryId logic mirrored from TransactionUpsertSheet
     const categories = useCategories();
+    const { budgets } = useBudgets();
 
+    // Filter out categories that already have budgets (except current budget's category in edit mode)
     const categoryOptions = React.useMemo(() => {
-      return buildCategoryOptions({
-        categories: categories ? categories.items.filter((c) => c.type === "expense") : [],
-        txType: "expense",
-        includeArchived: false,
-        renderIcon: renderCategoryIcon,
-      });
-    }, [categories]);
+        if (!categories) return [];
 
-    const categoryOptionsByValue = React.useMemo<Record<string, IOptionBase>>(
-      () =>
-        categoryOptions.reduce<Record<string, IOptionBase>>((acc, opt) => {
-          acc[String(opt.value)] = opt;
-          return acc;
-        }, {}),
-      [categoryOptions]
-    );
+        const expenseCategories = categories.items.filter((c) => c.type === "expense");
+
+        // Get set of category IDs that already have budgets
+        const budgetedCategoryIds = new Set(
+            budgets.map(b => b.categoryId)
+        );
+
+        // In edit mode, allow the current budget's category
+        if (isEdit && budget?.categoryId) {
+            budgetedCategoryIds.delete(budget.categoryId);
+        }
+
+        // Filter out categories with existing budgets
+        const availableCategories = expenseCategories.filter(
+            c => !budgetedCategoryIds.has(c.id)
+        );
+
+        return buildCategoryOptions({
+            categories: availableCategories,
+            txType: "expense",
+            includeArchived: false,
+            renderIcon: renderCategoryIcon,
+        });
+    }, [categories, budgets, isEdit, budget?.categoryId]);
+
+    // Build lookup map for category options
+    const categoryOptionsByValue = React.useMemo<Record<string, IOptionBase>>(() => {
+        const base = categoryOptions.reduce<Record<string, IOptionBase>>((acc, opt) => {
+            acc[String(opt.value)] = opt;
+            return acc;
+        }, {});
+
+        // In edit mode, ensure current category is always available (even if archived)
+        if (isEdit && budget?.categoryId && categories?.items) {
+            const currentCategory = categories.items.find(c => c.id === budget.categoryId);
+            if (currentCategory && !base[budget.categoryId]) {
+                // Build option for current category if not already in the list
+                const currentOpt = buildCategoryOptions({
+                    categories: [currentCategory],
+                    txType: "expense",
+                    includeArchived: true, // Include archived for current category display
+                    renderIcon: renderCategoryIcon,
+                })[0];
+                if (currentOpt) {
+                    base[String(currentOpt.value)] = currentOpt;
+                }
+            }
+        }
+
+        return base;
+    }, [categoryOptions, isEdit, budget?.categoryId, categories?.items]);
 
     const categoryId = useWatch({ control: form.control, name: "categoryId" });
     const chosenCategory = React.useMemo<IOptionBase[] | null>(() => {
-      if (!categoryId) return null;
-      const opt = findCategoryOption(categoryOptions, categoryId);
-      return opt ? [opt] : null;
-    }, [categoryId, categoryOptions]);
+        if (!categoryId) return null;
+        // Look up in the complete options map (includes current category even if archived)
+        const opt = categoryOptionsByValue[categoryId];
+        return opt ? [opt] : null;
+    }, [categoryId, categoryOptionsByValue]);
     // ---
 
     React.useEffect(() => {
@@ -107,14 +147,9 @@ export function BudgetUpsertSheet({
         setSaving(false);
         setCatOpen(false);
 
-        if (!isEdit) {
-            form.reset({ limit: "", categoryId: budget?.categoryId ?? null });
-            return;
-        }
-
         form.reset({
-            limit: budget ? fromMinorByCurrency(budget.limitMinor, budget.currency) : "",
-            categoryId: budget?.categoryId ?? null,
+            limit: isEdit && budget ? fromMinorByCurrency(budget.limitMinor, budget.currency) : "",
+            categoryId: isEdit && budget ? budget.categoryId : null,
         });
     }, [open, isEdit, budget, form]);
 
@@ -122,12 +157,14 @@ export function BudgetUpsertSheet({
         form.clearErrors("limit");
         form.clearErrors("categoryId");
 
-                const selectedCategoryId = values.categoryId;
+        // Validate category selection
+        const selectedCategoryId = values.categoryId;
         if (!selectedCategoryId) {
-          form.setError("categoryId", { type: "validate", message: "Choose a category" });
-          return;
+            form.setError("categoryId", { type: "validate", message: "Choose a category" });
+            return;
         }
 
+        // Validate limit amount
         const limitMinor = toMinorByCurrency(values.limit, currency);
         if (limitMinor == null || limitMinor <= 0) {
             form.setError("limit", {
@@ -140,6 +177,7 @@ export function BudgetUpsertSheet({
         setSaving(true);
         try {
             if (!isEdit) {
+                // Create new budget
                 const input: CreateBudgetInput = {
                     categoryId: selectedCategoryId,
                     period: "monthly",
@@ -148,21 +186,33 @@ export function BudgetUpsertSheet({
                 };
                 await onCreate(input);
             } else {
+                // Update existing budget
                 const input: UpdateBudgetInput = {
                     id: budget!.id,
-                    patch: { limitMinor },
+                    patch: {
+                        categoryId: selectedCategoryId,
+                        limitMinor
+                    },
                 };
                 await onUpdate(input);
             }
 
             onClose();
         } catch (e) {
+            // Handle validation errors
             if (e instanceof AppError && e.code === "VALIDATION_ERROR") {
                 const field = (e.meta as { field?: string })?.field;
                 if (field === "limit") {
                     form.setError("limit", { type: "server", message: e.message });
-                    return;
+                } else if (field === "categoryId") {
+                    form.setError("categoryId", { type: "server", message: e.message });
                 }
+                return;
+            }
+            // Handle duplicate category budget
+            if (e instanceof AppError && e.code === "CONFLICT") {
+                form.setError("categoryId", { type: "server", message: e.message });
+                return;
             }
             throw e;
         } finally {
@@ -184,91 +234,88 @@ export function BudgetUpsertSheet({
     const title = isEdit ? "Edit budget" : "Set budget";
 
     return (
-      <>
-        <BottomSheet
-            open={open}
-            title={<ModalHeader title={title} onClose={onClose} />}
-            height="half"
-            onClose={onClose}
-            footer={
-                <div className={styles.footer}>
-                    <ButtonBase
-                        fullWidth
-                        onClick={form.handleSubmit(onSubmit)}
-                        disabled={saving}
-                    >
-                        {saving ? "Saving…" : "Save"}
-                    </ButtonBase>
-
-                    {isEdit && onDelete && (
-                        <IconButton
-                            icon={Trash2}
-                            variant="default"
-                            onClick={handleDelete}
+        <>
+            <BottomSheet
+                open={open}
+                title={<ModalHeader title={title} onClose={onClose} />}
+                height="half"
+                onClose={onClose}
+                footer={
+                    <div className={styles.footer}>
+                        <ButtonBase
+                            fullWidth
+                            onClick={form.handleSubmit(onSubmit)}
                             disabled={saving}
-                            className={styles.deleteButton}
-                            ariaLabel="Remove budget"
+                        >
+                            {saving ? "Saving…" : "Save"}
+                        </ButtonBase>
+
+                        {isEdit && onDelete && (
+                            <IconButton
+                                icon={Trash2}
+                                variant="default"
+                                onClick={handleDelete}
+                                disabled={saving}
+                                className={styles.deleteButton}
+                                ariaLabel="Remove budget"
+                            />
+                        )}
+                    </div>
+                }
+            >
+                <FormProvider {...form}>
+                    <div className={styles.form}>
+                        <FormFieldSelect<FormValues>
+                            name="categoryId"
+                            label="Category"
+                            mode="single"
+                            placeholder="Choose category"
+                            onOpen={() => setCatOpen(true)}
+                            optionsByValue={categoryOptionsByValue}
+                            showChevron
+                            removable
+                            isOpen={catOpen}
+                            rules={{ required: "Choose a category" }}
+                            helperText="The category this budget applies to."
                         />
-                    )}
-                </div>
-            }
-        >
-            <FormProvider {...form}>
-                <div className={styles.form}>
-                    <FormFieldSelect<FormValues>
-                        name="categoryId"
-                        label="Category"
-                        mode="single"
-                        placeholder="Choose category"
-                        onOpen={() => !isEdit && setCatOpen(true)}
-                        optionsByValue={categoryOptionsByValue}
-                        showChevron
-                        removable
-                        isOpen={catOpen}
-                        disabled={isEdit}
-                        rules={{ required: "Choose a category" }}
-                        helperText="The category this budget applies to."
-                    />
 
-                    <FormFieldString<FormValues>
-                        name="limit"
-                        label="Monthly limit"
-                        placeholder="0"
-                        rightSlot={currency}
-                        rules={{
-                            required: "Введите лимит",
-                            validate: (v) => {
-                                const minor = toMinorByCurrency(v as string, currency);
-                                if (minor == null || minor <= 0) return "Введите лимит больше нуля";
-                                return true;
-                            },
-                        }}
-                        helperText="Set a monthly spending limit for this category."
-                    />
-                </div>
-            </FormProvider>
-        </BottomSheet>
+                        <FormFieldString<FormValues>
+                            name="limit"
+                            label="Monthly limit"
+                            placeholder="0"
+                            rightSlot={currency}
+                            rules={{
+                                required: "Введите лимит",
+                                validate: (v) => {
+                                    const minor = toMinorByCurrency(v as string, currency);
+                                    if (minor == null || minor <= 0) return "Введите лимит больше нуля";
+                                    return true;
+                                },
+                            }}
+                            helperText="Set a monthly spending limit for this category."
+                        />
+                    </div>
+                </FormProvider>
+            </BottomSheet>
 
-        {!isEdit && (
-          <CategoriesSheet
-            open={catOpen}
-            mode="single"
-            title="Category"
-            onClose={() => setCatOpen(false)}
-            options={categoryOptions}
-            chosenOptions={chosenCategory}
-            onChange={(val) => {
-              const next = Array.isArray(val) && val[0] ? String(val[0].value) : null;
-                            form.setValue("categoryId", next, { shouldValidate: true });
-            }}
-            onApply={(chosen) => {
-              const next = Array.isArray(chosen) && chosen[0] ? String(chosen[0].value) : null;
-                            form.setValue("categoryId", next, { shouldValidate: true });
-              setCatOpen(false);
-            }}
-          />
-        )}
-      </>
+            <CategoriesSheet
+                open={catOpen}
+                mode="single"
+                title="Category"
+                onClose={() => setCatOpen(false)}
+                options={Object.values(categoryOptionsByValue)}
+                chosenOptions={chosenCategory}
+                onChange={(val) => {
+                    const next = Array.isArray(val) && val[0] ? String(val[0].value) : null;
+                    form.setValue("categoryId", next, { shouldValidate: true });
+                }}
+                onApply={(chosen) => {
+                    const next = Array.isArray(chosen) && chosen[0] ? String(chosen[0].value) : null;
+                    form.setValue("categoryId", next, { shouldValidate: true });
+                    setCatOpen(false);
+                }}
+            />
+        </>
     );
 }
 
