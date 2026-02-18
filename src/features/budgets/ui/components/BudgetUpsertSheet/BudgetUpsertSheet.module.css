@@ -1,0 +1,38 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.footer {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.deleteButton {
+  height: 100%;
+  background: var(--color-error);
+}
+
+.categoryRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--color-muted, #64748b) 10%, transparent);
+}
+
+.categoryText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.helper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

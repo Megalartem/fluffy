@@ -3,11 +3,13 @@ import React from "react";
 import { Icon, ProgressRing } from "@/shared/ui/atoms";
 import { Home } from "lucide-react";
 import { BudgetItem } from "@/features/budgets/ui/molecules";
-import { Category } from "@/features/categories/model/types";
 import { Budget, CategoryBudgetSummary } from "@/features/budgets/model";
+import { BudgetUpsertSheet } from "@/features/budgets/ui/components";
+import { Category } from "@/features/categories/model/types";
 
 
 export default function TestUIBudgetsPage() {
+    const [currentBudget, setCurrentBudget] = React.useState<Budget | null>(null);
 
 
     const category: Category = {
@@ -71,25 +73,32 @@ export default function TestUIBudgetsPage() {
             <BudgetItem
                 budgetSummary={budgetSummary}
                 size="m"
-                onClick={() => { }}
-                onEdit={() => { }}
-                onDelete={() => { }}
+                onClick={() => setCurrentBudget(budgetSummary.budget)}
+                // onEdit={() => { }}
             />
             <BudgetItem
                 budgetSummary={budgetSummary2}
                 size="m"
-                onClick={() => { }}
-                onEdit={() => { }}
-                onDelete={() => { }}
+                onClick={() => setCurrentBudget(budgetSummary2.budget)}
+                // onEdit={() => { }}
             />
 
             <BudgetItem
                 budgetSummary={budgetSummary3}
                 size="m"
-                onClick={() => { }}
-                onEdit={() => { }}
-                onDelete={() => { }}
+                onClick={() => setCurrentBudget(budgetSummary3.budget)}
+                // onEdit={() => { }}
             />
+
+            {currentBudget && (
+                <BudgetUpsertSheet
+                    open={currentBudget !== null}
+                    budget={currentBudget}
+                    onClose={() => setCurrentBudget(null)}
+                    onCreate={() => {}}
+                    onUpdate={() => {}}
+                />
+            )}
         </div>
     );
 }
