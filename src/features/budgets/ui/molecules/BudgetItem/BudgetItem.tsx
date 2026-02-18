@@ -9,7 +9,7 @@ import { shownAmount } from "@/shared/lib/money/helper";
 import { getLazyLucideIcon } from "@/shared/lib/renderCategoryIcon";
 import styles from "./BudgetItem.module.css";
 import clsx from "clsx";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil } from "lucide-react";
 
 
 export function renderBudgetProgressRing(budgetSummary: CategoryBudgetSummary, size: BudgetItemSize): React.ReactNode {
@@ -48,7 +48,6 @@ export type BudgetItemProps = {
     onClick?: () => void;
 
     onEdit?: () => void;
-    onDelete?: () => void;
 };
 
 function clamp01(x: number) {
@@ -74,7 +73,6 @@ export function BudgetItem({
     direction = "row",
     onClick,
     onEdit,
-    onDelete,
 }: BudgetItemProps) {
     const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
     const { budget, category } = budgetSummary;
@@ -87,13 +85,6 @@ export function BudgetItem({
             icon: Pencil,
             label: "Edit",
             onAction: onEdit,
-        },
-        {
-            id: "delete",
-            label: "Delete",
-            icon: Trash2,
-            onAction: onDelete,
-            variant: "danger",
         },
     ];
 
