@@ -29,7 +29,7 @@ export function isBudgetOverLimit(summary: CategoryBudgetSummary): boolean {
  */
 export function isBudgetWarning(summary: CategoryBudgetSummary): boolean {
   const progress = getBudgetProgress(summary);
-  return progress >= 0.8 && !isBudgetOverLimit(summary);
+  return progress >= 0.75 && !isBudgetOverLimit(summary);
 }
 
 /**
