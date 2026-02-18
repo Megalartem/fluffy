@@ -29,6 +29,10 @@
   align-items: center;
 }
 
+.helperText {
+  padding-left: var(--spacing-2);
+}
+
 .error {
   color: var(--color-error);
 }

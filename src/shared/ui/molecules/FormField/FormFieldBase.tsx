@@ -57,7 +57,7 @@ export const FormFieldBase: React.FC<FormFieldBaseProps> = ({
           <Text variant="caption">{error}</Text>
         </div>
       ) : helperText ? (
-        <div id={hintId}>
+        <div id={hintId} className={styles.helperText}>
           <Text variant="caption">{helperText}</Text>
         </div>
       ) : null}
