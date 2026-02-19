@@ -15,12 +15,6 @@
     padding: var(--spacing-2) var(--spacing-3);
     border-radius: var(--radius-m);
     cursor: pointer;
-    background: transparent;
-    transition: background 0.12s ease;
-}
-
-.header:hover {
-    background: var(--color-bg-surface-raised);
 }
 
 .headerLeft {
@@ -41,14 +35,13 @@
 .list {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-1);
+    gap: var(--spacing-2);
 }
 
 .iconPlaceholder {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: var(--color-bg-surface-raised);
 }
 
 .spacer {

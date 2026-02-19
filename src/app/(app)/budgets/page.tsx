@@ -75,7 +75,7 @@ export default function BudgetsPage() {
     const isSheetOpen = isCreating || editingBudget !== undefined;
 
     return (
-        <div className="flex flex-col h-dvh bg-bg-main p-4 gap-4 overflow-hidden">
+        <div className="flex flex-col h-dvh p-4 gap-4">
             <PageHeader
                 title="Budgets"
 
