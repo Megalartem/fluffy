@@ -2,7 +2,7 @@
 
 import { ContributeGoalSheet, GoalUpsertSheet } from "@/features/goals/ui/components";
 import { GoalContributionItem, GoalItem } from "@/features/goals/ui/molecules";
-import { ButtonBase, GoalProgressRing, IconButton } from "@/shared/ui/atoms";
+import { ButtonBase, IconButton, ProgressRing } from "@/shared/ui/atoms";
 import { ActionMenu, ActionMenuItem, Card } from "@/shared/ui/molecules";
 import { PageHeader } from "@/shared/ui/molecules/PageHeader/PageHeader";
 import { Archive, ArrowLeft, Pencil, Trash2 } from "lucide-react";
@@ -131,20 +131,18 @@ export default function TestUIGoalsPage() {
                 title="Goals Test Page"
             />
 
-            <GoalProgressRing value={0.35} label="35%" size="s" />
-            <GoalProgressRing value={0.35} label="35%" size="m" />
-            <GoalProgressRing value={0.35} label="35%" size="l" />
-            <GoalProgressRing value={0.67} label="67%" size="xl" />
-            <GoalProgressRing value={0.35} label="35%" size="xxl" />
+            <ProgressRing value={0.35} label="35%" size="s" />
+            <ProgressRing value={0.35} label="35%" size="m" />
+            <ProgressRing value={0.35} label="35%" size="l" />
+            <ProgressRing value={0.67} label="67%" size="xl" />
+            <ProgressRing value={0.35} label="35%" size="xxl" />
 
             <GoalItem
                 goal={goal1}
-                subtitle="For work and gaming"
                 size="m"
             />
             <GoalItem
                 goal={goal2}
-                subtitle="For work and gaming"
                 size="l"
             />
 
@@ -162,7 +160,6 @@ export default function TestUIGoalsPage() {
 
             <GoalItem
                 goal={goal2}
-                subtitle="For work and gaming"
                 direction="column"
                 size="xl"
             />

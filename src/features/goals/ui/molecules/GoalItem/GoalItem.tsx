@@ -93,7 +93,7 @@ export function GoalItem({
           <ProgressRing 
             size={RING_SIZE_MAP[size]} 
             value={progress} 
-            color={goal.colorKey ?? "blue"}
+            color={goal.colorKey ?? "default"}
             label={label}
           />
         }
