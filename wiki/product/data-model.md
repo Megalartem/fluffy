@@ -1,6 +1,6 @@
 # Data Model
 
-**Последнее обновление:** 16 февраля 2026
+**Последнее обновление:** 19 февраля 2026
 
 ---
 
@@ -81,9 +81,12 @@ _На будущее:_ `syncStatus` / `version` / `lastSyncedAt` — не нуж
 | `updatedAt`  | ISO datetime         | ✅     |                            |                            |
 | `deletedAt`  | ISO datetime \| null | ➖     |                            |                            |
 
-**Правило удаления:** при удалении категории транзакции не ломаются → `categoryId = null`.
+**Правило удаления:** при удалении категории:
+- `categoryId = null` во всех транзакциях
+- связанный бюджет soft-delete
 
-См. [ADR-0002: Семантика удаления категорий](../decisions/0002-categories-deletion-semantics.md)
+См. [ADR-0002: Семантика удаления категорий](../decisions/0002-categories-deletion-semantics.md)  
+См. [ADR-0003: Связь бюджетов с категориями и каскадное удаление](../decisions/0003-budgets-categories-cascade-deletion.md)
 
 ---
 
@@ -144,6 +147,36 @@ _На будущее:_ `syncStatus` / `version` / `lastSyncedAt` — не нуж
 
 ---
 
+### Budget
+
+Бюджеты для контроля расходов по категориям.
+
+| Поле         | Тип                  | Обяз. | Пример                     | Правила                    |
+| ------------ | -------------------- | ----- | -------------------------- | -------------------------- |
+| `id`         | string               | ✅     | `bdg_...`                  | уникальный                 |
+| `workspaceId`| string               | ✅     | `ws_local`                 |                            |
+| `categoryId` | string               | ✅     | `cat_food`                 | только expense категории   |
+| `period`     | enum                 | ✅     | `monthly`                  | в MVP только monthly       |
+| `currency`   | string               | ✅     | `VND`                      | фиксируется при создании   |
+| `limitMinor` | number               | ✅     | `5000000`                  | > 0, в минорных единицах   |
+| `createdAt`  | ISO datetime         | ✅     |                            |                            |
+| `updatedAt`  | ISO datetime         | ✅     |                            |                            |
+| `deletedAt`  | ISO datetime \| null | ➖     |                            |                            |
+
+**Правила:**
+- Один активный бюджет на категорию
+- При удалении категории → бюджет soft-delete (см. [ADR-0003](../decisions/0003-budgets-categories-cascade-deletion.md))
+- Потраченная сумма (spent) не хранится — всегда вычисляется из транзакций
+- Общий бюджет = сумма лимитов категорий (не хранится отдельно)
+
+**Индексы:** 
+- `workspaceId+categoryId` - для быстрого поиска бюджета категории
+- `workspaceId+deletedAt` - для фильтрации активных бюджетов
+
+**См. также:** [Budgets Feature Spec](../planning/BUDGETS_FEATURE_SPEC.md)
+
+---
+
 ### AppSettings
 
 Настройки приложения (привязаны к workspace).
@@ -193,3 +226,4 @@ _На будущее:_ `syncStatus` / `version` / `lastSyncedAt` — не нуж
 - [Offline-First Patterns](../development/offline-first.md) - паттерны работы с данными
 - [ADR-0001: Goals ↔ Contributions ↔ Transactions](../decisions/0001-goals-contributions-transactions.md)
 - [ADR-0002: Семантика удаления категорий](../decisions/0002-categories-deletion-semantics.md)
+- [ADR-0003: Связь бюджетов с категориями и каскадное удаление](../decisions/0003-budgets-categories-cascade-deletion.md)

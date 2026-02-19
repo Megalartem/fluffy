@@ -70,7 +70,7 @@ export default function TestUICategoriesPage() {
                     open={true}
                     onClose={() => setEditingCategory(undefined)}
                     workspaceId="test-workspace"
-                    initial={editingCategory}
+                    category={editingCategory}
                     onCreate={async () => {}}
                     onUpdate={async (input) => {
                         await catUpdate(input.id, input.patch);

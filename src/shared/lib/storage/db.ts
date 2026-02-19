@@ -2,7 +2,7 @@ import Dexie, { Table } from "dexie";
 import type { AppSettings } from "@/features/settings/model/types";
 import type { Transaction } from "@/features/transactions/model/types";
 import type { Category, CategoryColor } from "@/features/categories/model/types";
-import type { MonthlyBudget } from "@/features/budgets/model/types";
+import type { Budget } from "@/features/budgets/model/types";
 import type { Goal, GoalContribution } from "@/features/goals/model/types";
 import { IconName } from "lucide-react/dynamic";
 
@@ -23,7 +23,7 @@ export class BudgetDB extends Dexie {
   settings!: Table<AppSettings, string>;
   transactions!: Table<Transaction, string>;
   categories!: Table<Category, string>;
-  budgets!: Table<MonthlyBudget, string>;
+  budgets!: Table<Budget, string>;
   goals!: Table<Goal, string>;
 
   goalContributions!: Table<GoalContribution, string>;
@@ -271,7 +271,7 @@ export class BudgetDB extends Dexie {
         });
       });
 
-    // v9: add linkedGoalId to transactions schema
+    // v9: add linkedGoalId to transactions schema + update budgets schema for category-based budgets
     this.version(9)
       .stores({
         meta: "&key",
@@ -283,13 +283,29 @@ export class BudgetDB extends Dexie {
         categories:
           "&id, workspaceId, type, order, isArchived, updatedAt, deletedAt, [workspaceId+type], [workspaceId+isArchived], [workspaceId+updatedAt]",
 
-        budgets: "&id, workspaceId, month, deletedAt",
+        // Updated budgets schema for category-based budgets
+        budgets:
+          "&id, workspaceId, categoryId, period, updatedAt, deletedAt, [workspaceId+categoryId], [workspaceId+period], [workspaceId+updatedAt]",
 
         goals:
           "&id, workspaceId, status, deadline, updatedAt, deletedAt, [workspaceId+status], [workspaceId+updatedAt]",
 
         goalContributions:
           "&id, workspaceId, goalId, dateKey, linkedTransactionId, updatedAt, deletedAt, [workspaceId+goalId], [workspaceId+dateKey], [workspaceId+updatedAt]",
+      })
+      .upgrade(async (tx) => {
+        // Migrate existing budgets: if they have 'month' field, this is old format - clear them
+        // In MVP we start fresh with category-based budgets
+        const existingBudgets = await tx.table("budgets").toArray();
+        if (existingBudgets.length > 0) {
+          // Check if any have old 'month' field
+          const hasOldFormat = existingBudgets.some((b: Budget) => 'month' in b);
+          if (hasOldFormat) {
+            // Clear old budgets - they're incompatible with new schema
+            await tx.table("budgets").clear();
+            console.log('Cleared old monthly budgets - incompatible with new category-based schema');
+          }
+        }
       });
   }
 }

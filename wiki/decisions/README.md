@@ -6,6 +6,7 @@
 
 - [ADR-0001: Goals ↔ Contributions ↔ Transactions](./0001-goals-contributions-transactions.md)
 - [ADR-0002: Семантика удаления категорий и влияние на транзакции](./0002-categories-deletion-semantics.md)
+- [ADR-0003: Связь бюджетов с категориями и каскадное удаление](./0003-budgets-categories-cascade-deletion.md)
 
 ## Scope
 
@@ -13,3 +14,4 @@
 - `transactions`
 - `categories`
 - `goals`
+- `budgets`

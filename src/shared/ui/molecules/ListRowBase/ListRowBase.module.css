@@ -21,7 +21,7 @@
 
 .l {
   min-height: 64px;
-  padding: var(--spacing-6);
+  padding: var(--spacing-4);
 }
 
 .muted {
@@ -71,6 +71,7 @@
 }
 
 .trailing {
+  height: 100%;
   display: grid;
   place-items: center;
   justify-items: end;

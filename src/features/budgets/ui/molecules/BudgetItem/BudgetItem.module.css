@@ -1,0 +1,51 @@
+.wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.statusBadge {
+  position: absolute;
+  top: var(--spacing-2);
+  right: var(--spacing-2);
+  z-index: 1;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+}
+
+.subtitle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.amounts {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-1);
+}
+
+.amountsColumn {
+  justify-content: center;
+}
+
+.overBudget {
+  font-weight: 500;
+}
+
+.actionMenuTrigger {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+}
+
+.trailing {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}

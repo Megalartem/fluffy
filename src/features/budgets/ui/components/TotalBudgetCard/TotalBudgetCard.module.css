@@ -1,0 +1,65 @@
+.wrapper {
+    width: 100%;
+    position: relative;
+}
+
+.badge {
+    position: absolute;
+    top: var(--spacing-4);
+    right: var(--spacing-4);
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+}
+
+/* Badge state colors */
+
+.badge.normal {
+    background-color: var(--color-success);
+}
+
+.badge.warning {
+    background-color: var(--color-warning);
+}
+
+.badge.over {
+    background-color: var(--color-error);
+}
+
+/* ── Title: amounts row ──────────────────────────────────────────── */
+
+.amounts {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: var(--spacing-1);
+}
+
+/* ── Subtitle: remaining · unbudgeted ───────────────────────────── */
+
+.meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-1);
+}
+
+.metaValue {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.dot {
+    color: var(--color-text-secondary);
+    opacity: 0.4;
+}
+
+.overText {
+    color: var(--color-error);
+    font-weight: var(--font-weight-semibold);
+}

@@ -7,7 +7,6 @@
 
 import type { Transaction } from "@/features/transactions/model/types";
 import type { Category } from "@/features/categories/model/types";
-import type { MonthlyBudget } from "@/features/budgets/model/types";
 import type { Goal } from "@/features/goals/model/types";
 import type { AppSettings } from "@/features/settings/model/types";
 import type { TransactionListQuery } from "@/features/transactions/api/repo";
@@ -94,31 +93,6 @@ export interface ICategoriesRepository {
 
   /**
    * Мягко удаляет категорию
-   */
-  softDelete(workspaceId: string, id: string): Promise<void>;
-}
-
-/**
- * Репозиторий для работы с бюджетами
- */
-export interface IBudgetsRepository {
-  /**
-   * Создает или обновляет бюджет на месяц
-   */
-  set(workspaceId: string, budget: MonthlyBudget): Promise<MonthlyBudget>;
-
-  /**
-   * Получает бюджет за конкретный месяц
-   */
-  getByMonth(workspaceId: string, month: string): Promise<MonthlyBudget | null>;
-
-  /**
-   * Получает все бюджеты workspace
-   */
-  list(workspaceId: string): Promise<MonthlyBudget[]>;
-
-  /**
-   * Мягко удаляет бюджет
    */
   softDelete(workspaceId: string, id: string): Promise<void>;
 }

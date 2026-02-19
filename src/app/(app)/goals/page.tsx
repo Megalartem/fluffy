@@ -161,13 +161,13 @@ export default function GoalsPage() {
   const isInitialLoading = !loadSettled && items.length === 0 && !error;
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg-main p-4">
+    <div className="flex h-dvh flex-col overflow-hidden bg-bg-main p-4">
       <PageHeader
         title="Goals"
 
       />
 
-      <div className="mt-4 flex flex-col gap-6 pb-24">
+      <div className="mt-4 flex flex-1 min-h-0 flex-col gap-6 overflow-y-auto">
         {isInitialLoading ? (
           <div className="flex flex-col gap-3">
             {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
@@ -201,6 +201,7 @@ export default function GoalsPage() {
             {renderSection("Archived", archivedGoals, handleGoalClick, openEdit, handleArchiveGoal, handleDeleteGoal)}
           </>
         )}
+        <div style={{ height: "var(--spacer-height)" }} />
       </div>
 
       <FAB label="Add Goal" onClick={openCreate} />
