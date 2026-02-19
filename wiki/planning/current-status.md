@@ -45,9 +45,9 @@
    - ✅ React hooks (useBudgets, useBudgetSummary, useBudgetMutation, etc.)
    - ✅ UI: BudgetItem, TotalBudgetCard, BudgetList, BudgetUpsertSheet
    - ✅ /budgets page (list, empty state, error state, loading skeleton)
-   - ⬜ "Categories Without Budget" section
+   - ✅ "Categories Without Budget" section
    - ⬜ Navigation entry in app-shell
-   - ⬜ Soft-delete budget on category delete
+   - ✅ Soft-delete budget on category delete
 
 ---
 
@@ -65,9 +65,9 @@
 - ✅ /budgets page with list, create, edit, delete, empty/error states
 
 **Remaining (~3h):**
-- [ ] "Categories Without Budget" collapsible section on /budgets page
+- [x] "Categories Without Budget" collapsible section on /budgets page
 - [ ] Navigation entry in app-shell (between Transactions and Goals)
-- [ ] Soft-delete budget when category is deleted
+- [x] Soft-delete budget when category is deleted
 
 **Tracker:** [BUDGETS_IMPLEMENTATION_TRACKER.md](BUDGETS_IMPLEMENTATION_TRACKER.md)
 
