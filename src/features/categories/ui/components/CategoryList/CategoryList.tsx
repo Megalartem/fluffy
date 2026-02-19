@@ -246,6 +246,7 @@ export const CategoryList = React.memo(function CategoryList({
           )}
         </DndContext>
       )}
+      <div className={styles.spacer} />
     </div>
   );
 });
