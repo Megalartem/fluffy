@@ -9,12 +9,9 @@ import styles from "./BudgetList.module.css";
 import type { CategoryBudgetSummary } from "@/features/budgets/model/types";
 import { getBudgetProgress } from "@/features/budgets/model/utils";
 import { BudgetItem, type BudgetItemSize, type BudgetItemDirection } from "@/features/budgets/ui/molecules";
-import { EmptyState, Skeleton } from "@/shared/ui/molecules";
 
 export interface BudgetListProps {
 	items: CategoryBudgetSummary[];
-	loading?: boolean;
-	error?: unknown;
 
 	size?: BudgetItemSize;
 	direction?: BudgetItemDirection;
@@ -23,7 +20,6 @@ export interface BudgetListProps {
 	onItemClick?: (item: CategoryBudgetSummary) => void;
 	onItemEdit?: (item: CategoryBudgetSummary) => void;
 	onItemDelete?: (item: CategoryBudgetSummary) => void;
-	onRetry?: () => void;
 }
 
 function normalizeProgress(summary: CategoryBudgetSummary): number {
@@ -34,15 +30,12 @@ function normalizeProgress(summary: CategoryBudgetSummary): number {
 
 export function BudgetList({
 	items,
-	loading = false,
-	error,
 	size = "m",
 	direction = "row",
 	className,
 	onItemClick,
 	onItemEdit,
 	onItemDelete,
-	onRetry,
 }: BudgetListProps) {
 	const sortedItems = React.useMemo(() => {
 		return [...items].sort((a, b) => {
@@ -51,38 +44,6 @@ export function BudgetList({
 			return a.category.name.localeCompare(b.category.name);
 		});
 	}, [items]);
-
-	if (error) {
-		return (
-			<EmptyState
-				title="Failed to load budgets"
-				description="Try again."
-				primaryAction={onRetry ? { label: "Reload", onClick: onRetry } : undefined}
-				className={clsx(styles.root, className)}
-			/>
-		);
-	}
-
-	if (loading) {
-		return (
-			<div className={clsx(styles.root, className)} aria-busy="true">
-				<Skeleton variant="line" width="100%" height={24} />
-				<Skeleton variant="line" width="100%" height={24} />
-				<Skeleton variant="line" width="100%" height={24} />
-				<Skeleton variant="line" width="100%" height={24} />
-			</div>
-		);
-	}
-
-	if (sortedItems.length === 0) {
-		return (
-			<EmptyState
-				title="No budgets yet"
-				description="Create your first budget to start tracking spending limits."
-				className={clsx(styles.root, className)}
-			/>
-		);
-	}
 
 	return (
 		<div className={clsx(styles.root, className)}>
@@ -108,6 +69,7 @@ export function BudgetList({
 					</AnimatePresence>
 				</div>
 			</LayoutGroup>
+			<div className={styles.spacer} />
 		</div>
 	);
 }

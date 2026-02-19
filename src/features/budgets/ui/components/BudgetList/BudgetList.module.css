@@ -1,9 +1,17 @@
 .root {
 	width: 100%;
+	min-height: 0;
+	flex: 1;
+	overflow-y: auto;
 }
 
 .list {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
+}
+
+.spacer {
+	height: var(--spacer-height);
+	flex-shrink: 0;
 }
