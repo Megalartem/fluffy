@@ -1,8 +1,8 @@
 # 📊 Current Project Status
 
-> **Current Date:** February 2026  
-> **Phase:** 4-5 Transition  
-> **Status:** Design System Implementation
+> **Current Date:** February 19, 2026  
+> **Phase:** 4-5 + Budgets Feature  
+> **Status:** Budgets MVP ~88% complete
 
 ---
 
@@ -36,35 +36,40 @@
    - ✅ Offline queue with conflict resolution
    - ✅ Firebase adapter skeleton
    - ✅ Sync UI components
-   - ✅ Database schema v6
+   - ✅ Database schema v9 (budgets table added)
    - ✅ Comprehensive documentation (5 guides)
+
+5. **Budgets Feature** (In Progress — ~88%)
+   - ✅ Budget data model, Dexie schema (v9), repository
+   - ✅ BudgetsService + BudgetSummaryService
+   - ✅ React hooks (useBudgets, useBudgetSummary, useBudgetMutation, etc.)
+   - ✅ UI: BudgetItem, TotalBudgetCard, BudgetList, BudgetUpsertSheet
+   - ✅ /budgets page (list, empty state, error state, loading skeleton)
+   - ⬜ "Categories Without Budget" section
+   - ⬜ Navigation entry in app-shell
+   - ⬜ Soft-delete budget on category delete
 
 ---
 
-## 🟡 Current Focus: Phase 5 (In Progress)
+## 🟡 Current Focus: Budgets Feature (Final Sprint)
 
-### Design System & UI Implementation
+### Budgets MVP Completion
 
-**Goal:** Create production-ready UI with visual consistency
+**Goal:** Ship category-based budgeting with progress tracking
 
-**What We're Working On:**
-- [ ] Design tokens (Tailwind config, CSS variables)
-- [ ] Component library audit and alignment
-- [ ] Page layout standardization
-- [ ] Dashboard refinement
-- [ ] Typography system
-- [ ] Form and input improvements
-- [ ] Color palette consistency
-- [ ] Mobile-first responsive verification
-- [ ] Component documentation
+**What's Done:**
+- ✅ Full data layer (model, schema v9, Dexie repo)
+- ✅ Business logic (BudgetsService, BudgetSummaryService, validators)
+- ✅ React hooks, DI registration
+- ✅ UI components (BudgetItem, TotalBudgetCard, BudgetList, BudgetUpsertSheet)
+- ✅ /budgets page with list, create, edit, delete, empty/error states
 
-**Target Metrics:**
-- Lighthouse score 90+
-- WCAG AA accessibility
-- Zero hardcoded styles
-- Mobile/tablet/desktop responsive
+**Remaining (~3h):**
+- [ ] "Categories Without Budget" collapsible section on /budgets page
+- [ ] Navigation entry in app-shell (between Transactions and Goals)
+- [ ] Soft-delete budget when category is deleted
 
-**Estimated Completion:** ~8-10 hours / 2 days
+**Tracker:** [BUDGETS_IMPLEMENTATION_TRACKER.md](BUDGETS_IMPLEMENTATION_TRACKER.md)
 
 ---
 
@@ -77,11 +82,12 @@
 - ✅ **Dashboard**: Overview of financial data
 - ✅ **Settings**: Basic configuration
 - ✅ **Backup/Restore**: Export/import data
+- ✅ **Budgets**: Create/edit/delete category budgets, view progress (navigation pending)
 - ✅ **Offline-First**: Full offline functionality with IndexedDB
 - ✅ **Sync UI**: Status indicators and sync controls
 
 ### Technical Infrastructure
-- ✅ **Database**: IndexedDB via Dexie.js (schema v6)
+- ✅ **Database**: IndexedDB via Dexie.js (schema v9)
 - ✅ **State Management**: React Context with AppState
 - ✅ **DI Container**: Service locator pattern
 - ✅ **Error Handling**: Global error boundaries
@@ -100,19 +106,16 @@
 
 ## 🚧 In Progress
 
-### Phase 5: Design System (Current Sprint)
-- **Status:** Active development
-- **Focus:** UI polish and consistency
-- **Files Being Updated:** 
-  - `tailwind.config.ts`
-  - `src/shared/design/`
-  - `src/shared/ui/`
-  - All page components
+### Budgets Feature (Final Sprint)
+- **Status:** ~88% complete
+- **Focus:** Remaining 3 tasks to ship MVP
+- **Tracker:** [BUDGETS_IMPLEMENTATION_TRACKER.md](BUDGETS_IMPLEMENTATION_TRACKER.md)
 
 ### Recent Activity
-- ✅ Completed Phase 4 documentation
-- 🟡 Starting design system implementation
-- 📝 Wiki documentation reorganization
+- ✅ Implemented full Budgets data layer (Phases 1-3 of feature)
+- ✅ Built all UI components: BudgetItem, TotalBudgetCard, BudgetList, BudgetUpsertSheet
+- ✅ /budgets page functional with CRUD
+- 🟡 Completing final integration tasks
 
 ---
 
@@ -207,8 +210,9 @@
 ### Completion Status
 - **Phases Complete:** 4 / 10 (40%)
 - **Core Features:** 100% (offline-first)
+- **Budgets Feature:** ~88% (MVP nearly complete)
 - **Cloud Sync:** Infrastructure ready, integration pending
-- **UI Polish:** 70% (Phase 5 in progress)
+- **UI Polish:** 70% (ongoing)
 - **i18n:** 0% (Phase 6 next)
 - **PWA:** 0% (Phase 9 planned)
 - **Tests:** 10% (Phase 10 planned)
@@ -261,4 +265,4 @@ This status will be updated:
 - Weekly during active development
 - When major milestones are reached
 
-**Last Updated:** February 16, 2026
+**Last Updated:** February 19, 2026

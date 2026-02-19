@@ -1,6 +1,6 @@
 # 🚀 Development Roadmap
 
-> **Last Updated:** February 2026  
+> **Last Updated:** February 19, 2026  
 > **Project Status:** Phase 4-5 Transition
 
 ## Overview
@@ -306,17 +306,22 @@
 ## Next Features (Post-Phase 5)
 
 ### Budgets Feature (MVP)
-**Status:** 🔵 Planned | **Estimate:** 20-24 hours
+**Status:** � In Progress (~88%) | **Estimate:** 20-24 hours | **Actual:** ~16h
 
 **Overview:**
 Category-based budgeting with computed overall budget, unbudgeted spend tracking, and progress monitoring.
 
-**Key Deliverables:**
-- Budget data model and repositories
-- Budget summary service with spent/limit calculations
-- Budget UI components (cards, progress bars, sheets)
-- /budgets page with category budgets list
-- Integration with transactions and categories
+**Delivered:**
+- ✅ Budget data model, Dexie schema (v9), repository
+- ✅ BudgetsService + BudgetSummaryService with full calculations
+- ✅ React hooks (useBudgets, useBudgetSummary, useBudgetMutation, etc.)
+- ✅ UI: BudgetItem molecule, TotalBudgetCard, BudgetList, BudgetUpsertSheet
+- ✅ /budgets page (list, empty state, error state, loading skeleton)
+
+**Remaining:**
+- ⬜ "Categories Without Budget" section on /budgets page
+- ⬜ Navigation entry in app-shell
+- ⬜ Soft-delete budget when category is deleted
 
 **Documentation:**
 - [Budgets Feature Spec](BUDGETS_FEATURE_SPEC.md)

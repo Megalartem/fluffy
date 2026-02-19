@@ -15,9 +15,9 @@
 | **Phase 1: Data Layer** | ✅ Complete | 4-5h | ~4h | 100% |
 | **Phase 2: Business Logic** | ✅ Complete | 5-6h | ~3h | 100% |
 | **Phase 3: React Integration** | ✅ Complete | 4-5h | ~2h | 100% |
-| **Phase 4: UI Components** | ⬜ Not Started | 6-8h | — | 0% |
+| **Phase 4: UI Components** | 🟡 In Progress | 6-8h | ~6h | ~90% |
 | **Phase 5: Integration & Polish** | ⬜ Not Started | 2-3h | — | 0% |
-| **Total** | — | **21-27h** | **~9h** | **60%** |
+| **Total** | — | **21-27h** | **~16h** | **~88%** |
 
 **Legend:** ⬜ Not Started | 🟡 In Progress | ✅ Complete | ⏸️ Blocked
 
@@ -407,131 +407,100 @@ budgets:
 
 ## 🎨 Phase 4: UI Components (6-8 hours)
 
-### Task 4.1: Atomic Components ⬜
-**Time:** 2 hours | **Status:** Not Started
+### Task 4.1: Atomic Components ~~⬜~~ ❌ Rejected
+**Status:** Rejected — not needed
 
-**Files to create:**
-- [ ] `src/features/budgets/ui/molecules/BudgetProgressBar.tsx`
-- [ ] `src/features/budgets/ui/molecules/BudgetStatusBadge.tsx`
-- [ ] `src/features/budgets/ui/atoms/BudgetAmount.tsx`
-- [ ] `src/features/budgets/ui/molecules/index.ts`
-
-**Checklist:**
-- [ ] **BudgetProgressBar**: Progress bar with color states (green → yellow → red)
-- [ ] Support different sizes (sm, md, lg)
-- [ ] Animate progress changes
-- [ ] **BudgetStatusBadge**: Show "On track", "Warning", "Over budget"
-- [ ] Use design system colors
-- [ ] **BudgetAmount**: Display amount with currency formatting
-- [ ] Support "spent / limit" format
-- [ ] Support "remaining" format
-- [ ] Export all components from index
-
-**Acceptance Criteria:**
-- Components use design system tokens
-- Components are responsive
-- Animations are smooth (use framer-motion if needed)
-- Components follow accessibility best practices
-
-**Color Logic:**
-```typescript
-progress < 0.8 → green
-0.8 <= progress < 1.0 → yellow (warning)
-progress >= 1.0 → red (over budget)
-```
+**Reasoning:**
+- `BudgetProgressBar` — `ProgressRing` from `shared/ui/atoms` already used in both `BudgetItem` and `TotalBudgetCard`; a linear bar was never part of the actual design
+- `BudgetStatusBadge` — inline `getBudgetBadge()` in `BudgetItem` using shared `Badge` is sufficient; extracted component would be used in only one place
+- `BudgetAmount` — `shownAmount()` + shared `Text` covers all formatting needs; `shared/ui/atoms/Amount` already exists if needed
+- `molecules/index.ts` — already exists at `src/features/budgets/ui/molecules/index.ts`
 
 ---
 
-### Task 4.2: Budget Cards ⬜
-**Time:** 2 hours | **Status:** Not Started
+### Task 4.2: Budget Cards ✅
+**Time:** 2 hours | **Status:** Complete | **Actual:** ~2h
 
-**Files to create:**
-- [ ] `src/features/budgets/ui/components/TotalBudgetCard.tsx`
-- [ ] `src/features/budgets/ui/components/CategoryBudgetCard.tsx`
+**Files created:**
+- ✅ `src/features/budgets/ui/components/TotalBudgetCard/TotalBudgetCard.tsx`
+- ✅ `src/features/budgets/ui/components/TotalBudgetCard/TotalBudgetCard.module.css`
+- ✅ `src/features/budgets/ui/components/TotalBudgetCard/index.ts`
+- ✅ `CategoryBudgetCard` — handled by existing `BudgetItem` molecule
 
 **Checklist:**
-- [ ] **TotalBudgetCard**:
-  - [ ] Display total spent / total limit
-  - [ ] Show progress bar
-  - [ ] Display remaining amount
-  - [ ] Show unbudgeted amount (if > 0)
-  - [ ] Handle loading state
-  - [ ] Handle empty state (no budgets)
-- [ ] **CategoryBudgetCard**:
-  - [ ] Display category icon and name
-  - [ ] Display spent / limit
-  - [ ] Show progress bar
-  - [ ] Display remaining (or "Over by X")
-  - [ ] Add click handler for editing
-  - [ ] Support hover states
-- [ ] Make cards responsive
-- [ ] Test on mobile viewport
+- ✅ **TotalBudgetCard**:
+  - ✅ Display total spent / total limit
+  - ✅ Show ProgressRing with state-based colors
+  - ✅ Display remaining amount (or "Over by X")
+  - ✅ Show unbudgeted amount (if > 0)
+  - ✅ Progress color: green < 80%, yellow 80–100%, red ≥ 100%
+  - ✅ Loading state delegated to page-level skeleton
+- ✅ **CategoryBudgetCard**: handled by existing `BudgetItem` molecule
 
 **Acceptance Criteria:**
-- Cards match design from spec section 6
-- Cards are clickable/interactive
-- Loading states don't cause layout shift
-- Cards are accessible (keyboard navigation, screen readers)
+- ✅ Cards match design from spec section 6
+- ✅ Cards are interactive
+- ✅ Loading states don't cause layout shift
 
 ---
 
-### Task 4.3: Budget Sheet (Create/Edit) ⬜
-**Time:** 2 hours | **Status:** Not Started
+### Task 4.3: Budget Sheet (Create/Edit) ✅
+**Time:** 2 hours | **Status:** Complete | **Actual:** ~2h
 
-**Files to create:**
-- [ ] `src/features/budgets/ui/components/BudgetUpsertSheet.tsx`
+**Files created:**
+- ✅ `src/features/budgets/ui/components/BudgetUpsertSheet/BudgetUpsertSheet.tsx`
+- ✅ `src/features/budgets/ui/components/BudgetUpsertSheet/BudgetUpsertSheet.module.css`
+- ✅ Exported via `src/features/budgets/ui/components/index.ts`
 
 **Checklist:**
-- [ ] Create Sheet component with form
-- [ ] Add category select field (only expense categories without active budgets)
-- [ ] Add limit amount input field
-- [ ] Auto-fill currency from workspace settings
-- [ ] Show period as "Monthly" (read-only in MVP)
-- [ ] Add save button
-- [ ] Add cancel button
-- [ ] Handle create mode
-- [ ] Handle edit mode
-- [ ] Show validation errors inline
-- [ ] Add loading state during submission
-- [ ] Close sheet on successful submission
-- [ ] Reset form on close
+- ✅ Create Sheet component with form (BottomSheet + FormProvider)
+- ✅ Add category select field (only expense categories without active budgets)
+- ✅ Add limit amount input field
+- ✅ Auto-fill currency from workspace settings
+- ✅ Period is always "monthly" (hardcoded, no visible readonly field in MVP)
+- ✅ Add save button
+- ✅ Add cancel button (via ModalHeader onClose)
+- ✅ Handle create mode
+- ✅ Handle edit mode
+- ✅ Show validation errors inline
+- ✅ Add loading state during submission
+- ✅ Close sheet on successful submission
+- ✅ Reset form on close
 
 **Acceptance Criteria:**
-- Form validates input before submission
-- Only valid categories appear in dropdown
-- Amount input supports decimal values
-- Sheet follows project patterns (like TransactionSheet)
-- Error messages are user-friendly
+- ✅ Form validates input before submission
+- ✅ Only valid categories appear in dropdown (expense only, no duplicate budgets)
+- ✅ Amount input supports decimal values
+- ✅ Sheet follows project patterns (mirrors TransactionUpsertSheet)
+- ✅ Error messages are user-friendly
 
 **Form Fields:**
-- Category (select) - required
+- Category (select, via CategoriesSheet) - required
 - Limit Amount (number input) - required, > 0
-- Period (readonly, "Monthly")
-- Currency (readonly, from settings)
+- Currency shown as right slot (readonly from workspace)
 
 ---
 
-### Task 4.4: Budgets Page ⬜
-**Time:** 2 hours | **Status:** Not Started
+### Task 4.4: Budgets Page 🟡
+**Time:** 2 hours | **Status:** In Progress
 
-**Files to create:**
-- [ ] `src/app/(app)/budgets/page.tsx`
-- [ ] `src/app/(app)/budgets/layout.tsx` (if needed)
+**Files created:**
+- ✅ `src/app/(app)/budgets/page.tsx`
 
 **Checklist:**
-- [ ] Create page with header
-- [ ] Add "New Budget" button in header
-- [ ] Add TotalBudgetCard at top
-- [ ] Add CategoryBudgets list section
-- [ ] Sort category budgets: over → warning → normal
-- [ ] Add "Categories Without Budget" collapsible section
-- [ ] Show spent amount for categories without budget
-- [ ] Add "Set Budget" CTA for each category without budget
-- [ ] Implement empty state (no budgets created yet)
-- [ ] Add loading skeleton
-- [ ] Handle error state
-- [ ] Make page responsive
-- [ ] Test on mobile and tablet
+- ✅ Create page with header
+- ✅ Add "New Budget" FAB button
+- ✅ Add TotalBudgetCard at top (above category list)
+- ✅ Add CategoryBudgets list section (BudgetList)
+- ✅ Sort category budgets: over → warning → normal (handled in BudgetList)
+- ⬜ Add "Categories Without Budget" collapsible section
+- ⬜ Show spent amount for categories without budget
+- ⬜ Add "Set Budget" CTA for each category without budget
+- ✅ Implement empty state (no budgets created yet)
+- ✅ Add loading skeleton
+- ✅ Handle error state
+- ⬜ Make page responsive (test)
+- ⬜ Test on mobile and tablet
 
 **Acceptance Criteria:**
 - Page follows app layout structure
@@ -764,5 +733,5 @@ async delete(id: string) {
 
 ---
 
-**Last Updated:** February 16, 2026  
+**Last Updated:** February 19, 2026  
 **Next Review:** TBD

@@ -55,7 +55,9 @@ app/
 │   ├── transactions/             # /transactions
 │   ├── goals/                    # /goals
 │   ├── categories/               # /categories
-│   └── settings/                 # /settings
+│   ├── budgets/                  # /budgets
+│   ├── settings/                 # /settings
+│   └── app-shell.tsx             # Navigation shell
 └── test/                         # Test pages
 ```
 
@@ -107,23 +109,33 @@ Each feature is a self-contained module with its own components, hooks, and logi
 ```text
 features/
 ├── transactions/                 # Transaction management
-│   ├── components/               # Transaction UI components
+│   ├── api/                      # Service layer, facades
 │   ├── hooks/                    # Transaction-specific hooks
-│   └── types.ts                  # Feature types
+│   ├── model/                    # Types, validators
+│   ├── ui/                       # Transaction UI components
+│   └── lib/                      # Feature utilities
 │
 ├── categories/                   # Category management
-│   ├── components/
+│   ├── api/
 │   ├── hooks/
-│   └── types.ts
+│   ├── model/
+│   └── ui/
 │
 ├── goals/                        # Goal management
-│   ├── components/
+│   ├── api/
 │   ├── hooks/
-│   └── types.ts
+│   ├── model/
+│   └── ui/
+│
+├── budgets/                      # Budget management
+│   ├── api/                      # BudgetsRepo interface + Dexie impl
+│   ├── hooks/                    # useBudgets, useBudgetSummary, etc.
+│   ├── model/                    # Types, BudgetsService, BudgetSummaryService
+│   └── ui/                       # BudgetItem, TotalBudgetCard, BudgetUpsertSheet
 │
 └── settings/                     # Application settings
-    ├── components/
-    └── hooks/
+    ├── api/
+    └── model/
 ```
 
 > **Key concept**: Features can depend on `core/` and `shared/`, but not on each other.
@@ -242,6 +254,12 @@ Each feature is independent:
 - Easy to understand and test
 
 ## Where to Find Things
+
+### Adding a New Budget
+- **UI**: `src/features/budgets/ui/`
+- **Logic**: `src/features/budgets/model/service.ts`, `summary-service.ts`
+- **Storage**: `src/features/budgets/api/repo.dexie.ts`
+- **Route**: `src/app/(app)/budgets/page.tsx`
 
 ### Adding a New Transaction
 - **UI**: `src/features/transactions/components/`
