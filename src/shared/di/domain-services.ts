@@ -30,7 +30,7 @@ function registerDomainServices() {
   );
 
   container.register(KEYS.categoryService, () =>
-    new CategoryService(new DexieCategoriesRepo(), transactionsRepo)
+    new CategoryService(new DexieCategoriesRepo(), transactionsRepo, budgetsRepo)
   );
 
   container.register(KEYS.goalsService, () =>
