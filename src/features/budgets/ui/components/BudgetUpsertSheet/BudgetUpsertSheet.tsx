@@ -46,6 +46,8 @@ interface IBudgetUpsertSheet {
     open: boolean;
     budget?: Budget;
     currentSpentMinor?: number;
+    /** Pre-select a category when opening in create mode */
+    preselectedCategoryId?: string;
 
     onClose: () => void;
 
@@ -58,6 +60,7 @@ export function BudgetUpsertSheet({
     open,
     onClose,
     budget,
+    preselectedCategoryId,
     onCreate,
     onUpdate,
     onDelete,
@@ -149,9 +152,9 @@ export function BudgetUpsertSheet({
 
         form.reset({
             limit: isEdit && budget ? fromMinorByCurrency(budget.limitMinor, budget.currency) : "",
-            categoryId: isEdit && budget ? budget.categoryId : null,
+            categoryId: isEdit && budget ? budget.categoryId : (preselectedCategoryId ?? null),
         });
-    }, [open, isEdit, budget, form]);
+    }, [open, isEdit, budget, preselectedCategoryId, form]);
 
     const onSubmit: SubmitHandler<FormValues> = async (values) => {
         form.clearErrors("limit");

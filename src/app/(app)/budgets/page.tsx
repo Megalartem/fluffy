@@ -4,8 +4,10 @@ import { useState, useCallback } from "react";
 import { Plus } from "lucide-react";
 
 import { BudgetList, BudgetUpsertSheet, TotalBudgetCard } from "@/features/budgets/ui/components";
+import { CategoriesWithoutBudgetSection } from "@/features/budgets/ui/molecules";
 import { useBudgetSummary } from "@/features/budgets/hooks/useBudgetSummary";
 import { useBudgetMutation } from "@/features/budgets/hooks/useBudgetMutation";
+import { useCategoriesWithoutBudget } from "@/features/budgets/hooks/useCategoriesWithoutBudget";
 import { FAB } from "@/shared/ui/atoms";
 import { ConfirmDialog, EmptyState, PageHeader, Skeleton } from "@/shared/ui/molecules";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
@@ -17,11 +19,13 @@ export default function BudgetsPage() {
     const { currency } = useWorkspace();
     const { summary, loading, error, refresh } = useBudgetSummary();
     const { budgetCreate, budgetUpdate, budgetDelete } = useBudgetMutation({ refresh });
+    const { categories: unbudgetedCategories, refresh: refreshUnbudgeted } = useCategoriesWithoutBudget();
 
     const [editingBudget, setEditingBudget] = useState<Budget | undefined>();
     const [deletingBudget, setDeletingBudget] = useState<Budget | undefined>();
     const [currentSpentMinor, setCurrentSpentMinor] = useState<number | undefined>();
     const [isCreating, setIsCreating] = useState(false);
+    const [preselectedCategoryId, setPreselectedCategoryId] = useState<string | undefined>();
 
     const handleEdit = useCallback((item: CategoryBudgetSummary) => {
         setCurrentSpentMinor(item.spentMinor);
@@ -32,12 +36,14 @@ export default function BudgetsPage() {
         setEditingBudget(undefined);
         setCurrentSpentMinor(undefined);
         setIsCreating(false);
+        setPreselectedCategoryId(undefined);
     }, []);
 
     const handleCreate = useCallback(async (input: CreateBudgetInput) => {
         await budgetCreate(input);
+        void refreshUnbudgeted();
         handleCloseSheet();
-    }, [budgetCreate, handleCloseSheet]);
+    }, [budgetCreate, refreshUnbudgeted, handleCloseSheet]);
 
     const handleUpdate = useCallback(async (input: UpdateBudgetInput) => {
         await budgetUpdate(input);
@@ -50,11 +56,19 @@ export default function BudgetsPage() {
 
     const handleConfirmDelete = useCallback(async (budget: Budget) => {
         await budgetDelete(budget.id);
+        void refreshUnbudgeted();
         setDeletingBudget(undefined);
-    }, [budgetDelete]);
+    }, [budgetDelete, refreshUnbudgeted]);
 
     const handleCreateNew = useCallback(() => {
         setEditingBudget(undefined);
+        setPreselectedCategoryId(undefined);
+        setIsCreating(true);
+    }, []);
+
+    const handleSetBudgetForCategory = useCallback((categoryId: string) => {
+        setEditingBudget(undefined);
+        setPreselectedCategoryId(categoryId);
         setIsCreating(true);
     }, []);
 
@@ -95,6 +109,13 @@ export default function BudgetsPage() {
                         items={summary?.categoryBudgets ?? []}
                         onItemEdit={handleEdit}
                         onItemDelete={(item) => handleDelete(item.budget)}
+                        footer={
+                            <CategoriesWithoutBudgetSection
+                                items={unbudgetedCategories}
+                                currency={currency}
+                                onSetBudget={handleSetBudgetForCategory}
+                            />
+                        }
                     />
                 </>
             )}
@@ -108,6 +129,7 @@ export default function BudgetsPage() {
             <BudgetUpsertSheet
                 open={isSheetOpen}
                 budget={editingBudget}
+                preselectedCategoryId={preselectedCategoryId}
                 currentSpentMinor={currentSpentMinor}
                 onClose={handleCloseSheet}
                 onCreate={handleCreate}

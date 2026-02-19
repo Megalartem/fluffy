@@ -16,6 +16,7 @@ export interface BudgetListProps {
 	size?: BudgetItemSize;
 	direction?: BudgetItemDirection;
 	className?: string;
+	footer?: React.ReactNode;
 
 	onItemClick?: (item: CategoryBudgetSummary) => void;
 	onItemEdit?: (item: CategoryBudgetSummary) => void;
@@ -36,6 +37,7 @@ export function BudgetList({
 	onItemClick,
 	onItemEdit,
 	onItemDelete,
+	footer,
 }: BudgetListProps) {
 	const sortedItems = React.useMemo(() => {
 		return [...items].sort((a, b) => {
@@ -69,6 +71,7 @@ export function BudgetList({
 					</AnimatePresence>
 				</div>
 			</LayoutGroup>
+			{footer}
 			<div className={styles.spacer} />
 		</div>
 	);
