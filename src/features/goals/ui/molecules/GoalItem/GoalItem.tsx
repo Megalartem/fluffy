@@ -54,7 +54,7 @@ export function GoalItem({
   onArchive,
   onDelete,
 }: GoalItemProps) {
-
+  // TODO: добавить параметр, который будет отключать логику открытия меню по long press
   const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
   const progress = clamp01(goal.currentAmountMinor / goal.targetAmountMinor);
   const label = `${Math.round(progress * 100)}%`;
@@ -83,7 +83,6 @@ export function GoalItem({
       variant: "danger",
     },
    ]
-
 
   return (
     <div className={styles.wrapper}>
