@@ -14,6 +14,5 @@
 
 export { InMemoryTransactionsRepository } from "./transactions";
 export { InMemoryCategoriesRepository } from "./categories";
-export { InMemoryBudgetsRepository } from "./budgets";
 export { InMemoryGoalsRepository } from "./goals";
 export { InMemorySettingsRepository } from "./settings";

@@ -1,0 +1,49 @@
+.root {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.header {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: var(--radius-m);
+    cursor: pointer;
+}
+
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.chevron {
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+.count {
+    color: var(--color-text-secondary);
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.iconPlaceholder {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+}
+
+.spacer {
+    height: var(--spacer-height);
+}

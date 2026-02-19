@@ -11,6 +11,7 @@ export type ProgressRingProps = {
   ariaLabel?: string;
   color?: GoalColor; // CSS color value for progress stroke
   className?: string;
+  children?: React.ReactNode;
 };
 
 const SIZE_CONFIG: Record<
@@ -36,6 +37,7 @@ export function ProgressRing({
   ariaLabel,
   color = "default",
   className,
+  children,
 }: ProgressRingProps) {
   const v = clamp01(value);
   const { diameter, stroke, labelSize } = SIZE_CONFIG[size];
@@ -134,7 +136,13 @@ export function ProgressRing({
         />
       </svg>
 
-      {label && <div className={styles.label} data-size={size}>{label}</div>}
+      {children ? (
+        <div className={styles.center} data-size={size}>
+          {children}
+        </div>
+      ) : (
+        label && <div className={styles.label} data-size={size}>{label}</div>
+      )}
     </div>
   );
 }

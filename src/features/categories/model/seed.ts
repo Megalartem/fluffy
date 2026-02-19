@@ -1,11 +1,8 @@
 import { db, ensureDbInitialized, nowIso } from "@/shared/lib/storage/db";
+import { makeId } from "@/shared/lib/id";
 import type { Category } from "./types";
 
 const seedKey = (workspaceId: string) => `seed_categories_${workspaceId}`;
-
-function makeId(prefix: string) {
-  return `${prefix}_${crypto.randomUUID()}`;
-}
 
 const randomColors = () => {
   const colors: Category["colorKey"][] = [

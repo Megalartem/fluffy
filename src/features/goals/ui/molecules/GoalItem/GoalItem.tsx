@@ -54,7 +54,7 @@ export function GoalItem({
   onArchive,
   onDelete,
 }: GoalItemProps) {
-
+  // TODO: добавить параметр, который будет отключать логику открытия меню по long press
   const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
   const progress = clamp01(goal.currentAmountMinor / goal.targetAmountMinor);
   const label = `${Math.round(progress * 100)}%`;
@@ -84,7 +84,6 @@ export function GoalItem({
     },
    ]
 
-
   return (
     <div className={styles.wrapper}>
       <GoalStatusBadge goal={goal} className={styles.statusBadge} />
@@ -93,7 +92,7 @@ export function GoalItem({
           <ProgressRing 
             size={RING_SIZE_MAP[size]} 
             value={progress} 
-            color={goal.colorKey ?? "blue"}
+            color={goal.colorKey ?? "default"}
             label={label}
           />
         }

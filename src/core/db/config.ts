@@ -32,13 +32,13 @@ export interface Budget {
   id: string;
   workspaceId: string;
   categoryId: string;
-  limit: number;
+  limitMinor: number; // Changed from 'limit' to match feature types
   currency: string;
   period: "monthly" | "yearly";
-  createdAt: number;
-  updatedAt: number;
-  deletedAt?: number;
-  version: number;
+  createdAt: string; // ISO datetime string
+  updatedAt: string; // ISO datetime string
+  deletedAt?: string | null;
+  version?: number;
   syncedAt?: number;
   lastSyncedAt?: number;
   syncStatus?: SyncStatus;
@@ -188,6 +188,37 @@ export class FluffyDatabase extends Dexie {
         if (!g.note) g.note = "";
       });
     });
+
+    // Version 8: Budgets feature alignment - limitMinor and ISO string timestamps
+    this.version(8).stores({
+      transactions:
+        "++id, workspaceId, [workspaceId+date], [workspaceId+type], [workspaceId+categoryId], [workspaceId+updatedAt], [workspaceId+syncStatus], [workspaceId+lastSyncedAt]",
+      budgets:
+        "++id, workspaceId, [workspaceId+categoryId], [workspaceId+deletedAt], [workspaceId+updatedAt], [workspaceId+syncStatus], [workspaceId+lastSyncedAt]",
+      categories:
+        "++id, workspaceId, [workspaceId+name], [workspaceId+updatedAt], [workspaceId+syncStatus], [workspaceId+lastSyncedAt]",
+      goals:
+        "++id, workspaceId, [workspaceId+deadline], [workspaceId+updatedAt], [workspaceId+syncStatus], [workspaceId+lastSyncedAt]",
+      settings:
+        "++id, [workspaceId+key], [workspaceId+updatedAt], [workspaceId+syncStatus], [workspaceId+lastSyncedAt]",
+    })
+    .upgrade(async (tx) => {
+      // Migrate budgets: rename 'limit' -> 'limitMinor', convert timestamps to ISO strings
+      await tx.table("budgets").toCollection().modify((b: Budget) => {
+        // limitMinor should already be present in the Budget interface
+        
+        // Convert numeric timestamps to ISO string timestamps
+        if (typeof b.createdAt === "number") {
+          b.createdAt = new Date(b.createdAt).toISOString();
+        }
+        if (typeof b.updatedAt === "number") {
+          b.updatedAt = new Date(b.updatedAt).toISOString();
+        }
+        if (typeof b.deletedAt === "number") {
+          b.deletedAt = new Date(b.deletedAt).toISOString();
+        }
+      });
+    });
   }
 
   /**
@@ -199,25 +230,25 @@ export class FluffyDatabase extends Dexie {
     const transactionCount = await this.transactions
       .where("workspaceId")
       .equals(workspaceId)
-      .filter((t) => !!(t.deletedAt && t.deletedAt < cutoffTime))
+      .filter((t) => !!(t.deletedAt && new Date(t.deletedAt).getTime() < cutoffTime))
       .delete();
 
     const budgetCount = await this.budgets
       .where("workspaceId")
       .equals(workspaceId)
-      .filter((b) => !!(b.deletedAt && b.deletedAt < cutoffTime))
+      .filter((b) => !!(b.deletedAt && new Date(b.deletedAt).getTime() < cutoffTime))
       .delete();
 
     const goalCount = await this.goals
       .where("workspaceId")
       .equals(workspaceId)
-      .filter((g) => !!(g.deletedAt && g.deletedAt < cutoffTime))
+      .filter((g) => !!(g.deletedAt && new Date(g.deletedAt).getTime() < cutoffTime))
       .delete();
 
     const categoryCount = await this.categories
       .where("workspaceId")
       .equals(workspaceId)
-      .filter((c) => !!(c.deletedAt && c.deletedAt < cutoffTime))
+      .filter((c) => !!(c.deletedAt && new Date(c.deletedAt).getTime() < cutoffTime))
       .delete();
 
     return transactionCount + budgetCount + goalCount + categoryCount;

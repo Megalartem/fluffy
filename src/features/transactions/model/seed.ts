@@ -1,15 +1,12 @@
 import { createDomainLogger } from "@/shared/logging/logger";
 import { db, ensureDbInitialized, nowIso } from "@/shared/lib/storage/db";
+import { makeId } from "@/shared/lib/id";
 import type { Transaction } from "./types";
 import { categoriesRepo } from "@/features/categories/api/repo.dexie";
 
 const logger = createDomainLogger("transactions:seed");
 
 const seedKey = (workspaceId: string) => `seed_transactions_${workspaceId}`;
-
-function makeId(prefix: string) {
-  return `${prefix}_${crypto.randomUUID()}`;
-}
 
 /**
  * Seeds sample transactions using real categories from the workspace.

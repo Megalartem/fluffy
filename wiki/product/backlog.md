@@ -1,6 +1,6 @@
 # 📋 Product Backlog
 
-> **Last Updated:** February 2026  
+> **Last Updated:** February 19, 2026  
 > **Status:** Active development, priorities updated
 
 ## Backlog Principles
@@ -27,7 +27,10 @@ Before reviewing the list, core rules:
 - EPIC 7: Settings (basic)
 - EPIC 8: UX quality and infrastructure
 
-### 🔵 Planned
+### � In Progress
+- EPIC 9: Budgets (MVP) — ~88% complete
+
+### �🔵 Planned
 - EPIC 1: Authentication and basic access
 
 ---
@@ -268,6 +271,107 @@ As a user, I want to add an expense or income in seconds from any screen.
 **AC:**
 - ✅ no "jumping" UI
 - ✅ clear loading expectation
+
+---
+
+## EPIC 9. Budgets (MVP)
+
+### Story 9.1 — Create Category Budget
+
+**Priority:** 🔥 P0  
+**Status:** ✅ Implemented  
+**Description:**  
+As a user, I want to set a monthly spending limit for a category to control my expenses.
+
+**Acceptance Criteria:**
+- ✅ can select expense category
+- ✅ can set limit amount
+- ✅ period defaults to "Monthly"
+- ✅ currency auto-filled from settings
+- ✅ validation: limit > 0
+- ✅ validation: one budget per category
+- ✅ validation: only expense categories allowed
+
+---
+
+### Story 9.2 — View Budget Progress
+
+**Priority:** 🔥 P0  
+**Status:** ✅ Implemented  
+**Description:**  
+As a user, I want to see how much I've spent vs my budget for each category.
+
+**AC:**
+- ✅ see spent / limit for each category
+- ✅ visual progress (ProgressRing with color states)
+- ✅ color coding: green → yellow (80%) → red (100%+)
+- ✅ "Over by X" indicator when exceeded
+- ✅ remaining amount clearly shown
+
+---
+
+### Story 9.3 — Total Budget Overview
+
+**Priority:** P1  
+**Status:** ✅ Implemented  
+**Description:**  
+As a user, I want to see my overall budget status across all categories.
+
+**AC:**
+- ✅ total spent / total limit
+- ✅ overall progress percentage
+- ✅ total remaining amount
+- ✅ unbudgeted spending shown separately (if > 0)
+
+---
+
+### Story 9.4 — Identify Unbudgeted Spending
+
+**Priority:** P1  
+**Status:** ✅ Implemented  
+**Description:**  
+As a user, I want to see expenses that aren't covered by any budget.
+
+**AC:**
+- ✅ categories without budgets listed in collapsible section on /budgets page
+- ✅ spent amount shown for each
+- ✅ CTA to "Set budget" — tapping pre-selects category in form
+- ✅ total unbudgeted amount shown in TotalBudgetCard (if > 0)
+- ✅ animated open/close (framer-motion)
+- ✅ FAB hidden when all categories already have budgets
+
+---
+
+### Story 9.5 — Edit/Delete Budget
+
+**Priority:** P1  
+**Status:** ✅ Implemented  
+**Description:**  
+As a user, I want to adjust or remove budget limits.
+
+**AC:**
+- ✅ can edit limit amount
+- ✅ can delete budget
+- ✅ update reflected immediately in UI
+- ✅ confirmation for delete action
+- ✅ can reduce limit below current spending (no hard block)
+
+---
+
+### Story 9.6 — Budget Warnings
+
+**Priority:** P2  
+**Status:** ✅ Implemented  
+**Description:**  
+As a user, I want to be warned when approaching or exceeding my budget.
+
+**AC:**
+- ✅ soft warning at 80% (yellow state via getBudgetBadge)
+- ✅ hard warning at 100% (red state)
+- ✅ visual indicators on budget cards (ProgressRing color + Badge)
+- ✅ clear messaging: "X left" or "Over by X"
+
+**Documentation:** [Budgets Feature Spec](../planning/BUDGETS_FEATURE_SPEC.md) | [Implementation Tracker](../planning/BUDGETS_IMPLEMENTATION_TRACKER.md)
 
 ---
 

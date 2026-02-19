@@ -1,18 +1,12 @@
 import type { Category, CreateCategoryInput } from "../model/types";
 import type { ICategoriesRepository } from "@/core/repositories"; // или твой CategoriesRepo
 import type { TransactionsRepo } from "@/features/transactions/api/repo";
+import type { BudgetsRepo } from "@/features/budgets/api/repo";
 import { AppError } from "@/shared/errors/app-error";
 import { nowIso } from "@/shared/lib/storage/db";
+import { makeId } from "@/shared/lib/id";
 
 import type { UpdateCategoryInput } from "./types";
-
-function makeId(prefix: string): string {
-  const uuid = typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
-
-  return `${prefix}_${uuid}`;
-}
 
 function normalizeName(name: string): string {
   return name.trim().replace(/\s+/g, " ");
@@ -21,7 +15,8 @@ function normalizeName(name: string): string {
 export class CategoryService {
   constructor(
     private readonly categoriesRepo: ICategoriesRepository,
-    private readonly transactionsRepo: TransactionsRepo
+    private readonly transactionsRepo: TransactionsRepo,
+    private readonly budgetsRepo: BudgetsRepo
   ) {}
 
   async addCategory(workspaceId: string, input: CreateCategoryInput): Promise<Category> {
@@ -94,5 +89,11 @@ export class CategoryService {
 
     // 2) cleanup transactions -> categoryId = null
     await this.transactionsRepo.unsetCategory(workspaceId, id);
+
+    // 3) soft delete associated budget (if any)
+    const budget = await this.budgetsRepo.getByCategoryId(workspaceId, id);
+    if (budget) {
+      await this.budgetsRepo.softDelete(workspaceId, budget.id);
+    }
   }
 }

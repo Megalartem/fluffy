@@ -15,7 +15,6 @@ import { LIMITS } from "@/shared/constants/limits";
 import { TRANSACTION_TYPES } from "@/shared/constants/transaction";
 import type { Transaction } from "@/features/transactions/model/types";
 import type { Category } from "@/features/categories/model/types";
-import type { MonthlyBudget } from "@/features/budgets/model/types";
 import type { Goal } from "@/features/goals/model/types";
 import type { AppSettings } from "@/features/settings/model/types";
 
@@ -151,64 +150,6 @@ export const categoryValidators = {
 };
 
 /**
- * Budget validators
- */
-export const budgetValidators = {
-  validateSet(data: unknown): ValidationResult<Partial<MonthlyBudget>> {
-    const errors: ValidationError[] = [];
-    const payload = data as Record<string, unknown>;
-
-    // Month
-    if (!payload.month || typeof payload.month !== "string") {
-      errors.push({
-        field: "month",
-        message: "Month is required (format: YYYY-MM)",
-        code: "REQUIRED",
-      });
-    } else if (!/^\d{4}-\d{2}$/.test(payload.month)) {
-      errors.push({
-        field: "month",
-        message: "Month must be in YYYY-MM format",
-        code: "INVALID_FORMAT",
-      });
-    }
-
-    // Amount
-    if (payload.amount === undefined || payload.amount === null) {
-      errors.push({
-        field: "amount",
-        message: "Budget amount is required",
-        code: "REQUIRED",
-      });
-    } else if (typeof payload.amount !== "number") {
-      errors.push({
-        field: "amount",
-        message: "Budget amount must be a number",
-        code: "TYPE_MISMATCH",
-      });
-    } else if (payload.amount < 0) {
-      errors.push({
-        field: "amount",
-        message: "Budget amount cannot be negative",
-        code: "OUT_OF_RANGE",
-      });
-    } else if (payload.amount > LIMITS.MAX_TRANSACTION_AMOUNT) {
-      errors.push({
-        field: "amount",
-        message: `Budget cannot exceed ${LIMITS.MAX_TRANSACTION_AMOUNT}`,
-        code: "OUT_OF_RANGE",
-      });
-    }
-
-    return {
-      valid: errors.length === 0,
-      data: errors.length === 0 ? (payload as Partial<MonthlyBudget>) : undefined,
-      errors,
-    };
-  },
-};
-
-/**
  * Goal validators
  */
 export const goalValidators = {
@@ -300,7 +241,6 @@ export const settingsValidators = {
 export const Validators = {
   transaction: transactionValidators,
   category: categoryValidators,
-  budget: budgetValidators,
   goal: goalValidators,
   settings: settingsValidators,
 };

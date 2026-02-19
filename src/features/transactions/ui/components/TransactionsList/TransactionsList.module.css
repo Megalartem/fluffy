@@ -3,6 +3,14 @@
 .root {
   display: grid;
   gap: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.spacer {
+  height: var(--spacer-height);
+  flex-shrink: 0;
 }
 
 .list {

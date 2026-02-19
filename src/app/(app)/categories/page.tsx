@@ -74,7 +74,7 @@ export default function CategoriesPage() {
     }, [catUpdate]);
 
     return (
-        <div className="flex flex-col min-h-screen bg-bg-main p-4 gap-4">
+        <div className="flex flex-col h-dvh overflow-hidden bg-bg-main p-4 gap-4">
             <div className="flex items-center justify-between">
                 <div className="text-lg font-semibold">Categories</div>
             </div>
@@ -94,9 +94,6 @@ export default function CategoriesPage() {
                 onDelete={handleDelete}
                 onReorder={handleReorder}
             />
-
-            {/* Spacer for FAB */}
-            <div style={{ height: "var(--spacer-height)" }} />
 
             {/* Category Sheet */}
             <CategoryUpsertSheet

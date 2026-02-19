@@ -11,9 +11,7 @@
  */
 
 import { createContext, useContext } from "react";
-import type { Notice } from "@/features/notifications/model/types";
 import type { Goal } from "@/features/goals/model/types";
-import type { BudgetStatus } from "@/features/budgets/model/types";
 
 /**
  * Core application state
@@ -30,9 +28,7 @@ export interface AppState {
       expenseTotal: number;
       incomeTotal: number;
     } | null;
-    budget: BudgetStatus | null;
     goals: Goal[];
-    notices: Notice[];
     loading: boolean;
     error: string | null;
   };
@@ -109,9 +105,7 @@ export const createDefaultAppState = (workspaceId: string): AppState => ({
   dashboard: {
     period: "current",
     summary: null,
-    budget: null,
     goals: [],
-    notices: [],
     loading: true,
     error: null,
   },
