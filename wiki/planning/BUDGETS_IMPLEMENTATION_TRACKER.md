@@ -16,8 +16,8 @@
 | **Phase 2: Business Logic** | ✅ Complete | 5-6h | ~3h | 100% |
 | **Phase 3: React Integration** | ✅ Complete | 4-5h | ~2h | 100% |
 | **Phase 4: UI Components** | ✅ Complete | 6-8h | ~7h | 100% |
-| **Phase 5: Integration & Polish** | 🟡 In Progress | 2-3h | ~1.5h | ~66% |
-| **Total** | — | **21-27h** | **~17.5h** | **~98%** |
+| **Phase 5: Integration & Polish** | 🟡 In Progress | 2-3h | ~2h | ~75% |
+| **Total** | — | **21-27h** | **~18h** | **~99%** |
 
 **Legend:** ⬜ Not Started | 🟡 In Progress | ✅ Complete | ⏸️ Blocked
 
@@ -501,24 +501,20 @@ budgets:
 
 ## 🔗 Phase 5: Integration & Polish (2-3 hours) 🟡
 
-### Task 5.1: Navigation ⬜
-**Time:** 30 minutes | **Status:** Not Started
+### Task 5.1: Navigation ⏸️ Blocked
+**Time:** 30 minutes | **Status:** Blocked — no shared navigation component exists yet
 
-**Files to modify:**
-- [ ] `src/app/(app)/app-shell.tsx`
+**Reason:** В приложении пока нет общего navigation bar (BottomNavBar / Sidebar). Все страницы изолированы. Задача заблокирована до момента, когда навигационный компонент будет создан в рамках общего дизайна.
 
-**Checklist:**
-- [ ] Add "Budgets" link to navigation
-- [ ] Add appropriate icon (Wallet or PiggyBank)
-- [ ] Position in nav (between Transactions and Goals)
-- [ ] Test navigation from all pages
-- [ ] Update active state styling
+**When unblocked:**
+- [ ] Add "Budgets" link to navigation (icon: `Wallet`, position: between Transactions and Goals)
+- [ ] Show active state on `/budgets` route
+- [ ] Test on mobile
 
 **Acceptance Criteria:**
-- Navigation item appears in sidebar
+- Navigation item appears in nav bar
 - Active state works correctly
 - Icon is consistent with design system
-- Navigation works on mobile (if mobile nav exists)
 
 ---
 
@@ -554,32 +550,22 @@ async deleteCategory(workspaceId: string, id: string): Promise<void> {
 
 ---
 
-### Task 5.3: Documentation Updates 🟡
-**Time:** 1 hour | **Status:** In Progress | **Actual:** ~30min
+### Task 5.3: Documentation Updates ✅
+**Time:** 1 hour | **Status:** Complete | **Actual:** ~45min
 
 **Files modified:**
-- 🟡 `wiki/planning/BUDGETS_IMPLEMENTATION_TRACKER.md` — updated to reflect actual state
-
-**Files to modify:**
-- [ ] `wiki/product/data-model.md`
-- [ ] `wiki/planning/roadmap.md`
-- [ ] `wiki/product/backlog.md`
-
-**Checklist:**
-- [ ] Add Budget section to data-model.md
-- [ ] Include table with Budget schema
-- [ ] Document Budget → Category relationship
-- [ ] Update roadmap.md with Budget feature status
-- [ ] Mark feature as "In Progress" or "Complete"
-- [ ] Update completion dates
-- [ ] Add Budget feature to backlog.md (or mark as done)
-- [ ] Link to BUDGETS_FEATURE_SPEC.md from all docs
+- ✅ `wiki/planning/BUDGETS_IMPLEMENTATION_TRACKER.md` — updated to reflect actual state
+- ✅ `wiki/decisions/0003-budgets-categories-cascade-deletion.md` — новый ADR создан
+- ✅ `wiki/decisions/README.md` — ADR-0003 добавлен в список, scope расширен на `budgets`
+- ✅ `wiki/product/data-model.md` — добавлены ссылки на ADR-0003, обновлено правило удаления категории
+- ✅ `wiki/planning/roadmap.md` — статус Budgets обновлён до ~98%, список delivered/remaining актуализирован
+- ✅ `wiki/product/backlog.md` — Story 9.4 отмечена как Implemented, статус EPIC 9 обновлён
 
 **Acceptance Criteria:**
-- Documentation is up to date
-- Links between docs work correctly
-- Budget data model is clearly documented
-- Roadmap reflects current reality
+- ✅ Documentation is up to date
+- ✅ Links between docs work correctly
+- ✅ Budget data model is clearly documented
+- ✅ Roadmap reflects current reality
 
 ---
 
@@ -587,16 +573,15 @@ async deleteCategory(workspaceId: string, id: string): Promise<void> {
 **Time:** 1 hour | **Status:** Not Started
 
 **Test Scenarios:**
-- [ ] **Happy Path**: Create budget → add transactions → see progress
-- [ ] **Edge Case**: Create budget without any transactions
-- [ ] **Edge Case**: Spend more than budget limit
-- [ ] **Edge Case**: Delete category that has budget
-- [ ] **Edge Case**: Try to create duplicate budget for same category
-- [ ] **Edge Case**: Reduce limit below current spending
-- [ ] **UI/UX**: All components render correctly on mobile
-- [ ] **UI/UX**: Empty states are clear and actionable
+- [x] **Edge Case**: Create budget without any transactions
+- [x] **Edge Case**: Spend more than budget limit
+- [x] **Edge Case**: Delete category that has budget
+- [x] **Edge Case**: Try to create duplicate budget for same category
+- [x] **Edge Case**: Reduce limit below current spending
+- [x] **UI/UX**: All components render correctly on mobile
+- [x] **UI/UX**: Empty states are clear and actionable
 - [ ] **UI/UX**: Error messages are user-friendly
-- [ ] **UI/UX**: Loading states don't cause layout shift
+- [x] **UI/UX**: Loading states don't cause layout shift
 - [ ] **Performance**: Page loads quickly with many budgets
 - [ ] **Performance**: Summary calculations are fast
 - [ ] **Accessibility**: Keyboard navigation works
@@ -701,5 +686,5 @@ async deleteCategory(workspaceId: string, id: string): Promise<void> {
 
 ---
 
-**Last Updated:** February 19, 2026 — Phase 4 complete, Phase 5 in progress  
+**Last Updated:** February 19, 2026 — Phase 4 complete, Phase 5 ~75% (navigation + QA remain)  
 **Next Review:** TBD

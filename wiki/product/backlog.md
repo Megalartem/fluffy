@@ -328,15 +328,17 @@ As a user, I want to see my overall budget status across all categories.
 ### Story 9.4 — Identify Unbudgeted Spending
 
 **Priority:** P1  
-**Status:** � In Progress  
+**Status:** ✅ Implemented  
 **Description:**  
 As a user, I want to see expenses that aren't covered by any budget.
 
 **AC:**
-- ⬜ categories without budgets listed (section on /budgets page not yet built)
-- ⬜ spent amount shown for each
-- ⬜ CTA to "Set budget" for each category
+- ✅ categories without budgets listed in collapsible section on /budgets page
+- ✅ spent amount shown for each
+- ✅ CTA to "Set budget" — tapping pre-selects category in form
 - ✅ total unbudgeted amount shown in TotalBudgetCard (if > 0)
+- ✅ animated open/close (framer-motion)
+- ✅ FAB hidden when all categories already have budgets
 
 ---
 

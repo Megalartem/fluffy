@@ -306,7 +306,7 @@
 ## Next Features (Post-Phase 5)
 
 ### Budgets Feature (MVP)
-**Status:** � In Progress (~88%) | **Estimate:** 20-24 hours | **Actual:** ~16h
+**Status:** 🟡 In Progress (~99%) | **Estimate:** 20-24 hours | **Actual:** ~18h
 
 **Overview:**
 Category-based budgeting with computed overall budget, unbudgeted spend tracking, and progress monitoring.
@@ -314,18 +314,21 @@ Category-based budgeting with computed overall budget, unbudgeted spend tracking
 **Delivered:**
 - ✅ Budget data model, Dexie schema (v9), repository
 - ✅ BudgetsService + BudgetSummaryService with full calculations
-- ✅ React hooks (useBudgets, useBudgetSummary, useBudgetMutation, etc.)
+- ✅ React hooks (useBudgets, useBudgetSummary, useBudgetMutation, useCategoriesWithoutBudget, etc.)
 - ✅ UI: BudgetItem molecule, TotalBudgetCard, BudgetList, BudgetUpsertSheet
-- ✅ /budgets page (list, empty state, error state, loading skeleton)
+- ✅ CategoriesWithoutBudgetSection (collapsible, framer-motion animation)
+- ✅ /budgets page (list, empty state, error state, loading skeleton, FAB visibility logic)
+- ✅ Cascade budget soft-delete on category deletion (ADR-0003)
+- ✅ ADR-0003 documented
 
-**Remaining:**
-- ⬜ "Categories Without Budget" section on /budgets page
+**Remaining (~1%):**
 - ⬜ Navigation entry in app-shell
-- ⬜ Soft-delete budget when category is deleted
+- ⬜ QA / mobile testing
 
 **Documentation:**
 - [Budgets Feature Spec](BUDGETS_FEATURE_SPEC.md)
 - [Implementation Tracker](BUDGETS_IMPLEMENTATION_TRACKER.md)
+- [ADR-0003: Budgets ↔ Categories](../decisions/0003-budgets-categories-cascade-deletion.md)
 
 ---
 
