@@ -318,6 +318,7 @@ export function TransactionsList({
                     )}
                 </div>
             )}
+            <div className={styles.spacer} />
         </div>
     );
 }
