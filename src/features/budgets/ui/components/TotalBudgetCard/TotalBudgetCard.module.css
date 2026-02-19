@@ -58,8 +58,3 @@
     color: var(--color-text-secondary);
     opacity: 0.4;
 }
-
-.overText {
-    color: var(--color-error);
-    font-weight: var(--font-weight-semibold);
-}

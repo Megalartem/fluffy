@@ -64,7 +64,7 @@ export function TotalBudgetCard({ summary, currency, className }: TotalBudgetCar
                 subtitle={
                     <div className={styles.meta}>
                         <Text variant="caption">Remaining{" "}</Text>
-                        <Text variant="caption" className={clsx(styles.metaValue, isOver && styles.overText)}>
+                        <Text variant="caption" className={styles.metaValue}>
                             {isOver
                                 ? `Over by ${shownAmount(-remaining, currency)}`
                                 : shownAmount(remaining, currency)}
