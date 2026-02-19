@@ -60,6 +60,11 @@ function getBudgetBadge(summary: CategoryBudgetSummary): { variant: "default" | 
         const label = `over by ${shownAmount(-getBudgetRemaining(summary), summary.budget.currency)}`;
         return { variant: "success", label: label };
     }
+
+    if (getBudgetRemaining(summary) === 0) {
+        return { variant: "default", label: "at limit" };
+    }
+
     if (isBudgetWarning(summary)) {
         const label = `${shownAmount(getBudgetRemaining(summary), summary.budget.currency)} left`;
         return { variant: "default", label: label };
