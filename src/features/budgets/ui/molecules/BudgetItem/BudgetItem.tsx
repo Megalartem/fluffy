@@ -55,6 +55,19 @@ function clamp01(x: number) {
     return Math.max(0, Math.min(1, x));
 }
 
+function getBudgetStatusDescription(summary: CategoryBudgetSummary): string {
+    if (isBudgetOverLimit(summary)) {
+        return `over budget by ${shownAmount(-getBudgetRemaining(summary), summary.budget.currency)}`;
+    }
+    if (getBudgetRemaining(summary) === 0) {
+        return "at limit";
+    }
+    if (isBudgetWarning(summary)) {
+        return `near limit, ${shownAmount(getBudgetRemaining(summary), summary.budget.currency)} remaining`;
+    }
+    return `${shownAmount(getBudgetRemaining(summary), summary.budget.currency)} remaining`;
+}
+
 function getBudgetBadge(summary: CategoryBudgetSummary): { variant: "default" | "success"; label: string } | null {
     if (isBudgetOverLimit(summary)) {
         const label = `over by ${shownAmount(-getBudgetRemaining(summary), summary.budget.currency)}`;
@@ -101,10 +114,13 @@ export function BudgetItem({
         },
     ];
 
+    const statusDescription = getBudgetStatusDescription(budgetSummary);
+    const accessibleLabel = `${category.name}: ${shownAmount(budgetSummary.spentMinor, budget.currency)} spent of ${shownAmount(budget.limitMinor, budget.currency)} limit, ${statusDescription}`;
+
     return (
         <div className={styles.wrapper}>
             {budgetBadge && (
-                <Badge variant={budgetBadge.variant} className={styles.statusBadge}>
+                <Badge variant={budgetBadge.variant} className={styles.statusBadge} aria-hidden="true">
                     {budgetBadge.label}
                 </Badge>
             )}
@@ -129,7 +145,7 @@ export function BudgetItem({
                 trailing={
                     <div className={styles.trailing}>
                         <ActionMenu
-                            ariaLabel="Budget actions"
+                            ariaLabel={`Actions for ${category.name} budget`}
                             items={actions}
                             triggerButtonBody={<></>}
                             triggerClassName={styles.actionMenuTrigger}
@@ -144,7 +160,7 @@ export function BudgetItem({
                 onClick={onClick}
                 onLongPress={() => setIsActionsMenuOpen(true)}
                 className={direction === "column" ? styles.column : undefined}
-                ariaLabel={`Open budget: ${category.name}`}
+                ariaLabel={accessibleLabel}
             />
         </div>
     );

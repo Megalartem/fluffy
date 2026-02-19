@@ -50,11 +50,16 @@ export function BudgetList({
 	return (
 		<div className={clsx(styles.root, className)}>
 			<LayoutGroup>
-				<div className={styles.list}>
+				<div
+					className={styles.list}
+					role="list"
+					aria-label="Category budgets"
+				>
 					<AnimatePresence initial={false} mode="popLayout">
 						{sortedItems.map((item) => (
 							<motion.div
 								key={item.budget.id}
+								role="listitem"
 								layout="position"
 								transition={{ type: "spring", stiffness: 420, damping: 36, mass: 0.9 }}
 							>

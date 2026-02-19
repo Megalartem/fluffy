@@ -43,7 +43,34 @@ export class BudgetSummaryService {
   ) {}
 
   /**
-   * Calculate spent amount for a category in a given month
+   * Fetch all expense transactions for a month and build a Map<categoryId, totalSpentMinor>.
+   * Use this internally for bulk operations to avoid N+1 DB queries.
+   */
+  private async buildSpendingMap(
+    workspaceId: string,
+    month?: string
+  ): Promise<{ map: Map<string, number>; totalMinor: number }> {
+    const { from, to } = getMonthRange(month);
+    const allExpenses = await this.transactionsRepo.list(workspaceId, {
+      type: "expense",
+      from,
+      to,
+    });
+
+    const map = new Map<string, number>();
+    let totalMinor = 0;
+    for (const tx of allExpenses) {
+      totalMinor += tx.amountMinor;
+      if (tx.categoryId) {
+        map.set(tx.categoryId, (map.get(tx.categoryId) ?? 0) + tx.amountMinor);
+      }
+    }
+    return { map, totalMinor };
+  }
+
+  /**
+   * Calculate spent amount for a category in a given month.
+   * For single-category look-ups (e.g. useCategoryBudgetSummary).
    * 
    * Formula: sum(transaction.amountMinor) where:
    * - transaction.type = "expense"
@@ -92,8 +119,11 @@ export class BudgetSummaryService {
   }
 
   /**
-   * Get total budget summary for all categories
-   * 
+   * Get total budget summary for all categories.
+   *
+   * Fetches all expense transactions for the month in a single query, then
+   * computes per-category spend in memory — eliminating N+1 DB round-trips.
+   *
    * Includes:
    * - Total limit (sum of all budget limits)
    * - Total spent (sum of spent in budgeted categories)
@@ -105,18 +135,14 @@ export class BudgetSummaryService {
     workspaceId: string,
     month?: string
   ): Promise<TotalBudgetSummary> {
-    const budgets = await this.budgetsService.list(workspaceId);
-    
-    // If no budgets, return empty state
-    if (budgets.length === 0) {
-      const { from, to } = getMonthRange(month);
-      const allExpenses = await this.transactionsRepo.list(workspaceId, {
-        type: "expense",
-        from,
-        to,
-      });
-      const totalExpenseMinor = allExpenses.reduce((sum, tx) => sum + tx.amountMinor, 0);
+    // Single DB round-trip for all expenses this month
+    const { map: spendingMap, totalMinor: totalExpenseMinor } =
+      await this.buildSpendingMap(workspaceId, month);
 
+    const budgets = await this.budgetsService.list(workspaceId);
+
+    // If no budgets, everything is unbudgeted
+    if (budgets.length === 0) {
       return {
         totalLimitMinor: 0,
         totalSpentMinor: 0,
@@ -125,34 +151,26 @@ export class BudgetSummaryService {
       };
     }
 
-    // Calculate per-category summaries
+    // Resolve categories for all budgets in parallel
+    const categoryEntries = await Promise.all(
+      budgets.map((b) => this.categoriesRepo.getById(workspaceId, b.categoryId))
+    );
+
     const categoryBudgets: CategoryBudgetSummary[] = [];
     let totalLimitMinor = 0;
     let totalSpentMinor = 0;
 
-    for (const budget of budgets) {
-      const summary = await this.getCategoryBudgetSummary(
-        workspaceId,
-        budget.categoryId,
-        month
-      );
-      
-      if (summary) {
-        categoryBudgets.push(summary);
-        totalLimitMinor += budget.limitMinor;
-        totalSpentMinor += summary.spentMinor;
-      }
+    for (let i = 0; i < budgets.length; i++) {
+      const budget = budgets[i];
+      const category = categoryEntries[i];
+      if (!category) continue;
+
+      const spentMinor = spendingMap.get(budget.categoryId) ?? 0;
+      categoryBudgets.push({ budget, category, spentMinor });
+      totalLimitMinor += budget.limitMinor;
+      totalSpentMinor += spentMinor;
     }
 
-    // Calculate unbudgeted spending
-    const { from, to } = getMonthRange(month);
-    const allExpenses = await this.transactionsRepo.list(workspaceId, {
-      type: "expense",
-      from,
-      to,
-    });
-
-    const totalExpenseMinor = allExpenses.reduce((sum, tx) => sum + tx.amountMinor, 0);
     const unbudgetedMinor = Math.max(0, totalExpenseMinor - totalSpentMinor);
 
     return {
@@ -164,29 +182,30 @@ export class BudgetSummaryService {
   }
 
   /**
-   * Get categories that have spending but no budget
-   * Useful for suggesting budget creation
+   * Get categories that have spending but no budget.
+   * Useful for suggesting budget creation.
+   *
+   * Uses a single transaction fetch shared with the spending map for efficiency.
    */
   async getCategoriesWithoutBudget(
     workspaceId: string,
     month?: string
   ): Promise<Array<{ category: Category; spentMinor: number }>> {
-    // Get all expense categories
-    const allCategories = await this.categoriesRepo.list(workspaceId);
-    const expenseCategories = allCategories.filter(cat => cat.type === "expense");
+    // Fetch all data in parallel
+    const [allCategories, budgets, { map: spendingMap }] = await Promise.all([
+      this.categoriesRepo.list(workspaceId),
+      this.budgetsService.list(workspaceId),
+      this.buildSpendingMap(workspaceId, month),
+    ]);
 
-    // Get all budgets
-    const budgets = await this.budgetsService.list(workspaceId);
-    const budgetedCategoryIds = new Set(budgets.map(b => b.categoryId));
+    const expenseCategories = allCategories.filter((cat) => cat.type === "expense");
+    const budgetedCategoryIds = new Set(budgets.map((b) => b.categoryId));
 
-    // Find categories without budgets that have spending
     const result: Array<{ category: Category; spentMinor: number }> = [];
 
     for (const category of expenseCategories) {
       if (budgetedCategoryIds.has(category.id)) continue;
-
-      const spentMinor = await this.getCategorySpent(workspaceId, category.id, month);
-      
+      const spentMinor = spendingMap.get(category.id) ?? 0;
       if (spentMinor > 0) {
         result.push({ category, spentMinor });
       }

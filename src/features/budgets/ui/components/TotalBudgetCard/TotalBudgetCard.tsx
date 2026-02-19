@@ -33,8 +33,12 @@ export function TotalBudgetCard({ summary, currency, className }: TotalBudgetCar
     const progressPct = Math.min(100, Math.round(rawProgress * 100));
     const isOver = state === "over";
 
+    const sectionLabel = isOver
+        ? `Total budget: ${shownAmount(summary.totalSpentMinor, currency)} of ${shownAmount(summary.totalLimitMinor, currency)} spent, over by ${shownAmount(-remaining, currency)}`
+        : `Total budget: ${shownAmount(summary.totalSpentMinor, currency)} of ${shownAmount(summary.totalLimitMinor, currency)} spent, ${shownAmount(remaining, currency)} remaining`;
+
     return (
-        <div className={clsx(styles.wrapper, className)}>
+        <section aria-label={sectionLabel} className={clsx(styles.wrapper, className)}>
             <ListRowBase
                 className={styles.column}
                 size="l"
@@ -67,7 +71,7 @@ export function TotalBudgetCard({ summary, currency, className }: TotalBudgetCar
                         </Text>
                         {summary.unbudgetedMinor > 0 && (
                             <>
-                                <Text variant="caption" className={styles.dot}>{"·"}</Text>
+                                <Text variant="caption" className={styles.dot} aria-hidden="true">{"·"}</Text>
                                 <Text variant="caption">{"Outside budgets "}</Text>
                                 <Text variant="caption" className={styles.metaValue}>
                                     {shownAmount(summary.unbudgetedMinor, currency)}
@@ -77,7 +81,7 @@ export function TotalBudgetCard({ summary, currency, className }: TotalBudgetCar
                     </div>
                 }
             />
-        </div>
+        </section>
     );
 }
 
