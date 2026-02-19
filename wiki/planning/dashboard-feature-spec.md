@@ -9,23 +9,24 @@ Dashboard — Feature Specification (Canvas)
 0) Анализ текущей реализации (февраль 2026)
 
 Что уже есть в коде:
-- Transaction: модель реализована (`expense | income | transfer`), repo + service + hooks — рабочие
+- Transaction: модель реализована (`expense | income | transfer`), repo + service + hooks — рабочие; `TransactionListQuery` содержит `from`/`to` date-range
 - Goal + GoalContribution: модель реализована, `currentAmountMinor` на Goal, contributions как отдельные записи
-- Category: модель реализована, без поля бюджетного лимита
+- Category: модель реализована
+- Budget: реализована как отдельный entity (`features/budgets/`); есть `Budget`, `TotalBudgetSummary`, `CategoryBudgetSummary`, `useBudgetSummary(month?)`
 - Settings: `defaultCurrency`, `locale` на `workspaceId`
-- App routes: `/(app)/transactions`, `/(app)/goals`, `/(app)/categories` — рабочие
+- App routes: `/(app)/transactions`, `/(app)/goals`, `/(app)/categories`, `/(app)/budgets` — рабочие
 
 Что ОТСУТСТВУЕТ и нужно для Dashboard:
 
 | Зависимость | Статус | Комментарий |
 |---|---|---|
 | Роут `/dashboard` | ❌ не создан | Нужен новый page под `/(app)/dashboard/page.tsx` |
-| Budget data model | ❌ не существует | `Category` не имеет `budgetLimitMinor`; нет отдельной Budget-сущности |
-| Роут `/budgets` | ❌ не создан | На него ссылается Budgets Summary Widget |
-| `repo.list()` date-range фильтр | ❌ отсутствует | TransactionsRepo.list принимает только `type` + `limit`; нет фильтрации по `dateKey` |
-| Навигация в app-shell | ⚠️ не настроена | Dashboard не включён в nav |
+| Budget data model | ✅ реализовано | Отдельный `Budget` entity в `features/budgets/` |
+| Роут `/budgets` | ✅ существует | `/(app)/budgets/page.tsx` работает |
+| `repo.list()` date-range фильтр | ✅ реализовано | `TransactionListQuery` содержит `from` и `to` |
+| Навигация в app-shell | ⚠️ не настроена | Dashboard и Budgets не числятся в nav |
 
-Вывод: перед Phase 1 необходимо решить судьбу Budgets Widget (вынести в Phase 2 или ввести бюджет как feature), создать роут и добавить date-range query в репозиторий транзакций.
+Вывод: все pre-requisites закрыты, кроме навигации и роута `/dashboard`. Можно начинать разработку Phase 1.
 
 ⸻
 
@@ -76,10 +77,7 @@ Phase 2 — Dashboard v2 (конструктор: move/resize + управлен
 Виджеты (минимальный набор):
 	1.	Period Summary (Income / Expense / Net)
 	2.	Budgets Summary (overall progress + remaining + outside budgets, если > 0)
-		⚠️ Зависимость: требует новой Budget-фичи (см. раздел 14). Варианты:
-			(a) добавить `budgetLimitMinor` на Category и считать бюджеты через категории — минимальный путь
-			(b) сделать отдельный Budget entity — более гибко, но дольше
-			Рекомендация: вариант (a) для Phase 1, вариант (b) в backlog
+		— использует `useBudgetSummary(month)` из `features/budgets`; `/budgets` роут уже существует
 	3.	Top Categories (top-3 categories by spend)
 	4.	Goals Preview (1–3 активные цели + быстрый CTA)
 
@@ -159,20 +157,20 @@ On click:
 
 6.2 Budgets Summary Widget
 
-⚠️ Зависимость: требует Budget-фичи (см. раздел 14).
+Использует `useBudgetSummary(month)` из `features/budgets/hooks`. Данные: `TotalBudgetSummary`.
 
 Показывает:
-	•	spent / limit (только по категориям с `budgetLimitMinor > 0`)
+	•	spent / limit (только по категориям с `limitMinor > 0`)
 	•	progress ring/bar
 	•	remaining
 	•	Outside budgets count (если > 0)
+	•	Unbudgeted (если `unbudgetedMinor > 0`)
 
 Empty state:
-	•	Если ни одна категория не имеет бюджета → "No budgets yet" + CTA к настройкам категорий
+	•	Если ни одного бюджета → "No budgets yet" + CTA к `/budgets`
 
 On click:
-	•	/categories?tab=budgets (Phase 1, если бюджеты — поле категории)
-		или /budgets (если будет отдельный роут — Phase 2+)
+	•	/budgets
 
 Secondary (опционально):
 	•	View outside → /transactions?period=<p>&scope=outsideBudgets&type=expense
@@ -235,19 +233,20 @@ Phase 2 filters (адекватная фильтрация)
 
 8.0 Требования к репозиторию (pre-requisites для Dashboard)
 
-`TransactionsRepo.list()` в текущей реализации принимает только `{ type, limit }`. Для Dashboard требуется:
+`TransactionsRepo.list()` уже поддерживает date-range через `TransactionListQuery`:
 
 ```typescript
-// Необходимо добавить:
-type TransactionListOptions = {
+// Уже реализовано:
+type TransactionListQuery = {
   type?: TransactionType;
   limit?: number;
-  dateKeyFrom?: string; // YYYY-MM-DD, включительно
-  dateKeyTo?: string;   // YYYY-MM-DD, включительно
+  from?: string;  // YYYY-MM-DD, включительно (dateKey >=)
+  to?: string;    // YYYY-MM-DD, включительно (dateKey <=)
+  categoryId?: string | null;
 };
 ```
 
-Это обязательно для корректной фильтрации по периоду (month / lastMonth). Без этого агрегация невозможна без загрузки всей истории транзакций.
+Dashboard-хуки используют поля `from` / `to` при вызове `repo.list()`.
 
 8.1 Принципы
 	•	не хранить computed totals в базе
@@ -324,10 +323,10 @@ features/
     model/
       types.ts              ← DashboardPeriod, DashboardFilters, DashboardSummary DTO
     hooks/
-      usePeriodSummary.ts   ← агрегация из TransactionsRepo по dateKeyFrom/dateKeyTo
-      useTopCategories.ts   ← агрегация расходов + join с CategoryRepo
-      useGoalsPreview.ts    ← обёртка над useGoals({ status: 'active' }), берёт top-N
-      useBudgetsSummary.ts  ← (когда Budget-фича появится)
+      usePeriodSummary.ts    ← агрегация из TransactionsRepo по from/to
+      useTopCategories.ts    ← агрегация расходов + join с CategoryRepo
+      useGoalsPreview.ts     ← обёртка над useGoals({ status: 'active' }), берёт top-N
+      useBudgetsSummary.ts   ← обёртка над useBudgetSummary(month) из features/budgets
       useDashboardFilters.ts ← чтение/запись period в URL search params
     ui/
       widgets/
@@ -358,7 +357,7 @@ features/
 
 ```
 usePeriodSummary
-  └─ вызывает TransactionsRepo.list({ dateKeyFrom, dateKeyTo })
+  └─ вызывает TransactionsRepo.list({ from, to })
   └─ агрегирует на клиенте (filter by type, sum amountMinor, exclude transfer)
 
 useGoalsPreview
@@ -366,9 +365,13 @@ useGoalsPreview
   └─ берёт slice [:3], считает progress
 
 useTopCategories
-  └─ вызывает TransactionsRepo.list({ type: 'expense', dateKeyFrom, dateKeyTo })
+  └─ вызывает TransactionsRepo.list({ type: 'expense', from, to })
   └─ группирует по categoryId, сортирует, берёт top-3
   └─ join с categories для name/color/icon
+
+useBudgetsSummary
+  └─ вызывает useBudgetSummary(month) из features/budgets/hooks
+  └─ преобразует TotalBudgetSummary → DashboardSummary.budgets
 ```
 
 9.4 Page
@@ -461,22 +464,19 @@ Phase 2 DoD
 14) Открытые вопросы
 	•	Нужен ли custom range в Phase 1.1 или сразу в Phase 2?
 	•	Какие виджеты будут первыми кандидатами на расширение (например, “Cashflow”, “Upcoming bills”)?
-	•	Политика mobile layout editor: drag vs кнопки “up/down”.	•	[Новый] Budgets в Phase 1: добавить `budgetLimitMinor` на `Category` или defer Budgets Widget полностью в Phase 2?
-	•	[Новый] Multi-currency: явно исключать non-default валюты в Phase 1 или блокировать агрегацию и показывать "mixed currencies" заглушку?
-	•	[Новый] Стартовый экран: переключить root `/` redirect на `/dashboard` вместо текущего boilerplate?
-	•	[Новый] `transfer` транзакции: только исключать из totals или показывать отдельной строкой в Period Summary?
+	•	Политика mobile layout editor: drag vs кнопки "up/down".
+	•	Multi-currency: явно исключать non-default валюты в Phase 1 или показывать "mixed currencies" заглушку?
+	•	`transfer` транзакции: только исключать из totals или показывать отдельной строкой в Period Summary?
 
 ⸻
 
 15) Pre-requisites & зависимости реализации
 
-Перед началом разработки Dashboard Phase 1 необходимо закрыть:
-
-| Задача | Приоритет | Примечание |
+| Задача | Приоритет | Статус |
 |---|---|---|
-| Добавить `dateKeyFrom` / `dateKeyTo` в `TransactionsRepo.list()` | Обязательно | Без этого нельзя фильтровать по периоду |
-| Создать `/(app)/dashboard/page.tsx` | Обязательно | Роут не существует |
-| Добавить Dashboard в app-shell навигацию | Обязательно | — |
-| Решить судьбу Budget-фичи (поле на Category или skip) | Обязательно | Влияет на состав Phase 1 виджетов |
-| Добавить `/(app)/categories?tab=budgets` или `/budgets` | Условно | Нужен только если Budgets Widget в Phase 1 |
-| Redirect `/` → `/dashboard` | Желательно | UX точка входа |
+| `TransactionListQuery` с `from`/`to` | Обязательно | ✅ Готово |
+| Budget feature — отдельный entity | Обязательно | ✅ Готово (`features/budgets/`) |
+| Роут `/budgets` | Обязательно | ✅ Готово |
+| Создать `/(app)/dashboard/page.tsx` | Обязательно | ❌ Не начато |
+| Добавить Dashboard + Budgets в app-shell навигацию | Обязательно | ❌ Не начато |
+| Redirect `/` → `/dashboard` | Желательно | ❌ Не начато |
