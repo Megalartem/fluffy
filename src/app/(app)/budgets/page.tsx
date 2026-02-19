@@ -108,6 +108,7 @@ export default function BudgetsPage() {
                     <BudgetList
                         items={summary?.categoryBudgets ?? []}
                         onItemEdit={handleEdit}
+                        onItemClick={handleEdit}
                         onItemDelete={(item) => handleDelete(item.budget)}
                         footer={
                             <CategoriesWithoutBudgetSection
