@@ -7,7 +7,7 @@ import { BudgetList, BudgetUpsertSheet, TotalBudgetCard } from "@/features/budge
 import { useBudgetSummary } from "@/features/budgets/hooks/useBudgetSummary";
 import { useBudgetMutation } from "@/features/budgets/hooks/useBudgetMutation";
 import { FAB } from "@/shared/ui/atoms";
-import { EmptyState, PageHeader, Skeleton } from "@/shared/ui/molecules";
+import { ConfirmDialog, EmptyState, PageHeader, Skeleton } from "@/shared/ui/molecules";
 import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import type { Budget, CategoryBudgetSummary, CreateBudgetInput, UpdateBudgetInput } from "@/features/budgets/model/types";
 
@@ -19,6 +19,7 @@ export default function BudgetsPage() {
     const { budgetCreate, budgetUpdate, budgetDelete } = useBudgetMutation({ refresh });
 
     const [editingBudget, setEditingBudget] = useState<Budget | undefined>();
+    const [deletingBudget, setDeletingBudget] = useState<Budget | undefined>();
     const [currentSpentMinor, setCurrentSpentMinor] = useState<number | undefined>();
     const [isCreating, setIsCreating] = useState(false);
 
@@ -43,10 +44,14 @@ export default function BudgetsPage() {
         handleCloseSheet();
     }, [budgetUpdate, handleCloseSheet]);
 
-    const handleDelete = useCallback(async (budget: Budget) => {
+    const handleDelete = useCallback((budget: Budget) => {
+        setDeletingBudget(budget);
+    }, []);
+
+    const handleConfirmDelete = useCallback(async (budget: Budget) => {
         await budgetDelete(budget.id);
-        handleCloseSheet();
-    }, [budgetDelete, handleCloseSheet]);
+        setDeletingBudget(undefined);
+    }, [budgetDelete]);
 
     const handleCreateNew = useCallback(() => {
         setEditingBudget(undefined);
@@ -94,6 +99,12 @@ export default function BudgetsPage() {
                 </>
             )}
 
+            <FAB
+                aria-label="Create Budget"
+                icon={Plus}
+                onClick={handleCreateNew}
+            />
+
             <BudgetUpsertSheet
                 open={isSheetOpen}
                 budget={editingBudget}
@@ -101,16 +112,22 @@ export default function BudgetsPage() {
                 onClose={handleCloseSheet}
                 onCreate={handleCreate}
                 onUpdate={handleUpdate}
-                onDelete={handleDelete}
+                onDelete={isCreating ? undefined : () => handleDelete(editingBudget!)}
             />
 
-            <FAB
-                aria-label="Create Budget"
-                icon={Plus}
-                onClick={handleCreateNew}
+            <ConfirmDialog
+                title="Delete Budget?"
+                description="Are you sure you want to delete this budget? This action cannot be undone."
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                open={deletingBudget !== undefined}
+                onConfirm={async () => {
+                    if (deletingBudget) {
+                        await handleConfirmDelete(deletingBudget);
+                    }
+                }}
+                onCancel={() => setDeletingBudget(undefined)}
             />
         </div>
     );
 }
-
-

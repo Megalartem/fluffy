@@ -1,9 +1,8 @@
 "use client";
 
-import React from "react";
 import clsx from "clsx";
 import { ListRowBase } from "@/shared/ui/molecules";
-import { Badge, ProgressRing, Text } from "@/shared/ui/atoms";
+import { ProgressRing, Text } from "@/shared/ui/atoms";
 import { shownAmount } from "@/shared/lib/money/helper";
 import {
     getTotalBudgetProgress,
@@ -36,9 +35,6 @@ export function TotalBudgetCard({ summary, currency, className }: TotalBudgetCar
 
     return (
         <div className={clsx(styles.wrapper, className)}>
-            <Badge className={clsx(styles.badge)}>
-                {progressPct}% Used
-            </Badge>
             <ListRowBase
                 className={styles.column}
                 size="l"
@@ -72,7 +68,7 @@ export function TotalBudgetCard({ summary, currency, className }: TotalBudgetCar
                         {summary.unbudgetedMinor > 0 && (
                             <>
                                 <Text variant="caption" className={styles.dot}>{"·"}</Text>
-                                <Text variant="caption">{"Unbudgeted "}</Text>
+                                <Text variant="caption">{"Outside budgets "}</Text>
                                 <Text variant="caption" className={styles.metaValue}>
                                     {shownAmount(summary.unbudgetedMinor, currency)}
                                 </Text>
