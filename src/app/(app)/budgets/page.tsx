@@ -19,7 +19,7 @@ export default function BudgetsPage() {
     const { currency } = useWorkspace();
     const { summary, loading, error, refresh } = useBudgetSummary();
     const { budgetCreate, budgetUpdate, budgetDelete } = useBudgetMutation({ refresh });
-    const { categories: unbudgetedCategories, refresh: refreshUnbudgeted } = useCategoriesWithoutBudget();
+    const { categories: unbudgetedCategories, loading: loadingUnbudgeted, refresh: refreshUnbudgeted } = useCategoriesWithoutBudget();
 
     const [editingBudget, setEditingBudget] = useState<Budget | undefined>();
     const [deletingBudget, setDeletingBudget] = useState<Budget | undefined>();
@@ -121,11 +121,13 @@ export default function BudgetsPage() {
                 </>
             )}
 
-            <FAB
-                aria-label="Create Budget"
-                icon={Plus}
-                onClick={handleCreateNew}
-            />
+            {(loadingUnbudgeted || unbudgetedCategories.length > 0) && (
+                <FAB
+                    aria-label="Create Budget"
+                    icon={Plus}
+                    onClick={handleCreateNew}
+                />
+            )}
 
             <BudgetUpsertSheet
                 open={isSheetOpen}
