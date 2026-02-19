@@ -3,16 +3,18 @@
 import { useState, useCallback } from "react";
 import { Plus } from "lucide-react";
 
-import { BudgetList, BudgetUpsertSheet } from "@/features/budgets/ui/components";
+import { BudgetList, BudgetUpsertSheet, TotalBudgetCard } from "@/features/budgets/ui/components";
 import { useBudgetSummary } from "@/features/budgets/hooks/useBudgetSummary";
 import { useBudgetMutation } from "@/features/budgets/hooks/useBudgetMutation";
 import { FAB } from "@/shared/ui/atoms";
 import { EmptyState, PageHeader, Skeleton } from "@/shared/ui/molecules";
+import { useWorkspace } from "@/shared/config/WorkspaceProvider";
 import type { Budget, CategoryBudgetSummary, CreateBudgetInput, UpdateBudgetInput } from "@/features/budgets/model/types";
 
 const SKELETON_COUNT = 5;
 
 export default function BudgetsPage() {
+    const { currency } = useWorkspace();
     const { summary, loading, error, refresh } = useBudgetSummary();
     const { budgetCreate, budgetUpdate, budgetDelete } = useBudgetMutation({ refresh });
 
@@ -80,11 +82,16 @@ export default function BudgetsPage() {
                     primaryAction={{ label: "Create Budget", onClick: handleCreateNew }}
                 />
             ) : (
-                <BudgetList
-                    items={summary?.categoryBudgets ?? []}
-                    onItemEdit={handleEdit}
-                    onItemDelete={(item) => handleDelete(item.budget)}
-                />
+                <>
+                    {summary && (
+                        <TotalBudgetCard summary={summary} currency={currency} />
+                    )}
+                    <BudgetList
+                        items={summary?.categoryBudgets ?? []}
+                        onItemEdit={handleEdit}
+                        onItemDelete={(item) => handleDelete(item.budget)}
+                    />
+                </>
             )}
 
             <BudgetUpsertSheet
