@@ -91,6 +91,7 @@ export function BudgetItem({
             id: "delete",
             icon: Trash2,
             label: "Delete",
+            variant: "danger",
             onAction: onDelete,
         },
     ];
